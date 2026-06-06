@@ -1,0 +1,457 @@
+/* MenuItem.css - Professional Menu Card with CSS Variables */
+
+.menu-item-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--ion-card-background);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  border: 1px solid var(--ion-border-color);
+  height: 100%;
+}
+
+.menu-item-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
+  border-color: var(--ion-color-primary);
+}
+
+.menu-item-card:active {
+  transform: translateY(-2px);
+}
+
+/* ==================== IMAGE SECTION ==================== */
+.menu-item-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  background: var(--ion-background-color);
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+}
+
+.menu-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.menu-item-card:hover .menu-item-image {
+  transform: scale(1.08);
+}
+
+/* Overlay on Image */
+.menu-item-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.menu-item-card:hover .menu-item-overlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.15));
+}
+
+/* ==================== POPULAR BADGE ==================== */
+.menu-item-popular-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--ion-color-primary);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  text-transform: uppercase;
+  animation: popInAnimation 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+
+.popular-icon {
+  font-size: 12px;
+  line-height: 1;
+  color: white !important;
+}
+
+@keyframes popInAnimation {
+  0% {
+    transform: scale(0.5) rotate(-180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+/* ==================== CONTENT SECTION ==================== */
+.menu-item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+  justify-content: space-between;
+}
+
+/* Header with Name and Description */
+.menu-item-header {
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.menu-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.menu-item-description {
+  margin: 6px 0 0 0;
+  font-size: 12px;
+  color: var(--ion-text-color-secondary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ==================== FOOTER SECTION ==================== */
+.menu-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ion-border-color);
+}
+
+.menu-item-price-section {
+  flex: 1;
+}
+
+.menu-item-price {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  letter-spacing: -0.3px;
+}
+
+/* ==================== ADD BUTTON ==================== */
+.menu-item-add-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  --box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-item-add-button:hover {
+  --box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+  transform: scale(1.05);
+}
+
+.menu-item-add-button:active {
+  transform: scale(0.9);
+}
+
+.add-icon {
+  font-size: 20px;
+  color: white;
+  line-height: 1;
+}
+
+/* ==================== QUANTITY BADGE ==================== */
+.menu-item-quantity-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1.5px solid var(--ion-color-primary);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ion-color-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: slideInAnimation 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.quantity-check-icon {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ion-color-primary) !important;
+  font-weight: 700;
+}
+
+.quantity-count {
+  line-height: 1;
+  color: var(--ion-color-primary) !important;
+  font-weight: 700;
+}
+
+@keyframes slideInAnimation {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablets (min 768px) */
+@media (min-width: 768px) {
+  .menu-item-card {
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu-item-card:hover {
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+  }
+
+  .menu-item-image-wrapper {
+    aspect-ratio: 4 / 3;
+  }
+
+  .menu-item-content {
+    padding: 20px;
+  }
+
+  .menu-item-name {
+    font-size: 16px;
+  }
+
+  .menu-item-description {
+    font-size: 13px;
+  }
+
+  .menu-item-price {
+    font-size: 18px;
+  }
+
+  .menu-item-add-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .add-icon {
+    font-size: 22px;
+  }
+}
+
+/* Large Tablets (min 1024px) */
+@media (min-width: 1024px) {
+  .menu-item-card {
+    border-radius: 20px;
+  }
+
+  .menu-item-content {
+    padding: 20px;
+  }
+
+  .menu-item-name {
+    font-size: 17px;
+    margin-bottom: 8px;
+  }
+
+  .menu-item-description {
+    font-size: 13px;
+  }
+
+  .menu-item-footer {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* Small Phones (max 480px) */
+@media (max-width: 480px) {
+  .menu-item-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .menu-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu-item-image-wrapper {
+    aspect-ratio: 16 / 10;
+  }
+
+  .menu-item-content {
+    padding: 12px;
+  }
+
+  .menu-item-name {
+    font-size: 14px;
+  }
+
+  .menu-item-description {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .menu-item-footer {
+    gap: 8px;
+    padding-top: 8px;
+    margin-top: 4px;
+  }
+
+  .menu-item-price {
+    font-size: 15px;
+  }
+
+  .menu-item-add-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .add-icon {
+    font-size: 18px;
+  }
+
+  .menu-item-popular-badge {
+    top: 6px;
+    right: 6px;
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+
+  .popular-icon {
+    font-size: 10px;
+  }
+
+  .menu-item-quantity-badge {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .quantity-check-icon {
+    font-size: 14px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .menu-item-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .menu-item-card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .menu-item-add-button {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .menu-item-footer {
+    gap: 16px;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: more) {
+  .menu-item-card {
+    border: 2px solid var(--ion-text-color);
+  }
+
+  .menu-item-name {
+    font-weight: 800;
+  }
+
+  .menu-item-price {
+    font-weight: 800;
+  }
+
+  .menu-item-popular-badge {
+    border: 1px solid white;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .menu-item-card,
+  .menu-item-image,
+  .menu-item-overlay,
+  .menu-item-add-button,
+  .menu-item-quantity-badge {
+    transition: none;
+  }
+
+  .menu-item-card:hover .menu-item-image {
+    transform: none;
+  }
+
+  .menu-item-card:hover {
+    transform: none;
+  }
+
+  .popular-icon {
+    animation: none;
+  }
+
+  @keyframes popInAnimation {
+    0%, 100% {
+      transform: scale(1) rotate(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInAnimation {
+    0%, 100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}

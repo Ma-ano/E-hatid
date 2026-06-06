@@ -1,0 +1,190 @@
+/* ============================================
+   BOTTOM NAVIGATION
+   Single navigation for all screen sizes
+   Fixed at bottom of screen
+   ============================================ */
+
+/* Utility class for pages with bottom nav */
+.ion-page-with-bottom-nav {
+  --padding-bottom: 80px !important;
+}
+
+/* Guest content fix - override the zero padding */
+.guest-home-content.ion-page-with-bottom-nav,
+.guest-cart-content.ion-page-with-bottom-nav {
+  --padding-bottom: 80px !important;
+}
+
+/* Mobile padding for bottom nav */
+@media (max-width: 575px) {
+  .ion-page-with-bottom-nav {
+    --padding-bottom: 80px !important;
+  }
+}
+
+/* Tablet padding for bottom nav */
+@media (min-width: 576px) and (max-width: 767px) {
+  .ion-page-with-bottom-nav {
+    --padding-bottom: 90px !important;
+  }
+}
+
+/* Desktop padding for bottom nav */
+@media (min-width: 768px) {
+  .ion-page-with-bottom-nav {
+    --padding-bottom: 96px !important;
+  }
+}
+
+.bottom-nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ion-background-color);
+  border-top: 1px solid var(--ion-border-color);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: constant(safe-area-inset-bottom);
+}
+
+.bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 56px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ion-text-color-secondary);
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  min-height: 48px;
+  position: relative;
+  text-decoration: none;
+}
+
+.bottom-nav-item:hover {
+  background: var(--ion-color-primary-tint);
+  opacity: 0.8;
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav-item.active {
+  color: var(--ion-color-primary);
+}
+
+.bottom-nav-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.bottom-nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Active indicator dot */
+.bottom-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  background: var(--ion-color-primary);
+  border-radius: 50%;
+}
+
+/* ============================================
+   TABLET (576px+)
+   ============================================ */
+@media (min-width: 576px) {
+  .bottom-nav {
+    height: 64px;
+    max-width: 500px;
+  }
+
+  .bottom-nav-icon {
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+
+  .bottom-nav-label {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   LARGE TABLET / SMALL DESKTOP (768px+)
+   Keep bottom nav but larger
+   ============================================ */
+@media (min-width: 768px) {
+  .bottom-nav-container {
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .bottom-nav {
+    height: 70px;
+    max-width: 550px;
+  }
+
+  .bottom-nav-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+
+  .bottom-nav-label {
+    font-size: 14px;
+  }
+
+  .bottom-nav-item {
+    padding: 10px 16px;
+    min-height: 56px;
+  }
+}
+
+/* ============================================
+   DESKTOP (1024px+)
+   Centered bottom nav with max width
+   ============================================ */
+@media (min-width: 1024px) {
+  .bottom-nav-container {
+    max-width: 700px;
+  }
+
+  .bottom-nav {
+    height: 72px;
+    max-width: 600px;
+  }
+
+  .bottom-nav-icon {
+    font-size: 28px;
+  }
+
+  .bottom-nav-label {
+    font-size: 14px;
+  }
+
+  .bottom-nav-item {
+    padding: 10px 20px;
+  }
+}

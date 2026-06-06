@@ -1,0 +1,479 @@
+/* src/pages/Vendor/VendorEarnings.css */
+
+.earnings-page {
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background-color: var(--ion-background-color);
+}
+
+@media (min-width: 576px) {
+  .earnings-page {
+    max-width: 720px;
+    padding: 24px;
+  }
+}
+
+@media (min-width: 768px) {
+  .earnings-page {
+    max-width: 960px;
+    padding: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .earnings-page {
+    max-width: 1200px;
+    padding: 32px;
+  }
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--ion-text-color-secondary);
+  font-weight: 500;
+}
+
+/* Finance Cards Grid */
+.finance-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .finance-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .finance-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.finance-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background-color: var(--ion-card-background);
+}
+
+.finance-card.primary {
+  background: linear-gradient(135deg, var(--ion-color-primary), #818CF8);
+  color: white;
+}
+
+.finance-card.success {
+  background: linear-gradient(135deg, var(--ion-color-success), #6ee7b7);
+  color: white;
+}
+
+.finance-card.warning {
+  background: linear-gradient(135deg, var(--ion-color-warning), #fbbf24);
+  color: white;
+}
+
+.finance-card.info {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  color: white;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  opacity: 0.9;
+}
+
+.card-icon {
+  font-size: 24px;
+}
+
+.card-amount {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.card-subtext {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Withdrawal Action */
+.withdrawal-action {
+  margin-bottom: 32px;
+}
+
+.withdrawal-action ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+}
+
+/* Transactions Section */
+.transactions-section {
+  margin-top: 32px;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+/* Transactions Table Container */
+.transactions-table-container {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .transactions-table-container {
+    display: block;
+  }
+}
+
+.transactions-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-content {
+  padding: 0;
+  overflow-x: auto;
+}
+
+/* Table Styling */
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--ion-card-background);
+}
+
+.transactions-table thead {
+  background-color: var(--ion-item-background);
+  border-bottom: 2px solid var(--ion-border-color);
+}
+
+.transactions-table thead th {
+  padding: 16px 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.transactions-table tbody tr {
+  border-bottom: 1px solid var(--ion-border-color);
+  transition: background-color 0.2s ease;
+}
+
+.transactions-table tbody tr:hover {
+  background-color: var(--ion-background-color);
+}
+
+.transactions-table tbody td {
+  padding: 16px 12px;
+  font-size: 14px;
+  color: var(--ion-text-color);
+}
+
+.transaction-date {
+  font-weight: 600;
+  color: var(--ion-text-color-secondary);
+  font-size: 13px;
+}
+
+.transaction-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.type-icon {
+  font-size: 18px;
+}
+
+.type-label {
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.transaction-description {
+  color: var(--ion-text-color-secondary);
+  font-size: 13px;
+}
+
+.transaction-amount {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.transaction-amount.positive {
+  color: var(--ion-color-success);
+}
+
+.transaction-amount.negative {
+  color: var(--ion-color-danger);
+}
+
+/* Mobile Card View */
+.transactions-mobile-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .transactions-mobile-container {
+    display: none;
+  }
+}
+
+.transaction-card-mobile {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.transaction-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.transaction-type-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.transaction-date-mobile {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ion-text-color-secondary);
+}
+
+.transaction-amount-mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.amount-value {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.amount-value.positive {
+  color: var(--ion-color-success);
+}
+
+.amount-value.negative {
+  color: var(--ion-color-danger);
+}
+
+.status-badge-mobile {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.transaction-description-mobile {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ion-text-color-secondary);
+  line-height: 1.4;
+}
+
+/* Withdrawal Modal */
+.withdrawal-modal ion-toolbar {
+  background-color: var(--ion-toolbar-background);
+  border-bottom: 1px solid var(--ion-border-color);
+}
+
+.withdrawal-modal ion-title {
+  color: var(--ion-text-color);
+}
+
+.withdrawal-form {
+  padding: 24px;
+  background-color: var(--ion-background-color);
+}
+
+.form-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: var(--ion-item-background);
+  border-radius: 8px;
+  border: 1px solid var(--ion-border-color);
+}
+
+.section-subtitle {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ion-text-color);
+  letter-spacing: 0.3px;
+}
+
+.balance-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.balance-label {
+  font-weight: 600;
+  color: var(--ion-text-color-secondary);
+}
+
+.balance-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ion-color-success);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ion-text-color);
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.amount-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 16px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.amount-input {
+  width: 100%;
+  padding: 12px 12px 12px 36px;
+  background-color: var(--ion-item-background);
+  color: var(--ion-text-color);
+  border: 1px solid var(--ion-border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.amount-input:focus {
+  border-color: var(--ion-color-primary);
+  outline: none;
+}
+
+.form-textarea {
+  background-color: var(--ion-item-background);
+  color: var(--ion-text-color);
+  border: 1px solid var(--ion-border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-textarea:focus {
+  border-color: var(--ion-color-primary);
+  outline: none;
+}
+
+.form-info {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid #3b82f6;
+  border-radius: 6px;
+}
+
+.info-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ion-text-color-secondary);
+  line-height: 1.4;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .earnings-page {
+    padding: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .finance-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card-amount {
+    font-size: 24px;
+  }
+}
+
+ion-content.vendor-content-fix::part(scroll) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.earnings-page {
+  flex: 1 0 auto;
+}

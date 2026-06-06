@@ -1,0 +1,149 @@
+/* For information on how to create your own theme, please refer to:
+http://ionicframework.com/docs/theming/ */
+/* src/theme/variables.css */
+
+:root {
+  /**
+   * CLEAN & PROFESSIONAL COLOR SCHEME
+   * Simple, modern, and easy to maintain
+   */
+
+  /* ==================== BRAND COLORS ==================== */
+  --ion-color-primary: #6366F1;
+  --ion-color-primary-rgb: 99, 102, 241;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #4F46E5;
+  --ion-color-primary-tint: #818CF8;
+
+  --ion-color-secondary: #EC4899;
+  --ion-color-secondary-rgb: 236, 72, 153;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #DB2777;
+  --ion-color-secondary-tint: #F472B6;
+
+  /* ==================== STATUS COLORS ==================== */
+  --ion-color-success: #10B981;
+  --ion-color-warning: #F59E0B;
+  --ion-color-danger: #EF4444;
+  --ion-color-light: #F3F4F6;
+  --ion-color-medium: #9CA3AF;
+  --ion-color-dark: #111827;
+}
+
+/* ==================== LIGHT MODE (DEFAULT) ==================== */
+:root {
+  --ion-background-color: #DDE1E5;
+  --ion-background-color-rgb: 221, 225, 229;
+  --ion-text-color: #1a1a1a;
+  --ion-text-color-rgb: 26, 26, 26;
+  --ion-text-color-secondary: #4B5563;
+  
+  --ion-card-background: #FFFFFF;
+  --ion-item-background: #FFFFFF;
+  --ion-toolbar-background: #FFFFFF;
+  
+  --ion-border-color: #B8BCC4;
+  --ion-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ==================== DARK MODE ==================== */
+:root.dark-mode {
+  --ion-background-color: #111827;
+  --ion-background-color-rgb: 17, 24, 39;
+  --ion-text-color: #F3F4F6;
+  --ion-text-color-rgb: 243, 244, 246;
+  --ion-text-color-secondary: #D1D5DB;
+  
+  --ion-card-background: #1F2937;
+  --ion-item-background: #1F2937;
+  --ion-toolbar-background: #1F2937;
+  
+  --ion-border-color: #374151;
+  --ion-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== SELECT DROPDOWN FIX ==================== */
+/* Fix for IonSelect options visibility in modal/popover */
+ion-select-option {
+  color: var(--ion-text-color) !important;
+  --ion-item-color: var(--ion-text-color);
+  --color: var(--ion-text-color) !important;
+  --ion-text-color: var(--ion-text-color) !important;
+}
+
+ion-select-option.md {
+  color: var(--ion-text-color) !important;
+  --color: var(--ion-text-color) !important;
+}
+
+/* Fix for select popover/modal text color */
+.select-popover,
+.select-bottom {
+  --ion-text-color: var(--ion-text-color) !important;
+  --ion-background-color: var(--ion-item-background) !important;
+}
+
+.select-popover .alert-radio-label,
+.select-bottom .alert-radio-label {
+  color: var(--ion-text-color) !important;
+}
+
+.select-popover ion-label,
+.select-bottom ion-label {
+  color: var(--ion-text-color) !important;
+}
+
+/* Fix for alert items in select modal */
+.alert.select-alert {
+  --ion-background-color: var(--ion-item-background) !important;
+  --ion-text-color: var(--ion-text-color) !important;
+}
+
+.alert.select-alert .alert-radio,
+.alert.select-alert .alert-checkbox {
+  --ion-background-color: var(--ion-item-background) !important;
+}
+
+.alert.select-alert .alert-radio-label,
+.alert.select-alert .alert-checkbox-label {
+  color: var(--ion-text-color) !important;
+}
+
+.alert.select-alert .alert-title,
+.alert.select-alert .alert-sub-title {
+  color: var(--ion-text-color) !important;
+}
+
+/* Fix for all ion-label in alerts */
+.alert ion-label {
+  color: var(--ion-text-color) !important;
+}
+
+/* iOS alert specific fixes */
+.alert {
+  --ion-background-color: var(--ion-item-background) !important;
+  --ion-text-color: var(--ion-text-color) !important;
+  --background: var(--ion-item-background) !important;
+  --color: var(--ion-text-color) !important;
+}
+
+.alert .alert-wrapper {
+  background-color: var(--ion-item-background) !important;
+}
+
+.alert .alert-radio-group .alert-radio-label,
+.alert .alert-checkbox-group .alert-checkbox-label {
+  color: var(--ion-text-color) !important;
+}
+
+.alert .alert-head .alert-title,
+.alert .alert-head .alert-sub-title {
+  color: var(--ion-text-color) !important;
+}
+
+.alert .alert-button {
+  color: var(--ion-color-primary);
+}
+

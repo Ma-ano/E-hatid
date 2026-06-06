@@ -1,0 +1,73 @@
+/* ============================================
+   LOGO HEADER
+   Centered logo at the top, clickable
+   ============================================ */
+
+.logo-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+  padding: 16px 16px 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.logo-header:hover {
+  opacity: 0.8;
+}
+
+.logo-header:active {
+  transform: scale(0.98);
+}
+
+.logo-header-primary {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ion-color-primary);
+  letter-spacing: -0.5px;
+}
+
+.logo-header-secondary {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ion-text-color);
+  letter-spacing: -0.5px;
+}
+
+/* ============================================
+   RESPONSIVE SIZES
+   ============================================ */
+@media (min-width: 576px) {
+  .logo-header {
+    padding: 20px 20px 10px 20px;
+  }
+
+  .logo-header-primary,
+  .logo-header-secondary {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 768px) {
+  .logo-header {
+    padding: 24px 24px 12px 24px;
+  }
+
+  .logo-header-primary,
+  .logo-header-secondary {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo-header {
+    padding: 28px 28px 14px 28px;
+  }
+
+  .logo-header-primary,
+  .logo-header-secondary {
+    font-size: 36px;
+  }
+}
