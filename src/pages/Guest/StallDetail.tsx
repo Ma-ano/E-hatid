@@ -210,6 +210,7 @@ const StallDetail: React.FC = () => {
                   <button
                     key={nav.id}
                     onClick={() => {
+                      setActiveSection(nav.id);
                       const el = sectionRefMap.current.get(nav.id);
                       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
