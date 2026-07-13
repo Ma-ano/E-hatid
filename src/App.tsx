@@ -2,10 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { IonApp, IonRouterOutlet, IonSpinner, IonPage, IonContent, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
-import { OrderProvider } from './context/OrderContext';
-import { ThemeProvider } from './context/ThemeContext';
 import { GuestLayout, CustomerLayout, RiderLayout, AdminLayout, VendorLayout } from './layouts';
 
 /* Core CSS required for Ionic components to work properly */
@@ -82,159 +78,151 @@ const PageLoader: React.FC = () => (
 
 const App: React.FC = () => (
   <IonApp>
-    <ThemeProvider>
-      <AuthProvider>
-        <CartProvider>
-          <OrderProvider>
-          <IonReactRouter>
-            <Suspense fallback={<PageLoader />}>
-            <IonRouterOutlet>
-              {/* Landing â€” standalone, no layout wrapper */}
-              <Route exact path="/">
-                <IonPage>
-                  <IonContent className="ion-content-center">
-                    <Landing />
-                  </IonContent>
-                </IonPage>
-              </Route>
+    <IonReactRouter>
+      <Suspense fallback={<PageLoader />}>
+        <IonRouterOutlet>
+          {/* Landing — standalone, no layout wrapper */}
+          <Route exact path="/">
+            <IonPage>
+              <IonContent className="ion-content-center">
+                <Landing />
+              </IonContent>
+            </IonPage>
+          </Route>
 
-              {/* Guest Routes */}
-              <ProtectedRoute exact path="/guest/home" requireAuth={false}>
-                <GuestLayout><CustomerHome /></GuestLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/guest/cart" requireAuth={false}>
-                <GuestLayout><GuestCart /></GuestLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/guest/location" requireAuth={false}>
-                <GuestLayout><GuestLocationPicker /></GuestLayout>
-              </ProtectedRoute>
+          {/* Guest Routes */}
+          <ProtectedRoute exact path="/guest/home" requireAuth={false}>
+            <GuestLayout><CustomerHome /></GuestLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/guest/cart" requireAuth={false}>
+            <GuestLayout><GuestCart /></GuestLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/guest/location" requireAuth={false}>
+            <GuestLayout><GuestLocationPicker /></GuestLayout>
+          </ProtectedRoute>
 
-              {/* Stall Detail (accessible to all) */}
-              <Route exact path="/stall/:id/menu">
-                <GuestLayout><StallDetail /></GuestLayout>
-              </Route>
+          {/* Stall Detail (accessible to all) */}
+          <Route exact path="/stall/:id/menu">
+            <GuestLayout><StallDetail /></GuestLayout>
+          </Route>
 
-              {/* Customer Routes */}
-              <ProtectedRoute exact path="/customer/home">
-                <CustomerLayout><CustomerHome /></CustomerLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/customer/profile">
-                <CustomerLayout><CustomerProfile /></CustomerLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/customer/cart">
-                <CustomerLayout><CustomerCart /></CustomerLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/customer/orders">
-                <CustomerLayout><CustomerOrders /></CustomerLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/customer/location">
-                <CustomerLayout><CustomerLocationPicker /></CustomerLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/customer/order-tracking">
-                <CustomerLayout><CustomerOrderTracking /></CustomerLayout>
-              </ProtectedRoute>
+          {/* Customer Routes */}
+          <ProtectedRoute exact path="/customer/home">
+            <CustomerLayout><CustomerHome /></CustomerLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/customer/profile">
+            <CustomerLayout><CustomerProfile /></CustomerLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/customer/cart">
+            <CustomerLayout><CustomerCart /></CustomerLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/customer/orders">
+            <CustomerLayout><CustomerOrders /></CustomerLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/customer/location">
+            <CustomerLayout><CustomerLocationPicker /></CustomerLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/customer/order-tracking">
+            <CustomerLayout><CustomerOrderTracking /></CustomerLayout>
+          </ProtectedRoute>
 
-              {/* Auth Routes */}
-              <ProtectedRoute exact path="/login" requireAuth={false}>
-                <Login />
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/register" requireAuth={false}>
-                <Register />
-              </ProtectedRoute>
+          {/* Auth Routes */}
+          <ProtectedRoute exact path="/login" requireAuth={false}>
+            <Login />
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/register" requireAuth={false}>
+            <Register />
+          </ProtectedRoute>
 
-              {/* Rider Routes */}
-              <ProtectedRoute exact path="/rider/home" requiredRole="rider">
-                <RiderLayout><RiderHome /></RiderLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/rider/orders" requiredRole="rider">
-                <RiderLayout><RiderOrders /></RiderLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/rider/earnings" requiredRole="rider">
-                <RiderLayout><RiderEarnings /></RiderLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/rider/profile" requiredRole="rider">
-                <RiderLayout><RiderProfile /></RiderLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/rider/login" requireAuth={false}>
-                <RiderLogin />
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/rider/register" requireAuth={false}>
-                <RiderRegister />
-              </ProtectedRoute>
+          {/* Rider Routes */}
+          <ProtectedRoute exact path="/rider/home" requiredRole="rider">
+            <RiderLayout><RiderHome /></RiderLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/rider/orders" requiredRole="rider">
+            <RiderLayout><RiderOrders /></RiderLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/rider/earnings" requiredRole="rider">
+            <RiderLayout><RiderEarnings /></RiderLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/rider/profile" requiredRole="rider">
+            <RiderLayout><RiderProfile /></RiderLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/rider/login" requireAuth={false}>
+            <RiderLogin />
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/rider/register" requireAuth={false}>
+            <RiderRegister />
+          </ProtectedRoute>
 
-              {/* Admin Routes */}
-              <ProtectedRoute exact path="/admin/dashboard" requiredRole="admin">
-                <AdminLayout><AdminDashboard /></AdminLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/admin/users" requiredRole="admin">
-                <AdminLayout><AdminUsers /></AdminLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/admin/riders" requiredRole="admin">
-                <AdminLayout><AdminRiders /></AdminLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/admin/orders" requiredRole="admin">
-                <AdminLayout><AdminOrders /></AdminLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/admin/reports" requiredRole="admin">
-                <AdminLayout><AdminReports /></AdminLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/admin/login" requireAuth={false}>
-                <AdminLogin />
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/admin/register" requireAuth={false}>
-                <AdminRegister />
-              </ProtectedRoute>
+          {/* Admin Routes */}
+          <ProtectedRoute exact path="/admin/dashboard" requiredRole="admin">
+            <AdminLayout><AdminDashboard /></AdminLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/admin/users" requiredRole="admin">
+            <AdminLayout><AdminUsers /></AdminLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/admin/riders" requiredRole="admin">
+            <AdminLayout><AdminRiders /></AdminLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/admin/orders" requiredRole="admin">
+            <AdminLayout><AdminOrders /></AdminLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/admin/reports" requiredRole="admin">
+            <AdminLayout><AdminReports /></AdminLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/admin/login" requireAuth={false}>
+            <AdminLogin />
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/admin/register" requireAuth={false}>
+            <AdminRegister />
+          </ProtectedRoute>
 
-              {/* Vendor Routes */}
-              <ProtectedRoute exact path="/vendor/dashboard" requiredRole="vendor">
-                <VendorLayout><VendorDashboard /></VendorLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/products" requiredRole="vendor">
-                <VendorLayout><VendorProducts /></VendorLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/orders" requiredRole="vendor">
-                <VendorLayout><VendorOrders /></VendorLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/earnings" requiredRole="vendor">
-                <VendorLayout><VendorEarnings /></VendorLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/reviews" requiredRole="vendor">
-                <VendorLayout><VendorReviews /></VendorLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/settings" requiredRole="vendor">
-                <VendorLayout><VendorSettings /></VendorLayout>
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/login" requireAuth={false}>
-                <VendorLogin />
-              </ProtectedRoute>
-              <ProtectedRoute exact path="/vendor/register" requireAuth={false}>
-                <VendorRegister />
-              </ProtectedRoute>
+          {/* Vendor Routes */}
+          <ProtectedRoute exact path="/vendor/dashboard" requiredRole="vendor">
+            <VendorLayout><VendorDashboard /></VendorLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/products" requiredRole="vendor">
+            <VendorLayout><VendorProducts /></VendorLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/orders" requiredRole="vendor">
+            <VendorLayout><VendorOrders /></VendorLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/earnings" requiredRole="vendor">
+            <VendorLayout><VendorEarnings /></VendorLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/reviews" requiredRole="vendor">
+            <VendorLayout><VendorReviews /></VendorLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/settings" requiredRole="vendor">
+            <VendorLayout><VendorSettings /></VendorLayout>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/login" requireAuth={false}>
+            <VendorLogin />
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/register" requireAuth={false}>
+            <VendorRegister />
+          </ProtectedRoute>
 
-              {/* Activity & Messages Routes */}
-              <Route exact path="/activities">
-                <GuestLayout><ActivityLog /></GuestLayout>
-              </Route>
-              <Route exact path="/messages">
-                <GuestLayout><Messages /></GuestLayout>
-              </Route>
+          {/* Activity & Messages Routes */}
+          <Route exact path="/activities">
+            <GuestLayout><ActivityLog /></GuestLayout>
+          </Route>
+          <Route exact path="/messages">
+            <GuestLayout><Messages /></GuestLayout>
+          </Route>
 
-              {/* Report Routes */}
-              <Route exact path="/report">
-                <GuestLayout><ReportIncident /></GuestLayout>
-              </Route>
+          {/* Report Routes */}
+          <Route exact path="/report">
+            <GuestLayout><ReportIncident /></GuestLayout>
+          </Route>
 
-              {/* Legacy redirects */}
-              <Route exact path="/guest/stall/:id" render={({match}) => <Redirect to={`/stall/${(match.params as any).id}/menu`} />} />
-            </IonRouterOutlet>
-            </Suspense>
-          </IonReactRouter>
-          <StorageConsent />
-          <ThemeToggle />
-          </OrderProvider>
-        </CartProvider>
-      </AuthProvider>
-    </ThemeProvider>
+          {/* Legacy redirects */}
+          <Route exact path="/guest/stall/:id" render={({match}) => <Redirect to={`/stall/`+(match.params as any).id+`/menu`} />} />
+        </IonRouterOutlet>
+      </Suspense>
+      <StorageConsent />
+      <ThemeToggle />
+    </IonReactRouter>
   </IonApp>
 );
 
