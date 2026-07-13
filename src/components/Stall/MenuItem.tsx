@@ -32,16 +32,16 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, onAdd, quantity }) => {
         {/* Header with Name and Action */}
         <div className="flex justify-between items-start mb-1 sm:mb-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm sm:text-base text-[var(--tw-text-color)] mb-0.5 truncate group-hover:text-[var(--ion-color-primary)] transition-colors">
+            <h3 className="font-semibold text-sm sm:text-base text-[var(--ion-text-color)] mb-0.5 truncate group-hover:text-[var(--ion-color-primary)] transition-colors">
               {item.name}
             </h3>
-            <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)] line-clamp-2">{item.description}</p>
+            <p className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)] line-clamp-2">{item.description}</p>
           </div>
         </div>
 
         {/* Footer with Price and Button */}
-        <div className="flex justify-between items-center mt-auto pt-2 sm:pt-3 border-t border-[var(--tw-border-color)]">
-          <span className="font-semibold text-sm sm:text-base text-[var(--tw-text-color)]">₱{item.price.toFixed(2)}</span>
+        <div className="flex justify-between items-center mt-auto pt-2 sm:pt-3 border-t border-[var(--ion-border-color)]">
+          <span className="font-semibold text-sm sm:text-base text-[var(--ion-text-color)]">₱{item.price.toFixed(2)}</span>
           
           {quantity ? (
             <div className="flex items-center gap-1.5 bg-green-50 text-green-600 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
