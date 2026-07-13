@@ -205,7 +205,7 @@ const StallDetail: React.FC = () => {
 
           {navItems.length > 1 && (
             <div className="sticky top-14 z-10 bg-[var(--ion-card-background)] border-b border-[var(--ion-border-color)]">
-              <div className="flex gap-2 bg-[var(--tw-light)] dark:bg-[#1E293B] p-1 rounded-full w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-2">
+              <div className="flex gap-2 bg-gray-100 dark:bg-slate-800 p-1 rounded-full w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-2">
                 {navItems.map(nav => (
                   <button
                     key={nav.id}

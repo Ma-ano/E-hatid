@@ -253,7 +253,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({
       isOpen={isOpen}
       onDidDismiss={onClose}
       className="menu-item-modal"
-      style={{ '--max-width': 'min(520px, 95vw)', '--max-height': '90vh', '--border-radius': '16px' } as any}
+      style={{ '--max-width': 'min(560px, 95vw)', '--max-height': '90vh', '--border-radius': '16px' } as any}
     >
       <IonHeader className="ion-no-border">
         <IonToolbar style={{ '--background': 'transparent' }}>

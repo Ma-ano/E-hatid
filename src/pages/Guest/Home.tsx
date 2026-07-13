@@ -92,7 +92,7 @@ const GuestHome: React.FC = () => {
 
         {/* Categories */}
         <div className="py-1 sm:py-2 overflow-x-auto no-scrollbar">
-          <div className="flex gap-2 bg-[var(--tw-light)] dark:bg-[#1E293B] p-1 rounded-full w-full">
+          <div className="flex gap-2 bg-gray-100 dark:bg-slate-800 p-1 rounded-full w-full">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -102,11 +102,11 @@ const GuestHome: React.FC = () => {
                 {selectedCategory === cat && (
                   <motion.div
                     layoutId="active-pill"
-                    className="absolute inset-0 bg-[var(--tw-primary)] rounded-full"
+                    className="absolute inset-0 bg-[var(--ion-color-primary)] rounded-full"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
-                <span className={`relative z-10 ${selectedCategory === cat ? "text-white" : "text-[var(--tw-text-secondary)] dark:text-gray-300"}`}>
+                <span className={`relative z-10 ${selectedCategory === cat ? "text-white" : "text-gray-500 dark:text-gray-300"}`}>
                   {cat}
                 </span>
               </button>
