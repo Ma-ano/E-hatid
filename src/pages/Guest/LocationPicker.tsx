@@ -1,8 +1,6 @@
 // src/pages/Guest/LocationPicker.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonButton,
   IonIcon,
   IonFooter,
@@ -15,7 +13,6 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-lea
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import PageHeader from '../../components/PageHeader';
-import AppFooter from '../../components/AppFooter';
 
 interface Suggestion {
   display: string;
@@ -25,7 +22,7 @@ interface Suggestion {
 
 const markerIcon = L.divIcon({
   className: '',
-  html: '<div style="background:#6366F1;width:24px;height:24px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',
+  html: '<div style="background:var(--ion-color-primary);width:24px;height:24px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',
   iconSize: [24, 24],
   iconAnchor: [12, 12],
 });
@@ -169,38 +166,25 @@ const GuestLocationPicker: React.FC = () => {
     history.goBack();
   };
 
-  const inputStyle = {
-    width: '100%',
-    padding: '12px',
-    borderRadius: '8px',
-    border: '1px solid var(--ion-border-color)',
-    background: 'var(--ion-background-color)',
-    color: 'var(--ion-text-color)',
-    fontFamily: 'inherit',
-    fontSize: '14px',
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-  };
-
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         showBack={true}
         cartCount={itemCount}
         onCartClick={() => history.push('/guest/cart')}
-        onOrdersClick={() => history.push('/user/orders')}
+        onOrdersClick={() => history.push('/customer/orders')}
         {...(isAuthenticated
-          ? { onProfileClick: () => history.push('/user/profile') }
-          : { onLoginClick: () => history.push('/user/login'), onRegisterClick: () => history.push('/user/register') }
+          ? { onProfileClick: () => history.push('/customer/profile') }
+          : { onLoginClick: () => history.push('/login'), onRegisterClick: () => history.push('/register') }
         )}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-        <div className="page-container" style={{ flex: 1, paddingTop: '24px', paddingBottom: '24px' }}>
+
+        <div className="flex flex-col min-h-full">
+        <div className="flex-1 max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pt-4 sm:pt-6 pb-6 sm:pb-8">
           {/* Map */}
-          <div style={{ width: '100%', height: '40vh', borderRadius: '12px', overflow: 'hidden', marginBottom: '16px' }}>
+          <div className="w-full h-[35vh] sm:h-[40vh] md:h-[45vh] rounded-2xl overflow-hidden mb-4 border border-[var(--ion-border-color)]">
             <MapContainer
               center={[selectedLocation?.lat || 14.5995, selectedLocation?.lng || 120.9842]}
               zoom={15}
@@ -219,21 +203,21 @@ const GuestLocationPicker: React.FC = () => {
           </div>
 
           {/* Address Search with Autocomplete */}
-          <div style={{ marginBottom: '16px', position: 'relative' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)', textTransform: 'uppercase', opacity: 0.7 }}>
+          <div className="mb-4 relative">
+            <label className="block mb-2 text-xs sm:text-sm font-semibold text-[var(--ion-text-color)] uppercase opacity-70">
               Delivery Address
             </label>
-            <div style={{ position: 'relative' }}>
-              <IonIcon icon={locationOutline} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ion-color-primary)', fontSize: '18px', zIndex: 1 }} />
+            <div className="relative">
+              <IonIcon icon={locationOutline} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ion-color-primary)] text-lg z-[1]" />
               <input
                 type="text"
                 placeholder="Search your address..."
                 value={query}
                 onChange={e => { setQuery(e.target.value); setSelectedAddress(null); }}
-                style={{ ...inputStyle, paddingLeft: '38px' }}
+                className="w-full p-3 pl-10 rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm outline-none focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all"
               />
               {fetching && (
-                <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--ion-text-color-secondary)]">
                   Searching...
                 </span>
               )}
@@ -241,26 +225,13 @@ const GuestLocationPicker: React.FC = () => {
 
             {/* Suggestions dropdown */}
             {suggestions.length > 0 && (
-              <div style={{
-                position: 'absolute', left: 0, right: 0, top: '100%', zIndex: 100,
-                background: 'var(--ion-card-background)',
-                border: '1px solid var(--ion-border-color)',
-                borderRadius: '0 0 8px 8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                maxHeight: '200px', overflowY: 'auto',
-              }}>
+              <div className="absolute left-0 right-0 top-full z-[100] bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] rounded-b-lg shadow-lg max-h-[200px] overflow-y-auto">
                 {suggestions.map((s, i) => (
                   <div key={i} onClick={() => selectSuggestion(s)}
-                    style={{
-                      padding: '10px 12px', cursor: 'pointer',
-                      borderBottom: i < suggestions.length - 1 ? '1px solid var(--ion-border-color)' : 'none',
-                      fontSize: '13px', color: 'var(--ion-text-color)',
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--ion-color-light)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    className="flex items-center gap-2 px-3 py-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ion-text-color)] hover:bg-[var(--ion-color-light)] border-b border-[var(--ion-border-color)] last:border-b-0 transition-colors"
                   >
-                    <IonIcon icon={locationOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)', fontSize: '14px', verticalAlign: 'middle' }} />
-                    {s.display}
+                    <IonIcon icon={locationOutline} className="text-[var(--ion-color-primary)] text-sm shrink-0" />
+                    <span className="truncate">{s.display}</span>
                   </div>
                 ))}
               </div>
@@ -269,20 +240,14 @@ const GuestLocationPicker: React.FC = () => {
 
           {/* Selected Address Display */}
           {selectedAddress && (
-            <div style={{
-              background: 'var(--ion-card-background)',
-              padding: '16px',
-              borderRadius: '12px',
-              border: '1px solid var(--ion-border-color)',
-              marginBottom: '24px',
-            }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <IonIcon icon={locationOutline} style={{ color: 'var(--ion-color-primary)', fontSize: '20px', minWidth: '20px', marginTop: '2px' }} />
-                <div>
-                  <p style={{ margin: '0 0 4px', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>
+            <div className="bg-[var(--ion-card-background)] p-4 md:p-6 rounded-2xl border border-[var(--ion-border-color)] mb-6">
+              <div className="flex gap-3">
+                <IonIcon icon={locationOutline} className="text-[var(--ion-color-primary)] text-lg shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="m-0 mb-1 text-xs text-[var(--ion-text-color-secondary)]">
                     Selected Address
                   </p>
-                  <p style={{ margin: 0, fontWeight: 600, fontSize: '14px', color: 'var(--ion-text-color)' }}>
+                  <p className="m-0 font-semibold text-xs sm:text-sm text-[var(--ion-text-color)] leading-relaxed">
                     {selectedAddress.display}
                   </p>
                 </div>
@@ -290,31 +255,28 @@ const GuestLocationPicker: React.FC = () => {
             </div>
           )}
         </div>
-        <AppFooter />
+
         </div>
-      </IonContent>
+
 
       {/* Footer */}
       {selectedAddress && selectedLocation && (
-        <IonFooter style={{
-          '--background': 'var(--ion-card-background)',
-          borderTop: '1px solid var(--ion-border-color)',
-        } as any}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
-          <IonButton expand="block" size="large"
-            style={{
-              '--background': '#6366F1', '--border-radius': '8px',
-              height: '48px', fontSize: '16px', fontWeight: 700,
-            }}
-            onClick={handleConfirm}
-          >
-            <IonIcon slot="start" icon={locationOutline} />
-            Confirm Location
-          </IonButton>
+        <IonFooter style={{ '--background': 'var(--ion-card-background)' } as any}>
+          <div className="border-t border-[var(--ion-border-color)] px-3 sm:px-4 py-3 sm:py-4">
+            <div className="max-w-2xl mx-auto">
+              <IonButton expand="block" size="large"
+                className="min-h-[48px]"
+                style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px', fontSize: '15px', fontWeight: 700 }}
+                onClick={handleConfirm}
+              >
+                <IonIcon slot="start" icon={locationOutline} />
+                Confirm Location
+              </IonButton>
+            </div>
           </div>
         </IonFooter>
       )}
-    </IonPage>
+    </>
   );
 };
 

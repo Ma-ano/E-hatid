@@ -122,7 +122,7 @@ const AdminRegister: React.FC = () => {
             <span style={{ color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>
               Not an admin?{' '}
               <span 
-                style={{ color: '#6366F1', fontWeight: 700, cursor: 'pointer' }}
+                style={{ color: 'var(--ion-color-primary)', fontWeight: 700, cursor: 'pointer' }}
                 onClick={() => history.push('/guest/home')}
               >
                 Go Back

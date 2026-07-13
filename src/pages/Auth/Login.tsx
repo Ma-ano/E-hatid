@@ -41,7 +41,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(email, password);
-      history.push('/user/home');
+      history.push('/customer/home');
     } catch (err) {
       setError(getAuthErrorMessage(err));
     } finally {
@@ -59,83 +59,59 @@ const Login: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="ion-padding" style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div style={{ maxWidth: '400px', margin: '0 auto', paddingTop: '40px', paddingBottom: '140px' }}>
+      <IonContent className="ion-padding">
+        <div className="max-w-md mx-auto pt-8 sm:pt-12 md:pt-16 pb-32 sm:pb-40">
           {/* Header */}
-          <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '32px', 
-              fontWeight: 800, 
-              color: '#6366F1',
-              marginBottom: '8px',
-              margin: '0 0 12px 0'
-            }}>
+          <div className="mb-8 sm:mb-10 text-center">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-extrabold text-[var(--ion-color-primary)] m-0 mb-2 sm:mb-3">
               Welcome Back
             </h1>
-            <p style={{ color: 'var(--ion-text-color-secondary)', marginBottom: 0, fontSize: '15px' }}>
+            <p className="text-sm sm:text-base text-[var(--ion-text-color-secondary)] m-0">
               Sign in to continue
             </p>
           </div>
 
           {error && (
-            <div style={{ 
-              background: '#fee2e2', 
-              padding: '12px', 
-              borderRadius: '8px', 
-              marginBottom: '24px',
-              color: '#991b1b',
-              fontSize: '14px',
-              border: '1px solid #fecaca'
-            }}>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded-lg mb-6 text-sm border border-red-200 dark:border-red-800">
               {error}
             </div>
           )}
 
           {/* Email Input */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)', textTransform: 'uppercase', opacity: 0.7 }}>Email</label>
-            <IonItem className="rider-input" style={{ marginBottom: '0', '--background': 'var(--ion-card-background)', '--border': '1px solid var(--ion-border-color)' } as any}>
+          <div className="mb-4">
+            <label className="block mb-2 text-xs sm:text-sm font-semibold text-[var(--ion-text-color)] uppercase opacity-70">Email</label>
+            <IonItem className="rounded-lg overflow-hidden" style={{ '--background': 'var(--ion-card-background)', '--border': '1px solid var(--ion-border-color)', '--border-radius': '8px', '--min-height': '48px' } as any}>
               <IonIcon icon={mailOutline} slot="start" color="primary" />
               <IonInput
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onIonChange={e => setEmail(e.detail.value!)}
-                style={{ '--padding-start': '8px', '--color': 'var(--ion-text-color)' } as any}
+                className="[--padding-start:8px] [--color:var(--ion-text-color)]"
               />
             </IonItem>
           </div>
 
           {/* Password Input */}
-          <div style={{ marginBottom: '12px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)', textTransform: 'uppercase', opacity: 0.7 }}>Password</label>
-            <IonItem className="rider-input" style={{ '--background': 'var(--ion-card-background)', '--border': '1px solid var(--ion-border-color)' } as any}>
+          <div className="mb-3">
+            <label className="block mb-2 text-xs sm:text-sm font-semibold text-[var(--ion-text-color)] uppercase opacity-70">Password</label>
+            <IonItem className="rounded-lg overflow-hidden" style={{ '--background': 'var(--ion-card-background)', '--border': '1px solid var(--ion-border-color)', '--border-radius': '8px', '--min-height': '48px' } as any}>
               <IonIcon icon={lockClosedOutline} slot="start" color="primary" />
               <IonInput
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={password}
                 onIonChange={e => setPassword(e.detail.value!)}
-                style={{ '--padding-start': '8px', '--color': 'var(--ion-text-color)' } as any}
+                className="[--padding-start:8px] [--color:var(--ion-text-color)]"
               />
-              <IonButton 
-                fill="clear" 
-                slot="end"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+              <IonButton fill="clear" slot="end" onClick={() => setShowPassword(!showPassword)} className="min-h-[44px] min-w-[44px]">
                 <IonIcon icon={showPassword ? eyeOffOutline : eyeOutline} color="primary" />
               </IonButton>
             </IonItem>
           </div>
 
-          <div style={{ textAlign: 'right', marginBottom: '24px' }}>
-            <IonButton fill="clear" style={{ 
-              '--color': '#6366F1', 
-              fontSize: '13px',
-              fontWeight: 600,
-              padding: '0',
-              height: 'auto'
-            }}>
+          <div className="text-right mb-6">
+            <IonButton fill="clear" className="text-xs sm:text-sm font-semibold h-auto p-0" style={{ '--color': 'var(--ion-color-primary)' }}>
               Forgot Password?
             </IonButton>
           </div>
@@ -143,12 +119,11 @@ const Login: React.FC = () => {
           <IonButton
             expand="block"
             size="large"
-            className="rider-button"
+            className="min-h-[48px]"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--border-radius': '8px',
-              height: '48px',
-              fontSize: '16px',
+              fontSize: '15px',
               fontWeight: 700,
               marginBottom: '24px'
             }}
@@ -158,20 +133,17 @@ const Login: React.FC = () => {
           </IonButton>
 
           {/* Sign Up Link */}
-          <div style={{ textAlign: 'center' }}>
-            <span style={{ color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>
+          <div className="text-center">
+            <span className="text-sm text-[var(--ion-text-color-secondary)]">
               Don't have an account?{' '}
-              <span 
-                style={{ color: '#6366F1', fontWeight: 700, cursor: 'pointer' }}
-                onClick={() => history.push('/user/register')}
-              >
+              <span className="text-[var(--ion-color-primary)] font-bold cursor-pointer hover:underline" onClick={() => history.push('/register')}>
                 Sign Up
               </span>
             </span>
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', margin: '32px 0 16px', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>
+        <p className="text-center my-8 text-xs text-[var(--ion-text-color-secondary)] px-4">
           By logging in, you agree to our Terms of Service and Privacy Policy
         </p>
         <IonLoading isOpen={loading} message="Signing in..." />

@@ -67,7 +67,7 @@ const RiderLogin: React.FC = () => {
             <h1 style={{ 
               fontSize: '32px', 
               fontWeight: 800, 
-              color: '#6366F1',
+              color: 'var(--ion-color-primary)',
               marginBottom: '8px',
               margin: '0 0 12px 0'
             }}>
@@ -131,7 +131,7 @@ const RiderLogin: React.FC = () => {
 
           <div style={{ textAlign: 'right', marginBottom: '24px' }}>
             <IonButton fill="clear" style={{ 
-              '--color': '#6366F1', 
+              '--color': 'var(--ion-color-primary)', 
               fontSize: '13px',
               fontWeight: 600,
               padding: '0',
@@ -146,7 +146,7 @@ const RiderLogin: React.FC = () => {
             size="large"
             className="rider-button"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--border-radius': '8px',
               height: '48px',
               fontSize: '16px',
@@ -163,7 +163,7 @@ const RiderLogin: React.FC = () => {
             <span style={{ color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>
               Don't have an account?{' '}
               <span 
-                style={{ color: '#6366F1', fontWeight: 700, cursor: 'pointer' }}
+                style={{ color: 'var(--ion-color-primary)', fontWeight: 700, cursor: 'pointer' }}
                 onClick={() => history.push('/rider/register')}
               >
                 Sign Up

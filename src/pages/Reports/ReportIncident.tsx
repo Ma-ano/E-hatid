@@ -1,8 +1,6 @@
 // src/pages/Reports/ReportIncident.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonCard,
   IonCardContent,
   IonButton,
@@ -28,7 +26,6 @@ import {
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const ReportIncident: React.FC = () => {
   const history = useHistory();
@@ -90,22 +87,21 @@ const ReportIncident: React.FC = () => {
   const selectedReportType = reportTypes.find(t => t.value === reportType);
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         {/* Header with Back Button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>
           <IonButton 
             fill="clear" 
             onClick={() => history.goBack()}
-            style={{ '--color': '#6366F1', margin: '0 0 0 -8px' } as any}
+            style={{ '--color': 'var(--ion-color-primary)', margin: '0 0 0 -8px' } as any}
           >
             <IonIcon icon={arrowBack} />
           </IonButton>
@@ -154,7 +150,7 @@ const ReportIncident: React.FC = () => {
                   key={type.value}
                   style={{
                     padding: '12px',
-                    background: reportType === type.value ? '#6366F1' : 'var(--ion-card-background)',
+                    background: reportType === type.value ? 'var(--ion-color-primary)' : 'var(--ion-card-background)',
                     border: reportType === type.value ? 'none' : '2px solid var(--ion-border-color)',
                     borderRadius: '8px',
                     cursor: 'pointer',
@@ -188,7 +184,7 @@ const ReportIncident: React.FC = () => {
               gap: '8px'
             }}>
               {[
-                { value: 'low', label: 'Low', color: '#6366F1' },
+                { value: 'low', label: 'Low', color: 'var(--ion-color-primary)' },
                 { value: 'medium', label: 'Medium', color: '#F59E0B' },
                 { value: 'high', label: 'High', color: '#EF5350' },
                 { value: 'critical', label: 'Critical', color: '#DC2626' },
@@ -288,7 +284,7 @@ const ReportIncident: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': 'white',
               height: '48px',
               fontSize: '14px',
@@ -324,18 +320,16 @@ const ReportIncident: React.FC = () => {
             </IonCardContent>
           </IonCard>
         </div>
-        <AppFooter />
-      </IonContent>
 
-      {/* Success Alert */}
-      <IonAlert
-        isOpen={showSuccess}
-        onDidDismiss={() => setShowSuccess(false)}
-        header="Report Submitted"
-        message="Thank you for reporting this issue. Our team will review it shortly."
-        buttons={['OK']}
-      />
-    </IonPage>
+        {/* Success Alert */}
+        <IonAlert
+          isOpen={showSuccess}
+          onDidDismiss={() => setShowSuccess(false)}
+          header="Report Submitted"
+          message="Thank you for reporting this issue. Our team will review it shortly."
+          buttons={['OK']}
+        />
+      </>
   );
 };
 

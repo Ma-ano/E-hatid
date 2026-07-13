@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonPage, IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonBadge, IonToggle, IonLabel, IonSpinner } from '@ionic/react';
+import { IonCard, IonCardContent, IonButton, IonIcon, IonBadge, IonToggle, IonLabel, IonSpinner } from '@ionic/react';
 import { addOutline, createOutline, star, starOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
@@ -7,8 +7,6 @@ import { useAuth } from '../../context/AuthContext';
 import { getStallByVendorId, updateStallMenu } from '../../services/stallService';
 import { MenuItem } from '../../types';
 import ProductEditorModal from './components/ProductEditorModal';
-import './VendorProducts.css';
-import AppFooter from '../../components/AppFooter';
 
 const VendorProducts: React.FC = () => {
   const history = useHistory();
@@ -75,7 +73,7 @@ const VendorProducts: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         showBack={true}
@@ -83,14 +81,13 @@ const VendorProducts: React.FC = () => {
         onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
       />
 
-      <IonContent className="vendor-content-fix" style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div className="products-page">
-          <div className="page-header">
-            <h1>Products</h1>
-            <p className="page-subtitle">Manage your menu items, options, and availability</p>
+        <div className="p-4">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-[var(--tw-text-color)]">Products</h1>
+            <p className="text-sm text-[var(--tw-text-secondary)] mt-1">Manage your menu items, options, and availability</p>
           </div>
 
-          <div className="products-header-actions">
+          <div className="flex gap-3 mb-4">
             <IonButton style={{ '--background': '#8B5CF6' }} onClick={handleAddProduct}>
               <IonIcon icon={addOutline} slot="start" />
               Add Product
@@ -98,54 +95,54 @@ const VendorProducts: React.FC = () => {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '48px' }}><IonSpinner name="crescent" /></div>
+            <div className="text-center p-12"><IonSpinner name="crescent" /></div>
           ) : products.length === 0 ? (
-            <IonCard className="orders-card"><IonCardContent><p style={{ textAlign: 'center', color: 'var(--ion-text-color-secondary)', margin: 0 }}>No products yet. Add your first menu item.</p></IonCardContent></IonCard>
+            <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No products yet. Add your first menu item.</p></IonCardContent></IonCard>
           ) : (
-            <div className="products-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {products.map(product => (
-                <IonCard key={product.id} className={`product-card ${!product.available ? 'unavailable' : ''}`} style={{ margin: 0 }}>
-                  <div className="product-image" style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)', height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-                    {product.popular && <span className="product-popular-badge">🔥 Popular</span>}
+                <IonCard key={product.id} className={`rounded-xl shadow ${!product.available ? 'opacity-60' : ''}`} style={{ margin: 0 }}>
+                  <div style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)', height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                    {product.popular && <span className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">🔥 Popular</span>}
                     {product.image ? (
-                      <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} />
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover absolute inset-0" />
                     ) : (
-                      <span style={{ fontSize: '36px', color: 'rgba(255,255,255,0.5)' }}>{product.name.charAt(0)}</span>
+                      <span className="text-4xl text-white/50">{product.name.charAt(0)}</span>
                     )}
                   </div>
                   <IonCardContent>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 style={{ margin: '0 0 4px', fontWeight: 700, color: 'var(--ion-text-color)' }}>{product.name}</h3>
-                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>{product.category}</p>
+                        <h3 className="m-0 mb-1 font-bold text-[var(--tw-text-color)]">{product.name}</h3>
+                        <p className="m-0 text-xs text-[var(--tw-text-secondary)]">{product.category}</p>
                       </div>
-                      <IonBadge color={product.available ? 'success' : 'medium'} style={{ fontSize: '11px' }}>
+                      <IonBadge color={product.available ? 'success' : 'medium'} className="text-xs">
                         {product.available ? 'Available' : 'Unavailable'}
                       </IonBadge>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '20px', fontWeight: 700, color: '#8B5CF6' }}>₱{product.price.toFixed(2)}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xl font-bold text-[#8B5CF6]">₱{product.price.toFixed(2)}</span>
+                      <div className="flex items-center gap-1">
                         {product.options && product.options.length > 0 && (
-                          <span style={{ fontSize: '11px', color: 'var(--ion-text-color-secondary)', background: 'var(--ion-card-background)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--ion-border-color)' }}>
+                          <span className="text-xs text-[var(--tw-text-secondary)] bg-[var(--tw-bg)] px-2 py-0.5 rounded border border-[var(--tw-border-color)]">
                             {product.options.length} option groups
                           </span>
                         )}
                         {product.addOns && product.addOns.length > 0 && (
-                          <span style={{ fontSize: '11px', color: 'var(--ion-text-color-secondary)', background: 'var(--ion-card-background)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--ion-border-color)' }}>
+                          <span className="text-xs text-[var(--tw-text-secondary)] bg-[var(--tw-bg)] px-2 py-0.5 rounded border border-[var(--tw-border-color)]">
                             {product.addOns.length} add-ons
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="product-toggles">
-                      <div className="product-toggle-row">
-                        <IonLabel className="toggle-label">Available</IonLabel>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <IonLabel>Available</IonLabel>
                         <IonToggle checked={product.available} onIonChange={() => toggleAvailable(product.id)} style={{ '--background-checked': '#8B5CF6' }} />
                       </div>
-                      <div className="product-toggle-row">
-                        <IonLabel className="toggle-label">
+                      <div className="flex items-center justify-between">
+                        <IonLabel>
                           <IonIcon icon={product.popular ? star : starOutline} style={{ color: '#F59E0B', marginRight: '4px', fontSize: '14px' }} />
                           Popular
                         </IonLabel>
@@ -153,7 +150,7 @@ const VendorProducts: React.FC = () => {
                       </div>
                     </div>
 
-                    <div style={{ marginTop: '12px' }}>
+                    <div className="mt-3">
                       <IonButton size="small" fill="outline" style={{ width: '100%', '--border-color': '#8B5CF6', '--color': '#8B5CF6' }} onClick={() => setEditingItem(product)}>
                         <IonIcon icon={createOutline} slot="start" />
                         Edit Options & Add-ons
@@ -165,8 +162,7 @@ const VendorProducts: React.FC = () => {
             </div>
           )}
         </div>
-        <AppFooter />
-      </IonContent>
+
 
       {editingItem && (
         <ProductEditorModal
@@ -176,7 +172,7 @@ const VendorProducts: React.FC = () => {
           onSave={handleSave}
         />
       )}
-    </IonPage>
+    </>
   );
 };
 

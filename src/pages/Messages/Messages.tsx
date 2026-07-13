@@ -1,7 +1,6 @@
 // src/pages/Messages/Messages.tsx
 import React, { useState, useEffect } from 'react';
 import {
-  IonPage,
   IonContent,
   IonSearchbar,
   IonCard,
@@ -34,7 +33,6 @@ import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
 import { Message } from '../../types';
-import AppFooter from '../../components/AppFooter';
 
 const Messages: React.FC = () => {
   const history = useHistory();
@@ -153,7 +151,7 @@ const Messages: React.FC = () => {
       case 'active':
         return '#10B981';
       case 'completed':
-        return '#6366F1';
+        return 'var(--ion-color-primary)';
       case 'cancelled':
         return '#EF4444';
       default:
@@ -182,22 +180,21 @@ const Messages: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         {/* Header with Back Button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>
           <IonButton 
             fill="clear" 
             onClick={() => history.goBack()}
-            style={{ '--color': '#6366F1', margin: '0 0 0 -8px' } as any}
+            style={{ '--color': 'var(--ion-color-primary)', margin: '0 0 0 -8px' } as any}
           >
             <IonIcon icon={arrowBack} />
           </IonButton>
@@ -248,7 +245,7 @@ const Messages: React.FC = () => {
                     <div style={{
                       width: '44px',
                       height: '44px',
-                      background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+                      background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
@@ -269,7 +266,7 @@ const Messages: React.FC = () => {
                           {conv.status}
                         </IonBadge>
                         {conv.unreadCount > 0 && (
-                          <IonBadge style={{ '--background': '#6366F1', fontSize: '9px' }}>
+                          <IonBadge style={{ '--background': 'var(--ion-color-primary)', fontSize: '9px' }}>
                             {conv.unreadCount}
                           </IonBadge>
                         )}
@@ -304,18 +301,16 @@ const Messages: React.FC = () => {
             ))
           )}
         </div>
-        <AppFooter />
-      </IonContent>
 
-      {/* Chat Modal */}
-      <IonModal isOpen={showChat} onDidDismiss={() => setShowChat(false)}>
-        <IonHeader>
-          <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
-            <IonButton slot="start" fill="clear" onClick={() => setShowChat(false)}>
-              <IonBackButton />
-            </IonButton>
-            <div style={{ flex: 1 }}>
-              <IonTitle style={{ fontSize: '14px' }}>
+        {/* Chat Modal */}
+        <IonModal isOpen={showChat} onDidDismiss={() => setShowChat(false)}>
+          <IonHeader>
+            <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
+              <IonButton slot="start" fill="clear" onClick={() => setShowChat(false)}>
+                <IonBackButton />
+              </IonButton>
+              <div style={{ flex: 1 }}>
+                <IonTitle style={{ fontSize: '14px' }}>
                 {selectedConversation?.otherPerson.name}
               </IonTitle>
               <p style={{ margin: '0 0 0 16px', fontSize: '11px', color: 'var(--ion-text-color-secondary)' }}>
@@ -358,7 +353,7 @@ const Messages: React.FC = () => {
                         padding: '12px 14px',
                         borderRadius: '12px',
                         background: msg.senderRole === 'user'
-                          ? '#6366F1'
+                          ? 'var(--ion-color-primary)'
                           : 'var(--ion-card-background)',
                         color: msg.senderRole === 'user' ? 'white' : 'var(--ion-text-color)',
                         fontSize: '13px',
@@ -458,7 +453,7 @@ const Messages: React.FC = () => {
                     <IonButton
                       fill="solid"
                       style={{
-                        '--background': '#6366F1',
+                        '--background': 'var(--ion-color-primary)',
                         '--color': 'white',
                         width: '44px',
                         height: '44px',
@@ -475,7 +470,7 @@ const Messages: React.FC = () => {
           )}
         </IonContent>
       </IonModal>
-    </IonPage>
+      </>
   );
 };
 

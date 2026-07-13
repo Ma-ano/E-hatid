@@ -1,8 +1,6 @@
 // src/pages/Rider/Earnings.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonCard,
   IonCardContent,
   IonBadge,
@@ -16,7 +14,6 @@ import { cashOutline, trendingUpOutline, downloadOutline, calendarOutline } from
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const RiderEarnings: React.FC = () => {
   const history = useHistory();
@@ -56,16 +53,15 @@ const RiderEarnings: React.FC = () => {
   const maxEarning = Math.max(...weeklyEarnings.map(e => e.amount));
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         {/* Rider Navigation */}
         <div style={{ 
           display: 'flex', 
@@ -81,7 +77,7 @@ const RiderEarnings: React.FC = () => {
             style={{
               '--background': 'transparent',
               '--color': 'var(--ion-text-color)',
-              border: '1px solid #6366F1',
+              border: '1px solid var(--ion-color-primary)',
               height: '40px',
               fontSize: '12px',
               fontWeight: 600,
@@ -112,7 +108,7 @@ const RiderEarnings: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': '#FFFFFF',
               height: '40px',
               fontSize: '12px',
@@ -153,7 +149,7 @@ const RiderEarnings: React.FC = () => {
             onClick={() => history.push('/activities')}
             style={{
               padding: '12px',
-              background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+              background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
               borderRadius: '12px',
               cursor: 'pointer',
               textAlign: 'center',
@@ -200,7 +196,7 @@ const RiderEarnings: React.FC = () => {
 
         {/* Total Earnings Card */}
         <div style={{ padding: '0 16px 16px' }}>
-          <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)' }}>
+          <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)' }}>
             <IonCardContent style={{ padding: '24px' }}>
               <div style={{ textAlign: 'center', color: 'white' }}>
                 <p style={{ margin: '0 0 8px', fontSize: '14px', opacity: 0.9 }}>Total Earnings</p>
@@ -228,7 +224,7 @@ const RiderEarnings: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <IonIcon icon={cashOutline} style={{ fontSize: '20px', color: '#6366F1' }} />
+                    <IonIcon icon={cashOutline} style={{ fontSize: '20px', color: 'var(--ion-color-primary)' }} />
                   </div>
                   <div>
                     <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Trips</p>
@@ -276,7 +272,7 @@ const RiderEarnings: React.FC = () => {
                       <div 
                         style={{
                           height: `${(day.amount / maxEarning) * 100}%`,
-                          background: 'linear-gradient(180deg, #6366F1 0%, #818CF8 100%)',
+                          background: 'linear-gradient(180deg, #FF5A1F 0%, #FF7A3D 100%)',
                           borderRadius: '8px 8px 0 0',
                           marginBottom: '8px',
                           minHeight: '20px'
@@ -297,15 +293,13 @@ const RiderEarnings: React.FC = () => {
           <IonButton 
             expand="block" 
             fill="outline"
-            style={{ '--border-color': '#6366F1', '--color': '#6366F1', margin: 0 }}
+            style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)', margin: 0 }}
           >
             <IonIcon slot="start" icon={downloadOutline} />
             Download Statement
           </IonButton>
         </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

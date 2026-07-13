@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  IonPage,
   IonContent,
   IonButton,
   IonIcon,
@@ -23,7 +22,6 @@ import { fetchStallById } from '../../services/stallService';
 import { updateOrderStatus } from '../../services/orderService';
 import type { Order, User, Stall } from '../../types';
 import PageHeader from '../../components/PageHeader';
-import AppFooter from '../../components/AppFooter';
 
 const statusSteps: { label: string; icon: string; statuses: Order['status'][] }[] = [
   { label: 'Order Placed', icon: checkmarkCircle, statuses: ['pending'] },
@@ -127,17 +125,15 @@ const OrderTracking: React.FC = () => {
 
   if (!order) {
     return (
-      <IonPage>
+      <>
         <PageHeader showLogo={true} cartCount={itemCount} />
-        <IonContent>
-          <div style={{ textAlign: 'center', padding: '48px' }}>
-            <p style={{ color: 'var(--ion-text-color-secondary)' }}>Order not found</p>
-            <IonButton style={{ '--background': '#6366F1' }} onClick={() => history.push('/user/home')}>
-              Back to Home
-            </IonButton>
-          </div>
-        </IonContent>
-      </IonPage>
+        <div style={{ textAlign: 'center', padding: '48px' }}>
+          <p style={{ color: 'var(--ion-text-color-secondary)' }}>Order not found</p>
+          <IonButton style={{ '--background': 'var(--ion-color-primary)' }} onClick={() => history.push('/customer/home')}>
+            Back to Home
+          </IonButton>
+        </div>
+      </>
     );
   }
 
@@ -166,16 +162,15 @@ const OrderTracking: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         cartCount={itemCount}
-        onCartClick={() => history.push('/user/cart')}
-        onOrdersClick={() => history.push('/user/orders')}
-        onProfileClick={() => history.push('/user/profile')}
+        onCartClick={() => history.push('/customer/cart')}
+        onOrdersClick={() => history.push('/customer/orders')}
+        onProfileClick={() => history.push('/customer/profile')}
       />
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
           <div className="page-container" style={{ flex: 1, paddingTop: '24px', paddingBottom: '40px', textAlign: 'center' }}>
             <div style={{
               width: '88px', height: '88px', borderRadius: '50%',
@@ -269,7 +264,7 @@ const OrderTracking: React.FC = () => {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <div style={{
                           width: '34px', height: '34px', borderRadius: '50%',
-                          background: cancelled ? (isActive ? '#EF4444' : 'var(--ion-card-background)') : (isActive ? '#6366F1' : 'var(--ion-card-background)'),
+                          background: cancelled ? (isActive ? '#EF4444' : 'var(--ion-card-background)') : (isActive ? 'var(--ion-color-primary)' : 'var(--ion-card-background)'),
                           border: isActive ? 'none' : '2px solid var(--ion-border-color)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           transition: 'all 0.3s ease', flexShrink: 0,
@@ -279,7 +274,7 @@ const OrderTracking: React.FC = () => {
                         {!isLast && (
                           <div style={{
                             width: '2px', height: '36px',
-                            background: isActive && !cancelled ? '#6366F1' : 'var(--ion-border-color)',
+                            background: isActive && !cancelled ? 'var(--ion-color-primary)' : 'var(--ion-border-color)',
                             transition: 'background 0.3s ease',
                           }} />
                         )}
@@ -310,7 +305,7 @@ const OrderTracking: React.FC = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                           <div style={{
                             width: '34px', height: '34px', borderRadius: '50%',
-                            background: cancelled ? (isActive ? '#EF4444' : 'var(--ion-card-background)') : (isActive ? '#6366F1' : 'var(--ion-card-background)'),
+                            background: cancelled ? (isActive ? '#EF4444' : 'var(--ion-card-background)') : (isActive ? 'var(--ion-color-primary)' : 'var(--ion-card-background)'),
                             border: isActive ? 'none' : '2px solid var(--ion-border-color)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             transition: 'all 0.3s ease', flexShrink: 0,
@@ -331,7 +326,7 @@ const OrderTracking: React.FC = () => {
                         {!isLast && (
                           <div style={{
                             flex: 1, height: '2px', margin: '0 8px', marginBottom: '24px',
-                            background: isActive && !cancelled ? '#6366F1' : 'var(--ion-border-color)',
+                            background: isActive && !cancelled ? 'var(--ion-color-primary)' : 'var(--ion-border-color)',
                             transition: 'background 0.3s ease',
                           }} />
                         )}
@@ -417,15 +412,13 @@ const OrderTracking: React.FC = () => {
             )}
 
             <IonButton expand="block" size="large"
-              style={{ '--background': '#6366F1', '--border-radius': '8px', height: '48px', fontSize: '16px', fontWeight: 600, marginTop: '40px' }}
-              onClick={() => history.push('/user/home')}
+              style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px', height: '48px', fontSize: '16px', fontWeight: 600, marginTop: '40px' }}
+              onClick={() => history.push('/customer/home')}
             >
               Back to Home
             </IonButton>
           </div>
-          <AppFooter />
         </div>
-      </IonContent>
 
       <IonAlert
         isOpen={showCancelAlert}
@@ -506,7 +499,7 @@ const OrderTracking: React.FC = () => {
           )}
         </IonContent>
       </IonModal>
-    </IonPage>
+    </>
   );
 };
 

@@ -1,13 +1,12 @@
-// src/components/ProtectedRoute.tsx
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { IonPage, IonContent, IonSpinner } from '@ionic/react';
 import { useAuth } from '../context/AuthContext';
+import FullScreenLoader from './FullScreenLoader';
 
 interface ProtectedRouteProps {
   path: string;
   exact?: boolean;
-  component: React.ComponentType<any>;
+  children: React.ReactNode;
   requireAuth?: boolean;
   requiredRole?: string;
 }
@@ -16,37 +15,32 @@ const roleLoginPaths: Record<string, string> = {
   vendor: '/vendor/login',
   admin: '/admin/login',
   rider: '/rider/login',
+  customer: '/login',
 };
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  path, 
-  exact = false, 
-  component: Component, 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  path,
+  exact = false,
+  children,
   requireAuth = true,
   requiredRole,
 }) => {
   const { user, authLoading } = useAuth();
 
   if (authLoading) {
-    return (
-      <IonPage>
-        <IonContent className="ion-padding" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IonSpinner name="crescent" />
-        </IonContent>
-      </IonPage>
-    );
+    return <FullScreenLoader />;
   }
 
   return (
     <Route exact={exact} path={path}>
       {requireAuth && !user ? (
-        <Redirect to={roleLoginPaths[requiredRole || ''] || '/user/login'} />
+        <Redirect to={roleLoginPaths[requiredRole || ''] || '/login'} />
       ) : requiredRole && user?.role !== requiredRole ? (
         <Redirect to="/" />
       ) : !requireAuth && user ? (
-        <Redirect to="/user/home" />
+        <Redirect to="/customer/home" />
       ) : (
-        <Component />
+        children
       )}
     </Route>
   );

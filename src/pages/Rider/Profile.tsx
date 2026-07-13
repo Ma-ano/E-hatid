@@ -1,8 +1,6 @@
 // src/pages/Rider/Profile.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonCard,
   IonCardContent,
   IonButton,
@@ -19,7 +17,6 @@ import { personOutline, callOutline, mailOutline, carOutline, starOutline, saveO
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const RiderProfile: React.FC = () => {
   const history = useHistory();
@@ -46,17 +43,16 @@ const RiderProfile: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    history.push('/user/login');
+    history.push('/login');
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={handleLogout}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         {/* Rider Navigation */}
         <div style={{ 
           display: 'flex', 
@@ -118,7 +114,7 @@ const RiderProfile: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': '#FFFFFF',
               height: '40px',
               fontSize: '12px',
@@ -143,7 +139,7 @@ const RiderProfile: React.FC = () => {
             onClick={() => history.push('/activities')}
             style={{
               padding: '12px',
-              background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+              background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
               borderRadius: '12px',
               cursor: 'pointer',
               textAlign: 'center',
@@ -184,7 +180,7 @@ const RiderProfile: React.FC = () => {
         </div>
 
         {/* Profile Header */}
-        <div style={{ padding: '24px 16px', textAlign: 'center', background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)' }}>
+        <div style={{ padding: '24px 16px', textAlign: 'center', background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)' }}>
           <div style={{
             width: '80px',
             height: '80px',
@@ -221,7 +217,7 @@ const RiderProfile: React.FC = () => {
               fill="clear" 
               size="small"
               onClick={() => setIsEditing(!isEditing)}
-              style={{ '--color': '#6366F1', margin: 0 }}
+              style={{ '--color': 'var(--ion-color-primary)', margin: 0 }}
             >
               {isEditing ? 'Done' : 'Edit'}
             </IonButton>
@@ -232,7 +228,7 @@ const RiderProfile: React.FC = () => {
               {isEditing ? (
                 <>
                   <IonItem lines="none" style={{ '--background': 'transparent', marginBottom: '12px' } as any}>
-                    <IonIcon icon={personOutline} slot="start" style={{ color: '#6366F1' }} />
+                    <IonIcon icon={personOutline} slot="start" style={{ color: 'var(--ion-color-primary)' }} />
                     <IonInput 
                       placeholder="Full Name"
                       value={profile.name}
@@ -241,7 +237,7 @@ const RiderProfile: React.FC = () => {
                     />
                   </IonItem>
                   <IonItem lines="none" style={{ '--background': 'transparent', marginBottom: '12px' } as any}>
-                    <IonIcon icon={mailOutline} slot="start" style={{ color: '#6366F1' }} />
+                    <IonIcon icon={mailOutline} slot="start" style={{ color: 'var(--ion-color-primary)' }} />
                     <IonInput 
                       placeholder="Email"
                       value={profile.email}
@@ -250,7 +246,7 @@ const RiderProfile: React.FC = () => {
                     />
                   </IonItem>
                   <IonItem lines="none" style={{ '--background': 'transparent' } as any}>
-                    <IonIcon icon={callOutline} slot="start" style={{ color: '#6366F1' }} />
+                    <IonIcon icon={callOutline} slot="start" style={{ color: 'var(--ion-color-primary)' }} />
                     <IonInput 
                       placeholder="Phone"
                       value={profile.phone}
@@ -336,7 +332,7 @@ const RiderProfile: React.FC = () => {
                 checked={notificationsEnabled} 
                 onIonChange={(e) => setNotificationsEnabled(e.detail.checked)}
                 slot="end"
-                style={{ '--background-checked': '#6366F1' }}
+                style={{ '--background-checked': 'var(--ion-color-primary)' }}
               />
             </IonItem>
           </IonCard>
@@ -347,7 +343,7 @@ const RiderProfile: React.FC = () => {
           {isEditing && (
             <IonButton 
               expand="block" 
-              style={{ '--background': '#6366F1', margin: '0 0 12px' }}
+              style={{ '--background': 'var(--ion-color-primary)', margin: '0 0 12px' }}
             >
               <IonIcon slot="start" icon={saveOutline} />
               Save Changes
@@ -363,9 +359,7 @@ const RiderProfile: React.FC = () => {
             Logout
           </IonButton>
         </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

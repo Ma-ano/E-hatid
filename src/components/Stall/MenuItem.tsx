@@ -3,7 +3,6 @@ import React from 'react';
 import { IonButton, IonIcon } from '@ionic/react';
 import { add, flame, checkmarkCircle } from 'ionicons/icons';
 import { MenuItem as MenuItemType } from '../../types';
-import './MenuItem.css';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -13,51 +12,52 @@ interface MenuItemProps {
 
 const MenuItem: React.FC<MenuItemProps> = ({ item, onAdd, quantity }) => {
   return (
-    <div className="menu-item-card">
+    <div className="rounded-xl overflow-hidden bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group">
       {/* Image Container */}
-      <div className="menu-item-image-wrapper">
-        <img src={item.image} alt={item.name} className="menu-item-image" />
-        <div className="menu-item-overlay"></div>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
         
         {/* Popular Badge */}
         {item.popular && (
-          <div className="menu-item-popular-badge">
-            <IonIcon icon={flame} className="popular-icon" />
-            <span>Popular</span>
+          <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-500/90 text-white px-2 py-1 rounded-full">
+            <IonIcon icon={flame} className="text-xs" />
+            <span className="text-xs font-semibold">Popular</span>
           </div>
         )}
       </div>
 
       {/* Content Container */}
-      <div className="menu-item-content">
+      <div className="flex flex-col flex-1 p-2 sm:p-3">
         {/* Header with Name and Action */}
-        <div className="menu-item-header">
-          <div className="menu-item-info">
-            <h3 className="menu-item-name">{item.name}</h3>
-            <p className="menu-item-description">{item.description}</p>
+        <div className="flex justify-between items-start mb-1 sm:mb-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-sm sm:text-base text-[var(--tw-text-color)] mb-0.5 truncate group-hover:text-[var(--ion-color-primary)] transition-colors">
+              {item.name}
+            </h3>
+            <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)] line-clamp-2">{item.description}</p>
           </div>
         </div>
 
         {/* Footer with Price and Button */}
-        <div className="menu-item-footer">
-          <div className="menu-item-price-section">
-            <span className="menu-item-price">₱{item.price.toFixed(2)}</span>
-          </div>
+        <div className="flex justify-between items-center mt-auto pt-2 sm:pt-3 border-t border-[var(--tw-border-color)]">
+          <span className="font-semibold text-sm sm:text-base text-[var(--tw-text-color)]">₱{item.price.toFixed(2)}</span>
           
           {quantity ? (
-            <div className="menu-item-quantity-badge">
-              <IonIcon icon={checkmarkCircle} className="quantity-check-icon" />
-              <span className="quantity-count">{quantity}</span>
+            <div className="flex items-center gap-1.5 bg-green-50 text-green-600 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
+              <IonIcon icon={checkmarkCircle} className="text-xs" />
+              <span className="font-semibold">x{quantity}</span>
             </div>
           ) : (
             <IonButton
-              className="menu-item-add-button"
+              className="min-h-[36px] text-xs sm:text-sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onAdd();
               }}
+              style={{ '--background': 'var(--ion-color-primary)', '--color': '#fff', '--border-radius': '8px' }}
             >
-              <IonIcon icon={add} className="add-icon" />
+              <IonIcon icon={add} className="mr-1" /> Add
             </IonButton>
           )}
         </div>

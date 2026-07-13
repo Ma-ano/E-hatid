@@ -1,7 +1,6 @@
 // src/pages/Admin/Dashboard.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
   IonContent,
   IonCard,
   IonCardContent,
@@ -21,7 +20,6 @@ import { peopleOutline, bicycleOutline, cartOutline, trendingUpOutline, warningO
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const AdminDashboard: React.FC = () => {
   const history = useHistory();
@@ -44,16 +42,15 @@ const AdminDashboard: React.FC = () => {
   ];
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         <div className="page-container" style={{ paddingTop: '16px', paddingBottom: '40px' }}>
         {/* Admin Navigation */}
         <div style={{ 
@@ -67,7 +64,7 @@ const AdminDashboard: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': '#FFFFFF',
               height: '40px',
               fontSize: '12px',
@@ -160,7 +157,7 @@ const AdminDashboard: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             {/* Total Users */}
             <IonCard 
-              style={{ margin: 0, background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)' }}
+              style={{ margin: 0, background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)' }}
             >
               <IonCardContent style={{ padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
@@ -303,7 +300,7 @@ const AdminDashboard: React.FC = () => {
             <IonButton 
               fill="clear" 
               size="small"
-              style={{ '--color': '#6366F1', margin: 0, height: '24px' } as any}
+              style={{ '--color': 'var(--ion-color-primary)', margin: 0, height: '24px' } as any}
               onClick={() => history.push('/activities')}
             >
               See All
@@ -323,7 +320,7 @@ const AdminDashboard: React.FC = () => {
                       padding: '12px',
                       background: 'var(--ion-background-color)',
                       borderRadius: '8px',
-                      borderLeft: `4px solid #6366F1`,
+                      borderLeft: `4px solid var(--ion-color-primary)`,
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                     }}
@@ -359,7 +356,7 @@ const AdminDashboard: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <IonButton 
               expand="block"
-              style={{ '--background': '#6366F1', margin: 0 }}
+              style={{ '--background': 'var(--ion-color-primary)', margin: 0 }}
               onClick={() => history.push('/admin/users')}
             >
               <IonIcon slot="start" icon={peopleOutline} />
@@ -376,8 +373,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
         </div>
-        <AppFooter />
-      </IonContent>
+
 
       {/* Activity Details Modal */}
       <IonModal isOpen={showActivityDetails} onDidDismiss={() => setShowActivityDetails(false)}>
@@ -425,7 +421,7 @@ const AdminDashboard: React.FC = () => {
           )}
         </IonContent>
       </IonModal>
-    </IonPage>
+    </>
   );
 };
 

@@ -87,7 +87,7 @@ const RiderRegister: React.FC = () => {
             <h1 style={{ 
               fontSize: '32px', 
               fontWeight: 800, 
-              color: '#6366F1',
+              color: 'var(--ion-color-primary)',
               marginBottom: '8px',
               margin: '0 0 12px 0'
             }}>
@@ -193,11 +193,11 @@ const RiderRegister: React.FC = () => {
               slot="start"
               checked={agreed}
               onIonChange={e => setAgreed(e.detail.checked)}
-              style={{ '--checkbox-background-checked': '#6366F1', '--border-color-checked': '#6366F1' } as any}
+              style={{ '--checkbox-background-checked': 'var(--ion-color-primary)', '--border-color-checked': 'var(--ion-color-primary)' } as any}
             />
             <IonLabel style={{ fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-              I agree to the <span style={{ color: '#6366F1', fontWeight: 700 }}>Terms of Service</span> and{' '}
-              <span style={{ color: '#6366F1', fontWeight: 700 }}>Privacy Policy</span>
+              I agree to the <span style={{ color: 'var(--ion-color-primary)', fontWeight: 700 }}>Terms of Service</span> and{' '}
+              <span style={{ color: 'var(--ion-color-primary)', fontWeight: 700 }}>Privacy Policy</span>
             </IonLabel>
           </IonItem>
 
@@ -206,7 +206,7 @@ const RiderRegister: React.FC = () => {
             size="large"
             className="rider-button"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--border-radius': '8px',
               height: '48px',
               fontSize: '16px',
@@ -222,7 +222,7 @@ const RiderRegister: React.FC = () => {
             <span style={{ color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>
               Already have an account?{' '}
               <span 
-                style={{ color: '#6366F1', fontWeight: 700, cursor: 'pointer' }}
+                style={{ color: 'var(--ion-color-primary)', fontWeight: 700, cursor: 'pointer' }}
                 onClick={() => history.push('/rider/login')}
               >
                 Sign In

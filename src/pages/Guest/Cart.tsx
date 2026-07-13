@@ -1,8 +1,6 @@
 // src/pages/Guest/Cart.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonButton,
   IonIcon,
   IonItem,
@@ -15,7 +13,6 @@ import CartItem from '../../components/Cart/CartItem';
 import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const GuestCart: React.FC = () => {
   const history = useHistory();
@@ -31,74 +28,48 @@ const GuestCart: React.FC = () => {
     if (isGuest) {
       setShowAuthModal(true);
     } else {
-      history.push('/user/login');
+      history.push('/login');
     }
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         showBackButton={true}
         backHref="/guest/home"
         cartCount={itemCount}
         onCartClick={() => history.push('/guest/cart')}
-        onOrdersClick={() => history.push('/user/orders')}
+        onOrdersClick={() => history.push('/customer/orders')}
         onProfileClick={() => {
           if (isGuest) {
-            history.push('/user/login');
+            history.push('/login');
           } else {
             logout();
-            history.push('/user/login');
+            history.push('/login');
           }
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-        <div className="page-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', paddingBottom: '40px' }}>
+
+        <div className="flex flex-col min-h-full">
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pb-10 sm:pb-16">
           {/* Page Title */}
-          <div style={{ padding: '20px 0 16px 0' }}>
-            <h2 style={{ 
-              margin: 0, 
-              fontSize: '28px', 
-              fontWeight: 700, 
-              color: 'var(--ion-text-color)' 
-            }}>
+          <div className="py-4 sm:py-5 md:py-6">
+            <h2 className="m-0 text-2xl xs:text-3xl sm:text-4xl font-bold text-[var(--ion-text-color)]">
               Your Cart
             </h2>
           </div>
           {items.length === 0 ? (
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              flex: 1,
-              padding: '24px',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                width: '120px',
-                height: '120px',
-                background: 'var(--ion-card-background)',
-                border: '2px solid var(--ion-border-color)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '24px'
-              }}>
-                <IonIcon icon={bicycleOutline} style={{ fontSize: '48px', color: '#6366F1' }} />
+            <div className="flex flex-col items-center justify-center flex-1 px-6 text-center">
+              <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 rounded-full bg-[var(--ion-card-background)] border-2 border-[var(--ion-border-color)] flex items-center justify-center mb-6">
+                <IonIcon icon={bicycleOutline} className="text-4xl sm:text-5xl text-[var(--ion-color-primary)]" />
               </div>
-              <h2 style={{ margin: '0 0 8px', fontWeight: 700, color: 'var(--ion-text-color)' }}>Your cart is empty</h2>
-              <p style={{ margin: 0, color: 'var(--ion-text-color-secondary)' }}>Add some delicious food to get started!</p>
+              <h2 className="m-0 mb-2 font-bold text-base sm:text-lg text-[var(--ion-text-color)]">Your cart is empty</h2>
+              <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">Add some delicious food to get started!</p>
               <IonButton
-                style={{ 
-                  marginTop: '24px',
-                  '--background': '#6366F1',
-                  '--border-radius': '8px'
-                }}
+                className="mt-6 min-h-[44px]"
+                style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px' }}
                 onClick={() => history.push('/guest/home')}
               >
                 Browse Stalls
@@ -107,37 +78,19 @@ const GuestCart: React.FC = () => {
           ) : (
             <>
               {/* Delivery Address */}
-              <div style={{ 
-                background: 'var(--ion-card-background)', 
-                margin: '0 0 16px 0', 
-                padding: '16px', 
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                border: '1px solid var(--ion-border-color)'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  background: 'var(--ion-background-color)',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid var(--ion-border-color)'
-                }}>
-                  <IonIcon icon={locationOutline} style={{ color: '#6366F1', fontSize: '20px' }} />
+              <div className="flex items-center gap-4 bg-[var(--ion-card-background)] mb-4 p-4 md:p-6 rounded-2xl border border-[var(--ion-border-color)]">
+                <div className="w-10 h-10 rounded-full bg-[var(--ion-background-color)] border border-[var(--ion-border-color)] flex items-center justify-center shrink-0">
+                  <IonIcon icon={locationOutline} className="text-[var(--ion-color-primary)] text-xl" />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: '0 0 4px', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Deliver to</p>
-                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--ion-text-color)' }}>Current Location</p>
+                <div className="flex-1 min-w-0">
+                  <p className="m-0 mb-0.5 text-xs text-[var(--ion-text-color-secondary)]">Deliver to</p>
+                  <p className="m-0 font-semibold text-sm sm:text-base text-[var(--ion-text-color)] truncate">Current Location</p>
                 </div>
-                <IonButton fill="clear" style={{ '--color': '#6366F1' }} onClick={() => history.push('/guest/location')}>Change</IonButton>
+                <IonButton fill="clear" className="shrink-0 min-h-[44px] text-sm" style={{ '--color': 'var(--ion-color-primary)' }} onClick={() => history.push('/guest/location')}>Change</IonButton>
               </div>
 
               {/* Cart Items */}
-              <div>
+              <div className="space-y-3 sm:space-y-4">
                 {items.map(item => (
                   <CartItem 
                     key={item.id} 
@@ -149,49 +102,35 @@ const GuestCart: React.FC = () => {
               </div>
 
               {/* Bill Details */}
-              <div style={{ 
-                background: 'var(--ion-card-background)', 
-                margin: '0', 
-                padding: '16px', 
-                borderRadius: '12px',
-                border: '1px solid var(--ion-border-color)'
-              }}>
-                <h3 style={{ margin: '0 0 16px', fontWeight: 700, fontSize: '16px', color: 'var(--ion-text-color)' }}>Bill Details</h3>
+              <div className="bg-[var(--ion-card-background)] mt-4 p-4 md:p-6 rounded-2xl border border-[var(--ion-border-color)]">
+                <h3 className="m-0 mb-4 font-bold text-sm sm:text-base text-[var(--ion-text-color)]">Bill Details</h3>
                 
-                <IonItem lines="none" style={{ '--padding-start': 0, '--inner-padding-end': 0, '--background': 'transparent' } as any}>
-                  <IonLabel style={{ color: 'var(--ion-text-color)' }}>Subtotal</IonLabel>
-                  <span slot="end" style={{ color: 'var(--ion-text-color)' }}>₱{total.toFixed(2)}</span>
-                </IonItem>
-                <IonItem lines="none" style={{ '--padding-start': 0, '--inner-padding-end': 0, '--background': 'transparent' } as any}>
-                  <IonLabel style={{ color: 'var(--ion-text-color)' }}>Delivery Fee</IonLabel>
-                  <span slot="end" style={{ color: 'var(--ion-text-color)' }}>₱{deliveryFee.toFixed(2)}</span>
-                </IonItem>
-                <IonItem lines="none" style={{ '--padding-start': 0, '--inner-padding-end': 0, '--background': 'transparent' } as any}>
-                  <IonLabel style={{ color: 'var(--ion-text-color)' }}>Service Fee</IonLabel>
-                  <span slot="end" style={{ color: 'var(--ion-text-color)' }}>₱{serviceFee.toFixed(2)}</span>
-                </IonItem>
+                <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
+                  <span>Subtotal</span>
+                  <span>₱{total.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
+                  <span>Delivery Fee</span>
+                  <span>₱{deliveryFee.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
+                  <span>Service Fee</span>
+                  <span>₱{serviceFee.toFixed(2)}</span>
+                </div>
                 
-                <div style={{ 
-                  borderTop: '1px solid var(--ion-border-color)', 
-                  marginTop: '12px', 
-                  paddingTop: '12px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontWeight: 700,
-                  fontSize: '18px',
-                  color: 'var(--ion-text-color)'
-                }}>
+                <div className="flex justify-between items-center pt-3 mt-2 border-t border-[var(--ion-border-color)] font-bold text-base sm:text-lg text-[var(--ion-text-color)]">
                   <span>Total</span>
-                  <span style={{ color: '#6366F1' }}>₱{finalTotal.toFixed(2)}</span>
+                  <span className="text-[var(--ion-color-primary)]">₱{finalTotal.toFixed(2)}</span>
                 </div>
               </div>
 
               {items.length > 0 && (
                 <IonButton
                   expand="block" size="large"
+                  className="mt-6 min-h-[48px] sm:min-h-[56px]"
                   style={{
-                    '--background': '#6366F1', '--border-radius': '8px',
-                    height: '56px', fontSize: '16px', fontWeight: 700, marginTop: '24px',
+                    '--background': 'var(--ion-color-primary)', '--border-radius': '8px',
+                    fontSize: '15px', fontWeight: 700,
                   }}
                   onClick={handleCheckout}
                 >
@@ -202,9 +141,9 @@ const GuestCart: React.FC = () => {
             </>
           )}
         </div>
-        <AppFooter />
+
       </div>
-      </IonContent>
+
 
       <IonModal isOpen={showAuthModal} onDidDismiss={() => setShowAuthModal(false)}>
         <div style={{
@@ -227,15 +166,15 @@ const GuestCart: React.FC = () => {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
             <IonButton expand="block" size="large"
-              style={{ '--background': '#6366F1', '--border-radius': '8px', height: '48px', fontSize: '15px', fontWeight: 600 }}
-              onClick={() => { setShowAuthModal(false); history.push('/user/login'); }}
+              style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px', height: '48px', fontSize: '15px', fontWeight: 600 }}
+              onClick={() => { setShowAuthModal(false); history.push('/login'); }}
             >
               <IonIcon slot="start" icon={logInOutline} />
               Log In
             </IonButton>
             <IonButton expand="block" size="large" fill="outline"
-              style={{ '--border-color': '#6366F1', '--color': '#6366F1', '--border-radius': '8px', height: '48px', fontSize: '15px', fontWeight: 600 }}
-              onClick={() => { setShowAuthModal(false); history.push('/user/register'); }}
+              style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)', '--border-radius': '8px', height: '48px', fontSize: '15px', fontWeight: 600 }}
+              onClick={() => { setShowAuthModal(false); history.push('/register'); }}
             >
               <IonIcon slot="start" icon={personAddOutline} />
               Sign Up
@@ -248,7 +187,7 @@ const GuestCart: React.FC = () => {
           </IonButton>
         </div>
       </IonModal>
-    </IonPage>
+    </>
   );
 };
 

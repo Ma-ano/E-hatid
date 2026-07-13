@@ -35,73 +35,78 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   customClass = ''
 }) => {
   return (
-    <IonHeader className={`ion-no-border page-header-constrained ${customClass}`}>
+    <IonHeader className={`ion-no-border ${customClass}`}>
       <IonToolbar
         style={{
           '--background': 'var(--ion-card-background)',
-          '--border-color': 'transparent'
+          '--border-color': 'transparent',
+          '--min-height': '56px'
         } as any}
       >
-        <IonButtons slot="start">
-          {(showBack || showBackButton) && (
-            <IonBackButton 
-              defaultHref={backHref} 
-              icon={arrowBack}
-              style={{ '--color': '#6366F1' }}
-            />
-          )}
-        </IonButtons>
+        <div className="flex items-center w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <IonButtons slot="start" className="shrink-0">
+            {(showBack || showBackButton) && (
+              <IonBackButton
+                defaultHref={backHref}
+                icon={arrowBack}
+                style={{ '--color': 'var(--ion-color-primary)', '--ionicon-stroke-width': '48px' }}
+              />
+            )}
+          </IonButtons>
 
-        <IonTitle
-          style={{
-            fontSize: '24px',
-            fontWeight: 700,
-            color: 'var(--ion-text-color)'
-          }}
-        >
-          {showLogo ? (
-            <span>
-              <IonIcon icon={carOutline} style={{ verticalAlign: 'middle', marginRight: '6px', color: '#6366F1' }} />
-              <span style={{ color: '#6366F1' }}>E-Hatid</span>
-            </span>
-          ) : (
-            title
-          )}
-        </IonTitle>
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            {showLogo ? (
+              <span className="inline-flex items-center gap-1.5 text-lg sm:text-xl md:text-2xl font-bold text-[var(--ion-text-color)]">
+                <IonIcon icon={carOutline} className="text-[var(--ion-color-primary)] shrink-0" />
+                <span className="text-[var(--ion-color-primary)] truncate">E-Hatid</span>
+              </span>
+            ) : (
+              <h1 className="text-base sm:text-lg md:text-xl font-bold text-[var(--ion-text-color)] truncate m-0">
+                {title}
+              </h1>
+            )}
+          </div>
 
-        <IonButtons slot="end">
-          {onCartClick && (
-            <IonButton onClick={onCartClick}>
-              <div style={{ position: 'relative' }}>
-                <IonIcon icon={cartOutline} style={{ fontSize: '24px', color: '#6366F1' }} />
-                {cartCount > 0 && (
-                  <IonBadge className="cart-badge">{cartCount}</IonBadge>
-                )}
-              </div>
-            </IonButton>
-          )}
-          <OrdersBadge onOrdersClick={onOrdersClick} />
-          {onLogoutClick && (
-            <IonButton onClick={onLogoutClick}>
-              <IonIcon icon={logOutOutline} style={{ fontSize: '24px', color: '#EF4444' }} />
-            </IonButton>
-          )}
-          {!onLogoutClick && onProfileClick && (
-            <IonButton onClick={onProfileClick}>
-              <IonIcon icon={personOutline} style={{ fontSize: '24px', color: 'var(--ion-text-color)' }} />
-            </IonButton>
-          )}
-          {!onLogoutClick && !onProfileClick && onLoginClick && onRegisterClick && (
-            <>
-              <IonButton fill="clear" size="small" onClick={onLoginClick} style={{ '--color': '#6366F1', fontWeight: 600 }}>
-                Login
+          <IonButtons slot="end" className="shrink-0 flex items-center gap-0.5 sm:gap-1">
+            {onCartClick && (
+              <IonButton onClick={onCartClick} className="min-w-[44px] min-h-[44px]">
+                <div className="relative">
+                  <IonIcon icon={cartOutline} className="text-xl sm:text-2xl text-[var(--ion-color-primary)]" />
+                  {cartCount > 0 && (
+                    <IonBadge className="cart-badge">{cartCount}</IonBadge>
+                  )}
+                </div>
               </IonButton>
-              <IonButton size="small" onClick={onRegisterClick} style={{ '--background': '#6366F1', '--color': '#ffffff', '--border-radius': '6px', fontWeight: 600 }}>
-                Register
+            )}
+            <OrdersBadge onOrdersClick={onOrdersClick} />
+            {onLogoutClick && (
+              <IonButton onClick={onLogoutClick} className="min-w-[44px] min-h-[44px]">
+                <IonIcon icon={logOutOutline} className="text-xl sm:text-2xl text-[#EF4444]" />
               </IonButton>
-            </>
-          )}
-        </IonButtons>
+            )}
+            {!onLogoutClick && onProfileClick && (
+              <IonButton onClick={onProfileClick} className="min-w-[44px] min-h-[44px]">
+                <IonIcon icon={personOutline} className="text-xl sm:text-2xl text-[var(--ion-text-color)]" />
+              </IonButton>
+            )}
+            {!onLogoutClick && !onProfileClick && onLoginClick && onRegisterClick && (
+              <>
+                <IonButton fill="clear" size="small" onClick={onLoginClick}
+                  className="text-sm sm:text-base font-semibold min-h-[44px]"
+                  style={{ '--color': 'var(--ion-color-primary)' }}
+                >
+                  Login
+                </IonButton>
+                <IonButton size="small" onClick={onRegisterClick}
+                  className="hidden xs:inline-flex text-xs sm:text-sm font-semibold min-h-[44px]"
+                  style={{ '--background': 'var(--ion-color-primary)', '--color': '#ffffff', '--border-radius': '6px' }}
+                >
+                  Register
+                </IonButton>
+              </>
+            )}
+          </IonButtons>
+        </div>
       </IonToolbar>
     </IonHeader>
   );
@@ -115,7 +120,7 @@ const OrdersBadge: React.FC<{ onOrdersClick?: () => void }> = ({ onOrdersClick }
   return (
     <IonButton onClick={onOrdersClick}>
       <div style={{ position: 'relative' }}>
-        <IonIcon icon={documentTextOutline} style={{ fontSize: '24px', color: '#6366F1' }} />
+        <IonIcon icon={documentTextOutline} style={{ fontSize: '24px', color: 'var(--ion-color-primary)' }} />
         {activeOrderCount > 0 && (
           <IonBadge className="cart-badge">{activeOrderCount}</IonBadge>
         )}

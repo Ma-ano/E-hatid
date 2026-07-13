@@ -1,71 +1,54 @@
-/* For information on how to create your own theme, please refer to:
-http://ionicframework.com/docs/theming/ */
-/* src/theme/variables.css */
-
 :root {
-  /**
-   * CLEAN & PROFESSIONAL COLOR SCHEME
-   * Simple, modern, and easy to maintain
-   */
-
-  /* ==================== BRAND COLORS ==================== */
-  --ion-color-primary: #6366F1;
-  --ion-color-primary-rgb: 99, 102, 241;
+  --ion-color-primary: #FF5A1F;
+  --ion-color-primary-rgb: 255, 90, 31;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #4F46E5;
-  --ion-color-primary-tint: #818CF8;
+  --ion-color-primary-shade: #E04E1B;
+  --ion-color-primary-tint: #FF7A3D;
 
-  --ion-color-secondary: #EC4899;
-  --ion-color-secondary-rgb: 236, 72, 153;
+  --ion-color-secondary: #FF7A3D;
+  --ion-color-secondary-rgb: 255, 122, 61;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #DB2777;
-  --ion-color-secondary-tint: #F472B6;
+  --ion-color-secondary-shade: #E06B34;
+  --ion-color-secondary-tint: #FF9566;
 
-  /* ==================== STATUS COLORS ==================== */
-  --ion-color-success: #10B981;
-  --ion-color-warning: #F59E0B;
+  --ion-color-success: #22C55E;
+  --ion-color-warning: #FACC15;
   --ion-color-danger: #EF4444;
-  --ion-color-light: #F3F4F6;
-  --ion-color-medium: #9CA3AF;
-  --ion-color-dark: #111827;
+  --ion-color-light: #F1F5F9;
+  --ion-color-medium: #94A3B8;
+  --ion-color-dark: #0F172A;
 }
 
-/* ==================== LIGHT MODE (DEFAULT) ==================== */
 :root {
-  --ion-background-color: #DDE1E5;
-  --ion-background-color-rgb: 221, 225, 229;
-  --ion-text-color: #1a1a1a;
-  --ion-text-color-rgb: 26, 26, 26;
-  --ion-text-color-secondary: #4B5563;
-  
+  --ion-background-color: #F8FAFC;
+  --ion-background-color-rgb: 248, 250, 252;
+  --ion-text-color: #0F172A;
+  --ion-text-color-rgb: 15, 23, 42;
+  --ion-text-color-secondary: #64748B;
+
   --ion-card-background: #FFFFFF;
   --ion-item-background: #FFFFFF;
   --ion-toolbar-background: #FFFFFF;
-  
-  --ion-border-color: #B8BCC4;
-  --ion-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+  --ion-border-color: #E5E7EB;
 }
 
-/* ==================== DARK MODE ==================== */
-:root.dark-mode {
-  --ion-background-color: #111827;
-  --ion-background-color-rgb: 17, 24, 39;
-  --ion-text-color: #F3F4F6;
-  --ion-text-color-rgb: 243, 244, 246;
-  --ion-text-color-secondary: #D1D5DB;
-  
-  --ion-card-background: #1F2937;
-  --ion-item-background: #1F2937;
-  --ion-toolbar-background: #1F2937;
-  
-  --ion-border-color: #374151;
-  --ion-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+.dark {
+  --ion-background-color: #0B0F19;
+  --ion-background-color-rgb: 11, 15, 25;
+  --ion-text-color: #F1F5F9;
+  --ion-text-color-rgb: 241, 245, 249;
+  --ion-text-color-secondary: #94A3B8;
+
+  --ion-card-background: #1E293B;
+  --ion-item-background: #1E293B;
+  --ion-toolbar-background: #1E293B;
+
+  --ion-border-color: #334155;
 }
 
-/* ==================== SELECT DROPDOWN FIX ==================== */
-/* Fix for IonSelect options visibility in modal/popover */
 ion-select-option {
   color: var(--ion-text-color) !important;
   --ion-item-color: var(--ion-text-color);
@@ -78,7 +61,6 @@ ion-select-option.md {
   --color: var(--ion-text-color) !important;
 }
 
-/* Fix for select popover/modal text color */
 .select-popover,
 .select-bottom {
   --ion-text-color: var(--ion-text-color) !important;
@@ -95,7 +77,6 @@ ion-select-option.md {
   color: var(--ion-text-color) !important;
 }
 
-/* Fix for alert items in select modal */
 .alert.select-alert {
   --ion-background-color: var(--ion-item-background) !important;
   --ion-text-color: var(--ion-text-color) !important;
@@ -116,12 +97,10 @@ ion-select-option.md {
   color: var(--ion-text-color) !important;
 }
 
-/* Fix for all ion-label in alerts */
 .alert ion-label {
   color: var(--ion-text-color) !important;
 }
 
-/* iOS alert specific fixes */
 .alert {
   --ion-background-color: var(--ion-item-background) !important;
   --ion-text-color: var(--ion-text-color) !important;
@@ -146,4 +125,3 @@ ion-select-option.md {
 .alert .alert-button {
   color: var(--ion-color-primary);
 }
-

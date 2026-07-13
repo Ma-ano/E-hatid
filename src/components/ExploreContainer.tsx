@@ -1,12 +1,20 @@
-import './ExploreContainer.css';
-
 interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
   return (
-    <div id="container">
-      <strong>Ready to create an app?</strong>
-      <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <div className="flex flex-col items-center justify-center p-4 sm:p-8">
+      <strong className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-center">Ready to create an app?</strong>
+      <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)] text-center">
+        Start with Ionic{' '}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://ionicframework.com/docs/components"
+          className="text-[var(--ion-color-primary)] font-medium hover:underline"
+        >
+          UI Components
+        </a>
+      </p>
     </div>
   );
 };

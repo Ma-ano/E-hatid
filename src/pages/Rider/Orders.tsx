@@ -1,8 +1,6 @@
 // src/pages/Rider/Orders.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonSegment,
   IonSegmentButton,
   IonLabel,
@@ -16,7 +14,6 @@ import { timeOutline, checkmarkCircleOutline, navigateOutline } from 'ionicons/i
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const RiderOrders: React.FC = () => {
   const history = useHistory();
@@ -70,7 +67,7 @@ const RiderOrders: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'picking_up': return '#F59E0B';
-      case 'delivering': return '#6366F1';
+      case 'delivering': return 'var(--ion-color-primary)';
       case 'delivered': return '#10B981';
       default: return '#9CA3AF';
     }
@@ -86,16 +83,15 @@ const RiderOrders: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         {/* Rider Navigation */}
         <div style={{ 
           display: 'flex', 
@@ -111,7 +107,7 @@ const RiderOrders: React.FC = () => {
             style={{
               '--background': 'transparent',
               '--color': 'var(--ion-text-color)',
-              border: '1px solid #6366F1',
+              border: '1px solid var(--ion-color-primary)',
               height: '40px',
               fontSize: '12px',
               fontWeight: 600,
@@ -126,7 +122,7 @@ const RiderOrders: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': '#FFFFFF',
               height: '40px',
               fontSize: '12px',
@@ -183,7 +179,7 @@ const RiderOrders: React.FC = () => {
             onClick={() => history.push('/activities')}
             style={{
               padding: '12px',
-              background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+              background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
               borderRadius: '12px',
               cursor: 'pointer',
               textAlign: 'center',
@@ -279,13 +275,13 @@ const RiderOrders: React.FC = () => {
                       <IonButton 
                         expand="block"
                         fill="outline"
-                        style={{ '--border-color': '#6366F1', '--color': '#6366F1', margin: 0 }}
+                        style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)', margin: 0 }}
                       >
                         Call
                       </IonButton>
                       <IonButton 
                         expand="block"
-                        style={{ '--background': '#6366F1', margin: 0 }}
+                        style={{ '--background': 'var(--ion-color-primary)', margin: 0 }}
                         onClick={() => history.push(`/rider/tracking/${order.id}`)}
                       >
                         Track
@@ -332,7 +328,7 @@ const RiderOrders: React.FC = () => {
                     </div>
                     <div>
                       <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Earned</p>
-                      <p style={{ margin: '4px 0 0', fontSize: '16px', color: '#6366F1', fontWeight: 700 }}>
+                      <p style={{ margin: '4px 0 0', fontSize: '16px', color: 'var(--ion-color-primary)', fontWeight: 700 }}>
                         ₱{order.fee}
                       </p>
                     </div>
@@ -342,9 +338,7 @@ const RiderOrders: React.FC = () => {
             ))}
           </div>
         )}
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

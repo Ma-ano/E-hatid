@@ -1,8 +1,6 @@
 // src/pages/Admin/Users.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonCard,
   IonCardContent,
   IonSearchbar,
@@ -17,7 +15,6 @@ import { personOutline, trashOutline, lockOpenOutline, lockClosedOutline } from 
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const AdminUsers: React.FC = () => {
   const history = useHistory();
@@ -86,16 +83,15 @@ const AdminUsers: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         <div className="page-container" style={{ paddingTop: '16px', paddingBottom: '40px' }}>
         {/* Admin Navigation */}
         <div style={{ 
@@ -125,7 +121,7 @@ const AdminUsers: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': '#FFFFFF',
               height: '40px',
               fontSize: '12px',
@@ -311,9 +307,7 @@ const AdminUsers: React.FC = () => {
           )}
         </div>
       </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

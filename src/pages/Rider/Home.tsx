@@ -1,8 +1,6 @@
 // src/pages/Rider/Home.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonButton,
   IonCard,
   IonCardHeader,
@@ -18,7 +16,6 @@ import { mapOutline, cashOutline, checkmarkCircleOutline, timeOutline, navigateO
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const RiderHome: React.FC = () => {
   const history = useHistory();
@@ -60,301 +57,207 @@ const RiderHome: React.FC = () => {
   ];
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
-        {/* Rider Navigation */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px',
-          padding: '16px',
-          overflowX: 'auto',
-          background: 'var(--ion-card-background)',
-          borderBottomLeftRadius: '12px',
-          borderBottomRightRadius: '12px'
-        }}>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': '#6366F1',
-              '--color': '#FFFFFF',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-          >
-            🏠 Home
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/orders')}
-          >
-            📦 Orders
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/earnings')}
-          >
-            💰 Earnings
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/profile')}
-          >
-            👤 Profile
-          </IonButton>
-        </div>
-
-        {/* Quick Access Menu */}
-        <div style={{
-          padding: '0 16px 16px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '10px'
-        }}>
-          <div 
-            onClick={() => history.push('/activities')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>📋</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Activity</p>
+        <div className="max-w-4xl mx-auto">
+          {/* Rider Navigation */}
+          <div className="flex gap-2 p-3 sm:p-4 overflow-x-auto bg-[var(--ion-card-background)] rounded-b-xl">
+            <IonButton
+              expand="block"
+              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
+              style={{ '--background': 'var(--ion-color-primary)', '--color': '#FFFFFF', textTransform: 'none' }}
+            >
+              🏠 Home
+            </IonButton>
+            <IonButton
+              expand="block"
+              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
+              style={{ '--background': 'transparent', '--color': 'var(--ion-text-color)', textTransform: 'none', '--border-color': 'var(--ion-border-color)' }}
+              onClick={() => history.push('/rider/orders')}
+            >
+              📦 Orders
+            </IonButton>
+            <IonButton
+              expand="block"
+              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
+              style={{ '--background': 'transparent', '--color': 'var(--ion-text-color)', textTransform: 'none', '--border-color': 'var(--ion-border-color)' }}
+              onClick={() => history.push('/rider/earnings')}
+            >
+              💰 Earnings
+            </IonButton>
+            <IonButton
+              expand="block"
+              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
+              style={{ '--background': 'transparent', '--color': 'var(--ion-text-color)', textTransform: 'none', '--border-color': 'var(--ion-border-color)' }}
+              onClick={() => history.push('/rider/profile')}
+            >
+              👤 Profile
+            </IonButton>
           </div>
-          <div 
-            onClick={() => history.push('/messages')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>💬</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Messages</p>
-          </div>
-        </div>
 
-        {/* Status Toggle */}
-        <div style={{ padding: '16px' }}>
-          <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-            <IonCardContent>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Quick Access Menu */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 p-3 sm:p-4">
+            <div onClick={() => history.push('/activities')}
+              className="p-3 sm:p-4 rounded-xl cursor-pointer text-center text-white bg-gradient-to-br from-[#FF5A1F] to-[#FF7A3D] hover:opacity-90 transition-opacity"
+            >
+              <div className="text-lg sm:text-xl mb-1">📋</div>
+              <p className="m-0 text-[10px] sm:text-xs font-semibold">Activity</p>
+            </div>
+            <div onClick={() => history.push('/messages')}
+              className="p-3 sm:p-4 rounded-xl cursor-pointer text-center text-white bg-gradient-to-br from-[#10B981] to-[#34D399] hover:opacity-90 transition-opacity"
+            >
+              <div className="text-lg sm:text-xl mb-1">💬</div>
+              <p className="m-0 text-[10px] sm:text-xs font-semibold">Messages</p>
+            </div>
+          </div>
+
+          {/* Status Toggle */}
+          <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+            <div className="bg-[var(--ion-card-background)] rounded-xl border border-[var(--ion-border-color)] p-3 sm:p-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 style={{ margin: 0, color: 'var(--ion-text-color)', fontWeight: 700 }}>
+                  <h3 className="m-0 text-sm sm:text-base font-bold text-[var(--ion-text-color)]">
                     {isAvailable ? 'Online' : 'Offline'}
                   </h3>
-                  <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>
+                  <p className="m-0 mt-1 text-xs text-[var(--ion-text-color-secondary)]">
                     {isAvailable ? 'Ready to accept orders' : 'Tap to go online'}
                   </p>
                 </div>
-                <IonToggle 
-                  checked={isAvailable} 
+                <IonToggle
+                  checked={isAvailable}
                   onIonChange={(e) => setIsAvailable(e.detail.checked)}
-                  style={{ '--background-checked': '#6366F1' }}
+                  style={{ '--background-checked': 'var(--ion-color-primary)' }}
                 />
               </div>
-            </IonCardContent>
-          </IonCard>
-        </div>
-
-        {/* Quick Stats */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            {/* Today's Earnings */}
-            <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    background: 'rgba(255,255,255,0.2)', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <IonIcon icon={cashOutline} style={{ fontSize: '20px', color: 'white' }} />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Today's Earnings</p>
-                    <h4 style={{ margin: '4px 0 0', color: 'white', fontWeight: 700 }}>₱{earnings.toFixed(2)}</h4>
-                  </div>
-                </div>
-              </IonCardContent>
-            </IonCard>
-
-            {/* Completed Deliveries */}
-            <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    background: 'rgba(255,255,255,0.2)', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <IonIcon icon={checkmarkCircleOutline} style={{ fontSize: '20px', color: 'white' }} />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Completed Today</p>
-                    <h4 style={{ margin: '4px 0 0', color: 'white', fontWeight: 700 }}>{completedDeliveries}</h4>
-                  </div>
-                </div>
-              </IonCardContent>
-            </IonCard>
+            </div>
           </div>
-        </div>
 
-        {/* Rating */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-            <IonCardContent>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <p style={{ margin: 0, fontSize: '14px', color: 'var(--ion-text-color-secondary)' }}>Current Rating</p>
-                  <h3 style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 700 }}>★ {rating}</h3>
+          {/* Quick Stats */}
+          <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="bg-gradient-to-br from-[#FF5A1F] to-[#FF7A3D] rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                    <IonIcon icon={cashOutline} className="text-lg sm:text-xl text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="m-0 text-[10px] sm:text-xs text-white/80">Today's Earnings</p>
+                    <h4 className="m-0 mt-1 text-sm sm:text-base font-bold text-white truncate">₱{earnings.toFixed(2)}</h4>
+                  </div>
                 </div>
-                <IonBadge color="light" style={{ fontSize: '14px', padding: '8px 12px' }}>Excellent</IonBadge>
               </div>
-            </IonCardContent>
-          </IonCard>
-        </div>
 
-        {/* Available Orders */}
-        {isAvailable && (
-          <>
-            <div style={{ padding: '16px 16px 8px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-                Available Orders
-              </h2>
+              <div className="bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                    <IonIcon icon={checkmarkCircleOutline} className="text-lg sm:text-xl text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="m-0 text-[10px] sm:text-xs text-white/80">Completed Today</p>
+                    <h4 className="m-0 mt-1 text-sm sm:text-base font-bold text-white truncate">{completedDeliveries}</h4>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div style={{ padding: '0 16px 16px' }}>
-              {availableOrders.map(order => (
-                <IonCard key={order.id} style={{ margin: '0 0 12px', background: 'var(--ion-card-background)' }}>
-                  <IonCardContent>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <div>
-                        <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-                          {order.stallName}
-                        </h3>
-                        <p style={{ margin: 0, fontSize: '14px', color: 'var(--ion-text-color-secondary)' }}>
-                          {order.customerName}
-                        </p>
-                      </div>
-                      <IonBadge color="light" style={{ '--background': '#6366F1', color: 'white', fontWeight: 700 }}>
-                        ₱{order.fee}
-                      </IonBadge>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', fontSize: '14px', color: 'var(--ion-text-color-secondary)' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <IonIcon icon={mapOutline} style={{ fontSize: '16px' }} />
-                        {order.distance}
-                      </span>
-                    </div>
-
-                    <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '12px', fontSize: '12px' }}>
-                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                        <IonIcon icon={navigateOutline} style={{ fontSize: '14px', color: '#6366F1' }} />
-                        <div>
-                          <p style={{ margin: 0, color: 'var(--ion-text-color-secondary)' }}>From:</p>
-                          <p style={{ margin: 0, color: 'var(--ion-text-color)', fontWeight: 600 }}>{order.pickupLocation}</p>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <IonIcon icon={navigateOutline} style={{ fontSize: '14px', color: '#10B981' }} />
-                        <div>
-                          <p style={{ margin: 0, color: 'var(--ion-text-color-secondary)' }}>To:</p>
-                          <p style={{ margin: 0, color: 'var(--ion-text-color)', fontWeight: 600 }}>{order.deliveryLocation}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <IonButton 
-                      expand="block"
-                      style={{ '--background': '#6366F1', margin: 0 }}
-                      onClick={() => history.push(`/rider/orders/${order.id}`)}
-                    >
-                      Accept Order
-                    </IonButton>
-                  </IonCardContent>
-                </IonCard>
-              ))}
-            </div>
-          </>
-        )}
-
-        {!isAvailable && (
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            padding: '40px 20px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔴</div>
-            <p style={{ color: 'var(--ion-text-color)', fontWeight: 700, fontSize: '16px' }}>You're currently offline</p>
-            <p style={{ color: 'var(--ion-text-color-secondary)', fontSize: '14px', marginBottom: '20px' }}>
-              Toggle above to go online and start accepting orders
-            </p>
           </div>
-        )}
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+
+          {/* Rating */}
+          <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+            <div className="bg-[var(--ion-card-background)] rounded-xl border border-[var(--ion-border-color)] p-3 sm:p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="m-0 text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">Current Rating</p>
+                  <h3 className="m-0 mt-1 text-sm sm:text-base font-bold text-[var(--ion-text-color)]">★ {rating}</h3>
+                </div>
+                <span className="text-xs sm:text-sm font-semibold bg-[var(--tw-light)] text-[var(--tw-text-secondary)] px-3 py-1.5 rounded-full">Excellent</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Available Orders */}
+          {isAvailable && (
+            <>
+              <div className="px-3 sm:px-4 pb-2 sm:pb-3">
+                <h2 className="m-0 text-base sm:text-lg font-bold text-[var(--ion-text-color)]">
+                  Available Orders
+                </h2>
+              </div>
+
+              <div className="px-3 sm:px-4 pb-4 space-y-3 sm:space-y-4">
+                {availableOrders.map(order => (
+                  <div key={order.id} className="bg-[var(--ion-card-background)] rounded-xl border border-[var(--ion-border-color)] overflow-hidden">
+                    <div className="p-3 sm:p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="m-0 mb-1 text-sm sm:text-base font-bold text-[var(--ion-text-color)] truncate">
+                            {order.stallName}
+                          </h3>
+                          <p className="m-0 text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">
+                            {order.customerName}
+                          </p>
+                        </div>
+                        <span className="shrink-0 bg-[var(--ion-color-primary)] text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full">
+                          ₱{order.fee}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-2 sm:gap-3 mb-3 text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">
+                        <span className="flex items-center gap-1">
+                          <IonIcon icon={mapOutline} className="text-sm" />
+                          {order.distance}
+                        </span>
+                      </div>
+
+                      <div className="bg-[var(--ion-background-color)] rounded-lg p-3 mb-3 text-xs sm:text-sm space-y-2">
+                        <div className="flex gap-2">
+                          <IonIcon icon={navigateOutline} className="text-sm text-[var(--ion-color-primary)] shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <p className="m-0 text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)]">From:</p>
+                            <p className="m-0 text-xs sm:text-sm font-semibold text-[var(--ion-text-color)] truncate">{order.pickupLocation}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <IonIcon icon={navigateOutline} className="text-sm text-[#10B981] shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <p className="m-0 text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)]">To:</p>
+                            <p className="m-0 text-xs sm:text-sm font-semibold text-[var(--ion-text-color)] truncate">{order.deliveryLocation}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <IonButton
+                        expand="block"
+                        className="min-h-[44px]"
+                        style={{ '--background': 'var(--ion-color-primary)', margin: 0 }}
+                        onClick={() => history.push(`/rider/orders/${order.id}`)}
+                      >
+                        Accept Order
+                      </IonButton>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {!isAvailable && (
+            <div className="flex flex-col items-center justify-center py-10 sm:py-16 px-5 text-center">
+              <div className="text-4xl sm:text-5xl mb-4">🔴</div>
+              <p className="text-sm sm:text-base font-bold text-[var(--ion-text-color)] m-0 mb-2">You're currently offline</p>
+              <p className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)] m-0 mb-5">
+                Toggle above to go online and start accepting orders
+              </p>
+            </div>
+          )}
+        </div>
+    </>
   );
 };
 

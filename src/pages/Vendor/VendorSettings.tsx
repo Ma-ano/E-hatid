@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IonPage, IonContent, IonCard, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonIcon, IonToggle, IonSpinner, IonToast } from '@ionic/react';
+import { IonCard, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonIcon, IonToggle, IonSpinner, IonToast } from '@ionic/react';
 import { storefrontOutline, timeOutline, bicycleOutline, cartOutline, notificationsOutline, colorPaletteOutline, cameraOutline, personOutline, callOutline, locationOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
 import { getStallByVendorId, createStall, updateStall } from '../../services/stallService';
-import './VendorSettings.css';
 import { compressImage } from '../../utils/compressImage';
-import AppFooter from '../../components/AppFooter';
 
 const VendorSettings: React.FC = () => {
   const history = useHistory();
@@ -151,25 +149,21 @@ const VendorSettings: React.FC = () => {
 
   if (loading) {
     return (
-      <IonPage>
+      <>
         <PageHeader showLogo={true} showBack={true} backHref="/vendor/dashboard" />
-        <IonContent style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', '--background': 'var(--ion-background-color)' } as any}>
-          <IonSpinner name="crescent" />
-        </IonContent>
-      </IonPage>
+        <IonSpinner name="crescent" />
+      </>
     );
   }
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         showBack={true}
         backHref="/vendor/dashboard"
         onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
       />
-
-      <IonContent className="vendor-content-fix" style={{ '--background': 'var(--ion-background-color)' } as any}>
         <div className="settings-page">
           <div className="page-header">
             <h1>Settings</h1>
@@ -358,9 +352,7 @@ const VendorSettings: React.FC = () => {
             color={toastMessage.includes('Failed') ? 'danger' : 'success'}
           />
         </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

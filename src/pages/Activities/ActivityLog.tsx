@@ -1,7 +1,6 @@
 // src/pages/Activities/ActivityLog.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
   IonContent,
   IonSegment,
   IonSegmentButton,
@@ -33,7 +32,6 @@ import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
 import { Activity } from '../../types';
-import AppFooter from '../../components/AppFooter';
 
 const ActivityLog: React.FC = () => {
   const history = useHistory();
@@ -130,7 +128,7 @@ const ActivityLog: React.FC = () => {
         return '#F59E0B';
       case 'info':
       default:
-        return '#6366F1';
+        return 'var(--ion-color-primary)';
     }
   };
 
@@ -197,22 +195,21 @@ const ActivityLog: React.FC = () => {
       });
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         {/* Header with Back Button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>
           <IonButton 
             fill="clear" 
             onClick={() => history.goBack()}
-            style={{ '--color': '#6366F1', margin: '0 0 0 -8px' } as any}
+            style={{ '--color': 'var(--ion-color-primary)', margin: '0 0 0 -8px' } as any}
           >
             <IonIcon icon={arrowBack} />
           </IonButton>
@@ -313,98 +310,96 @@ const ActivityLog: React.FC = () => {
             ))
           )}
         </div>
-        <AppFooter />
-      </IonContent>
 
-      {/* Activity Details Modal */}
-      <IonModal isOpen={showDetails} onDidDismiss={() => setShowDetails(false)}>
-        <IonHeader>
-          <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
-            <IonButton slot="start" fill="clear" onClick={() => setShowDetails(false)}>
-              <IonBackButton defaultHref="/user/home" />
-            </IonButton>
-            <IonTitle>Activity Details</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
-          {selectedActivity && (
-            <div style={{ padding: '16px' }}>
-              <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-                <IonCardContent style={{ padding: '16px' }}>
-                  {/* Header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                    <div style={{
-                      width: '56px',
-                      height: '56px',
-                      background: getActivityColor(selectedActivity.severity),
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <IonIcon icon={getActivityIcon(selectedActivity.type)} style={{ fontSize: '28px', color: 'white' }} />
-                    </div>
-                    <div>
-                      <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-                        {selectedActivity.title}
-                      </h2>
-                      <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>
-                        {new Date(selectedActivity.createdAt ?? '').toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Status Badge */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <IonBadge style={{ '--background': getActivityColor(selectedActivity.severity), fontSize: '12px', padding: '6px 12px' }}>
-                      {getStatusBadge(selectedActivity.severity)}
-                    </IonBadge>
-                  </div>
-
-                  {/* Description */}
-                  <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>
-                    <h4 style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>
-                      Description
-                    </h4>
-                    <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color)' }}>
-                      {selectedActivity.description}
-                    </p>
-                  </div>
-
-                  {/* Metadata */}
-                  {selectedActivity.metadata && Object.keys(selectedActivity.metadata).length > 0 && (
-                    <div>
-                      <h4 style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>
-                        Details
-                      </h4>
+        {/* Activity Details Modal */}
+        <IonModal isOpen={showDetails} onDidDismiss={() => setShowDetails(false)}>
+          <IonHeader>
+            <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
+              <IonButton slot="start" fill="clear" onClick={() => setShowDetails(false)}>
+                <IonBackButton defaultHref="/customer/home" />
+              </IonButton>
+              <IonTitle>Activity Details</IonTitle>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
+            {selectedActivity && (
+              <div style={{ padding: '16px' }}>
+                <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
+                  <IonCardContent style={{ padding: '16px' }}>
+                    {/* Header */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                       <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '12px',
-                        padding: '12px',
-                        background: 'var(--ion-background-color)',
-                        borderRadius: '8px'
+                        width: '56px',
+                        height: '56px',
+                        background: getActivityColor(selectedActivity.severity),
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                       }}>
-                        {Object.entries(selectedActivity.metadata).map(([key, value]) => (
-                          <div key={key}>
-                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--ion-text-color-secondary)', textTransform: 'capitalize' }}>
-                              {key.replace(/_/g, ' ')}
-                            </p>
-                            <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>
-                              {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                            </p>
-                          </div>
-                        ))}
+                        <IonIcon icon={getActivityIcon(selectedActivity.type)} style={{ fontSize: '28px', color: 'white' }} />
+                      </div>
+                      <div>
+                        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
+                          {selectedActivity.title}
+                        </h2>
+                        <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>
+                          {new Date(selectedActivity.createdAt ?? '').toLocaleString()}
+                        </p>
                       </div>
                     </div>
-                  )}
-                </IonCardContent>
-              </IonCard>
-            </div>
-          )}
-        </IonContent>
-      </IonModal>
-    </IonPage>
+
+                    {/* Status Badge */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <IonBadge style={{ '--background': getActivityColor(selectedActivity.severity), fontSize: '12px', padding: '6px 12px' }}>
+                        {getStatusBadge(selectedActivity.severity)}
+                      </IonBadge>
+                    </div>
+
+                    {/* Description */}
+                    <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>
+                      <h4 style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>
+                        Description
+                      </h4>
+                      <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color)' }}>
+                        {selectedActivity.description}
+                      </p>
+                    </div>
+
+                    {/* Metadata */}
+                    {selectedActivity.metadata && Object.keys(selectedActivity.metadata).length > 0 && (
+                      <div>
+                        <h4 style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>
+                          Details
+                        </h4>
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '12px',
+                          padding: '12px',
+                          background: 'var(--ion-background-color)',
+                          borderRadius: '8px'
+                        }}>
+                          {Object.entries(selectedActivity.metadata).map(([key, value]) => (
+                            <div key={key}>
+                              <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--ion-text-color-secondary)', textTransform: 'capitalize' }}>
+                                {key.replace(/_/g, ' ')}
+                              </p>
+                              <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>
+                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </IonCardContent>
+                </IonCard>
+              </div>
+            )}
+          </IonContent>
+        </IonModal>
+      </>
   );
 };
 

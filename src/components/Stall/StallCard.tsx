@@ -11,58 +11,44 @@ interface StallCardProps {
 
 const StallCard: React.FC<StallCardProps> = ({ stall, onClick }) => {
   return (
-    <IonCard 
-      className="rider-card stall-card" 
+    <div
+      className="rounded-xl overflow-hidden bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
       onClick={onClick}
-      style={{ margin: '0 0 16px 0', cursor: onClick ? 'pointer' : 'default' }}
     >
-      <div style={{ position: 'relative', height: '180px', overflow: 'hidden', borderRadius: '16px 16px 0 0' }}>
-        <img 
-          src={stall.image} 
+      <div className="relative w-full aspect-[4/3] overflow-hidden">
+        <img
+          src={stall.image}
           alt={stall.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          className="w-full h-full object-cover"
         />
-        <IonBadge 
-          color="light" 
-          style={{ 
-            position: 'absolute', 
-            top: '12px', 
-            right: '12px',
-            padding: '8px 12px',
-            borderRadius: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontWeight: 600
-          }}
-        >
-          <IonIcon icon={star} color="warning" style={{ fontSize: '14px' }} />
+        <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex items-center gap-1 bg-white/90 text-gray-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
+          <IonIcon icon={star} className="text-amber-500 text-xs" />
           {stall.rating}
-        </IonBadge>
+        </div>
       </div>
       
-      <IonCardHeader style={{ padding: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-          <IonCardTitle style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)', margin: 0 }}>
+      <div className="p-3 sm:p-4">
+        <div className="flex justify-between items-start gap-2 mb-2">
+          <h3 className="text-sm sm:text-base font-bold text-[var(--ion-text-color)] m-0 truncate">
             {stall.name}
-          </IonCardTitle>
-          <IonBadge color="light" style={{ color: '#6366F1', fontWeight: 600 }}>
+          </h3>
+          <span className="text-xs font-semibold text-[var(--ion-color-primary)] bg-[var(--ion-color-primary)]/10 px-2 py-0.5 rounded-full shrink-0">
             {stall.cuisine}
-          </IonBadge>
+          </span>
         </div>
         
-        <div style={{ display: 'flex', gap: '16px', color: '#6B7280', fontSize: '14px' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <IonIcon icon={timeOutline} />
+        <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">
+          <span className="flex items-center gap-1">
+            <IonIcon icon={timeOutline} className="text-sm" />
             {stall.deliveryTime}
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <IonIcon icon={bicycleOutline} />
+          <span className="flex items-center gap-1">
+            <IonIcon icon={bicycleOutline} className="text-sm" />
             ₱{stall.deliveryFee.toFixed(2)}
           </span>
         </div>
-      </IonCardHeader>
-    </IonCard>
+      </div>
+    </div>
   );
 };
 

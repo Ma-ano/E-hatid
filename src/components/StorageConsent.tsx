@@ -18,31 +18,19 @@ const StorageConsent: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 99999,
-      background: 'var(--ion-card-background)', color: 'var(--ion-text-color)',
-      borderTop: '1px solid var(--ion-border-color)',
-      padding: '14px 16px', paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
-      display: 'flex', alignItems: 'center', gap: '12px',
-      boxShadow: '0 -2px 12px rgba(0,0,0,0.1)',
-      animation: 'slideUp 0.3s ease',
-    }}>
-      <style>{`
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-      `}</style>
-      <p style={{ flex: 1, margin: 0, fontSize: '13px', lineHeight: 1.4 }}>
-        We use local storage to remember your preferences and cart items. By continuing, you agree to this.
-      </p>
-      <button onClick={accept} style={{
-        flexShrink: 0, padding: '8px 20px', borderRadius: '8px', border: 'none',
-        background: 'var(--ion-color-primary)', color: '#fff',
-        fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-      }}>
-        Accept
-      </button>
+    <div className="fixed bottom-0 left-0 right-0 z-[99999] bg-[var(--ion-card-background)] text-[var(--ion-text-color)] border-t border-[var(--ion-border-color)] px-3 sm:px-4 py-3 sm:py-4 shadow-lg animate-[slideUp_0.3s_ease]"
+      style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
+    >
+      <div className="flex items-center gap-3 max-w-4xl mx-auto">
+        <p className="flex-1 m-0 text-xs sm:text-sm leading-relaxed">
+          We use local storage to remember your preferences and cart items. By continuing, you agree to this.
+        </p>
+        <button onClick={accept}
+          className="shrink-0 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-none bg-[var(--ion-color-primary)] text-white text-xs sm:text-sm font-semibold cursor-pointer hover:opacity-90 transition-opacity min-h-[36px]"
+        >
+          Accept
+        </button>
+      </div>
     </div>
   );
 };

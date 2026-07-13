@@ -240,8 +240,8 @@ const VendorRegister: React.FC = () => {
               <button onClick={() => setPhoneType('mobile')}
                 style={{
                   flex: 1, padding: '6px', borderRadius: '6px', cursor: 'pointer',
-                  border: phoneType === 'mobile' ? '2px solid #6366F1' : '1px solid var(--ion-border-color)',
-                  background: phoneType === 'mobile' ? '#6366F1' : 'var(--ion-card-background)',
+                  border: phoneType === 'mobile' ? '2px solid var(--ion-color-primary)' : '1px solid var(--ion-border-color)',
+                  background: phoneType === 'mobile' ? 'var(--ion-color-primary)' : 'var(--ion-card-background)',
                   color: phoneType === 'mobile' ? '#fff' : 'var(--ion-text-color)',
                   fontFamily: 'inherit', fontSize: '13px', fontWeight: 600,
                 }}
@@ -251,8 +251,8 @@ const VendorRegister: React.FC = () => {
               <button onClick={() => setPhoneType('company')}
                 style={{
                   flex: 1, padding: '6px', borderRadius: '6px', cursor: 'pointer',
-                  border: phoneType === 'company' ? '2px solid #6366F1' : '1px solid var(--ion-border-color)',
-                  background: phoneType === 'company' ? '#6366F1' : 'var(--ion-card-background)',
+                  border: phoneType === 'company' ? '2px solid var(--ion-color-primary)' : '1px solid var(--ion-border-color)',
+                  background: phoneType === 'company' ? 'var(--ion-color-primary)' : 'var(--ion-card-background)',
                   color: phoneType === 'company' ? '#fff' : 'var(--ion-text-color)',
                   fontFamily: 'inherit', fontSize: '13px', fontWeight: 600,
                 }}

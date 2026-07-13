@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonPage, IonContent, IonCard, IonCardContent, IonIcon, IonSpinner } from '@ionic/react';
+import { IonCard, IonCardContent, IonIcon, IonSpinner } from '@ionic/react';
 import { star, starOutline, thumbsUp } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
@@ -7,8 +7,6 @@ import { useAuth } from '../../context/AuthContext';
 import { fetchReviewsByStall, getReviewStats } from '../../services/reviewService';
 import { getStallByVendorId } from '../../services/stallService';
 import { Review } from '../../types';
-import './VendorReviews.css';
-import AppFooter from '../../components/AppFooter';
 
 const VendorReviews: React.FC = () => {
   const history = useHistory();
@@ -46,7 +44,7 @@ const VendorReviews: React.FC = () => {
   }, [user]);
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         showBack={true}
@@ -54,37 +52,36 @@ const VendorReviews: React.FC = () => {
         onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
       />
 
-      <IonContent className="vendor-content-fix" style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div className="reviews-page">
-          <div className="page-header">
-            <h1>Reviews</h1>
-            <p className="page-subtitle">See what your customers are saying</p>
+        <div className="p-4">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-[var(--tw-text-color)]">Reviews</h1>
+            <p className="text-sm text-[var(--tw-text-secondary)] mt-1">See what your customers are saying</p>
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '48px' }}><IonSpinner name="crescent" /></div>
+            <div className="text-center p-12"><IonSpinner name="crescent" /></div>
           ) : (
             <>
-              <IonCard className="rating-summary-card">
+              <IonCard className="rounded-xl shadow mb-4">
                 <IonCardContent>
-                  <div className="rating-summary-grid">
-                    <div className="rating-main">
-                      <div style={{ fontSize: '48px', fontWeight: 800, color: '#8B5CF6' }}>{total > 0 ? rating : '—'}</div>
-                      <div style={{ display: 'flex', gap: '4px', margin: '8px 0' }}>
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex flex-col items-center">
+                      <div className="text-5xl font-extrabold text-[#8B5CF6]">{total > 0 ? rating : '—'}</div>
+                      <div className="flex gap-1 my-2">
                         {[1,2,3,4,5].map(s => (
-                          <IonIcon key={s} icon={s <= Math.round(rating) ? star : starOutline} style={{ fontSize: '20px', color: '#F59E0B' }} />
+                          <IonIcon key={s} icon={s <= Math.round(rating) ? star : starOutline} className="text-xl" style={{ color: '#F59E0B' }} />
                         ))}
                       </div>
-                      <p style={{ margin: 0, fontSize: '14px', color: 'var(--ion-text-color-secondary)' }}>{total} reviews</p>
+                      <p className="m-0 text-sm text-[var(--tw-text-secondary)]">{total} reviews</p>
                     </div>
-                    <div className="rating-bars">
+                    <div className="flex-1">
                       {[5,4,3,2,1].map((stars, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '14px', minWidth: '40px', color: 'var(--ion-text-color)' }}>{stars} ★</span>
-                          <div style={{ flex: 1, height: '8px', background: 'var(--ion-border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div key={i} className="flex items-center gap-3 mb-2">
+                          <span className="text-sm min-w-[40px] text-[var(--tw-text-color)]">{stars} ★</span>
+                          <div className="flex-1 h-2 bg-[var(--tw-border-color)] rounded-full overflow-hidden">
                             <div style={{ width: total > 0 ? `${(distribution[5 - stars] / total) * 100}%` : '0%', height: '100%', background: '#F59E0B', borderRadius: '4px' }} />
                           </div>
-                          <span style={{ fontSize: '13px', minWidth: '30px', color: 'var(--ion-text-color-secondary)' }}>{distribution[5 - stars]}</span>
+                          <span className="text-xs min-w-[30px] text-[var(--tw-text-secondary)]">{distribution[5 - stars]}</span>
                         </div>
                       ))}
                     </div>
@@ -93,28 +90,28 @@ const VendorReviews: React.FC = () => {
               </IonCard>
 
               {reviews.length === 0 ? (
-                <IonCard className="orders-card"><IonCardContent><p style={{ textAlign: 'center', color: 'var(--ion-text-color-secondary)', margin: 0 }}>No reviews yet</p></IonCardContent></IonCard>
+                <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No reviews yet</p></IonCardContent></IonCard>
               ) : (
-                <div style={{ display: 'grid', gap: '16px' }}>
+                <div className="grid gap-4">
                   {reviews.map((review, i) => (
-                    <IonCard key={i} className="orders-card" style={{ margin: 0 }}>
+                    <IonCard key={i} className="rounded-xl shadow" style={{ margin: 0 }}>
                       <IonCardContent>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                        <div className="flex justify-between items-start mb-2">
                           <div>
-                            <h3 style={{ margin: '0 0 4px', fontWeight: 700, color: 'var(--ion-text-color)' }}>{review.userName}</h3>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <div style={{ display: 'flex', gap: '2px' }}>
+                            <h3 className="m-0 mb-1 font-bold text-[var(--tw-text-color)]">{review.userName}</h3>
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-0.5">
                                 {[1,2,3,4,5].map(s => (
-                                  <IonIcon key={s} icon={s <= review.rating ? star : starOutline} style={{ fontSize: '14px', color: '#F59E0B' }} />
+                                  <IonIcon key={s} icon={s <= review.rating ? star : starOutline} className="text-sm" style={{ color: '#F59E0B' }} />
                                 ))}
                               </div>
-                              <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>{review.date}</span>
+                              <span className="text-xs text-[var(--tw-text-secondary)]">{review.date}</span>
                             </div>
                           </div>
                         </div>
-                        <p style={{ margin: '12px 0', fontSize: '14px', color: 'var(--ion-text-color)', lineHeight: 1.5 }}>{review.comment}</p>
-                        <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <p className="my-3 text-sm text-[var(--tw-text-color)] leading-relaxed">{review.comment}</p>
+                        <div className="flex gap-4 text-xs text-[var(--tw-text-secondary)]">
+                          <span className="flex items-center gap-1">
                             <IonIcon icon={thumbsUp} /> {review.likes}
                           </span>
                         </div>
@@ -126,9 +123,8 @@ const VendorReviews: React.FC = () => {
             </>
           )}
         </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+
+    </>
   );
 };
 

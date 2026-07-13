@@ -1,8 +1,6 @@
 // src/pages/User/Profile.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonButton,
   IonIcon,
 } from '@ionic/react';
@@ -11,7 +9,6 @@ import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import AppFooter from '../../components/AppFooter';
 
 const COUNTRY_CODES = [
   { code: '+63', label: 'PH +63' },
@@ -108,22 +105,21 @@ const UserProfile: React.FC = () => {
       address,
       age: age ? Number(age) : undefined,
     });
-    history.push('/user/home');
+    history.push('/customer/home');
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         title="My Profile"
         showBack={true}
-        backHref="/user/home"
+        backHref="/customer/home"
         cartCount={itemCount}
-        onCartClick={() => history.push('/user/cart')}
-        onOrdersClick={() => history.push('/user/orders')}
-        onProfileClick={() => history.push('/user/profile')}
+        onCartClick={() => history.push('/customer/cart')}
+        onOrdersClick={() => history.push('/customer/orders')}
+        onProfileClick={() => history.push('/customer/profile')}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         <div className="page-container" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
           {/* Avatar */}
           <div style={{ textAlign: 'center', marginBottom: '32px', paddingTop: '16px' }}>
@@ -298,9 +294,7 @@ const UserProfile: React.FC = () => {
             Sign Out
           </IonButton>
         </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

@@ -1,8 +1,6 @@
 // src/pages/Admin/Orders.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonContent,
   IonCard,
   IonCardContent,
   IonSearchbar,
@@ -17,7 +15,6 @@ import { cartOutline, timeOutline, checkmarkCircleOutline, closeCircleOutline } 
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { useAuth } from '../../context/AuthContext';
-import AppFooter from '../../components/AppFooter';
 
 const AdminOrders: React.FC = () => {
   const history = useHistory();
@@ -92,8 +89,8 @@ const AdminOrders: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return '#F59E0B';
-      case 'preparing': return '#3B82F6';
-      case 'delivering': return '#6366F1';
+      case 'preparing': return '#FF5A1F';
+      case 'delivering': return 'var(--ion-color-primary)';
       case 'delivered': return '#10B981';
       case 'cancelled': return '#EF4444';
       default: return '#9CA3AF';
@@ -111,16 +108,15 @@ const AdminOrders: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader 
         showLogo={true}
         onProfileClick={() => {
           logout();
-          history.push('/user/login');
+          history.push('/login');
         }}
       />
 
-      <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
         <div className="page-container" style={{ paddingTop: '16px', paddingBottom: '40px' }}>
         {/* Admin Navigation */}
         <div style={{ 
@@ -182,7 +178,7 @@ const AdminOrders: React.FC = () => {
           <IonButton
             expand="block"
             style={{
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               '--color': '#FFFFFF',
               height: '40px',
               fontSize: '12px',
@@ -285,7 +281,7 @@ const AdminOrders: React.FC = () => {
                       </p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#6366F1' }}>
+                      <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--ion-color-primary)' }}>
                         ₱{order.total.toFixed(2)}
                       </h4>
                     </div>
@@ -336,9 +332,7 @@ const AdminOrders: React.FC = () => {
           )}
         </div>
       </div>
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

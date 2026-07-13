@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { IonPage, IonContent, IonCard, IonCardContent, IonIcon, IonButton, IonSpinner, IonModal, IonHeader, IonToolbar, IonButtons, IonTitle, IonTextarea, IonToast } from '@ionic/react';
+import { IonContent, IonCard, IonCardContent, IonIcon, IonButton, IonSpinner, IonModal, IonHeader, IonToolbar, IonButtons, IonTitle, IonTextarea, IonToast } from '@ionic/react';
 import { trendingUpOutline, cartOutline, starOutline, peopleOutline, storefrontOutline, cashOutline, settingsOutline, clipboardOutline, checkmarkOutline, closeOutline, documentTextOutline, locationOutline, personOutline, callOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
@@ -8,8 +8,6 @@ import { getEarningsStats, updateOrderStatus, subscribeVendorOrders } from '../.
 import { getReviewStats } from '../../services/reviewService';
 import { useOrders } from '../../context/OrderContext';
 import { Order } from '../../types';
-import './VendorDashboard.css';
-import AppFooter from '../../components/AppFooter';
 
 const VendorDashboard: React.FC = () => {
   const history = useHistory();
@@ -20,7 +18,7 @@ const VendorDashboard: React.FC = () => {
     { icon: trendingUpOutline, label: 'Total Sales', value: '₱0', color: '#8B5CF6' },
     { icon: cartOutline, label: 'Orders Today', value: '0', color: '#10B981' },
     { icon: starOutline, label: 'Average Rating', value: '0.0', color: '#F59E0B' },
-    { icon: peopleOutline, label: 'Total Customers', value: '0', color: '#6366F1' },
+    { icon: peopleOutline, label: 'Total Customers', value: '0', color: 'var(--ion-color-primary)' },
   ]);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [declineModalOpen, setDeclineModalOpen] = useState(false);
@@ -124,29 +122,28 @@ const VendorDashboard: React.FC = () => {
   const isProcessing = (id: string) => processingOrders.has(id);
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
       />
 
-      <IonContent className="vendor-content-fix" style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div className="vendor-dashboard">
-          <div className="dashboard-section">
-            <div className="section-header">
-              <h2 className="section-title">Dashboard Overview</h2>
+        <div className="p-4 space-y-6">
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-[var(--tw-text-color)]">Dashboard Overview</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
               {stats.map((stat, i) => (
-                <IonCard key={i} className="stat-card" style={{ borderTop: `4px solid ${stat.color}` }}>
+                <IonCard key={i} className="rounded-xl shadow" style={{ borderTop: `4px solid ${stat.color}` }}>
                   <IonCardContent>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div className="stat-icon" style={{ background: `${stat.color}20`, color: stat.color }}>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg" style={{ background: `${stat.color}20`, color: stat.color }}>
                         <IonIcon icon={stat.icon} />
                       </div>
                       <div>
-                        <p className="stat-label">{stat.label}</p>
-                        <h3 className="stat-value">{loading ? '...' : stat.value}</h3>
+                        <p className="text-sm text-[var(--tw-text-secondary)]">{stat.label}</p>
+                        <h3 className="text-xl font-bold text-[var(--tw-text-color)]">{loading ? '...' : stat.value}</h3>
                       </div>
                     </div>
                   </IonCardContent>
@@ -155,71 +152,78 @@ const VendorDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="dashboard-section">
-            <div className="section-header">
-              <h2 className="section-title">Quick Links</h2>
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-[var(--tw-text-color)]">Quick Links</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
               {quickLinks.map((link, i) => (
                 <IonCard key={i} button onClick={() => history.push(link.route)}
-                  style={{ margin: 0, borderRadius: '12px', borderTop: `3px solid ${link.color}` }}>
-                  <IonCardContent style={{ textAlign: 'center', padding: '16px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: `${link.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
-                      <IonIcon icon={link.icon} style={{ fontSize: '20px', color: link.color }} />
+                  className="m-0 rounded-xl" style={{ borderTop: `3px solid ${link.color}` }}>
+                  <IonCardContent className="text-center p-4">
+                    <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ background: `${link.color}20` }}>
+                      <IonIcon icon={link.icon} className="text-xl" style={{ color: link.color }} />
                     </div>
-                    <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{link.label}</p>
+                    <p className="m-0 text-sm font-semibold text-[var(--tw-text-color)]">{link.label}</p>
                   </IonCardContent>
                 </IonCard>
               ))}
             </div>
           </div>
 
-          <div className="dashboard-section">
-            <div className="section-header">
-              <h2 className="section-title">Recent Orders</h2>
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-[var(--tw-text-color)]">Recent Orders</h2>
               <IonButton fill="clear" onClick={() => history.push('/vendor/orders')} style={{ '--color': '#8B5CF6' }}>
                 View All
               </IonButton>
             </div>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '32px' }}><IonSpinner name="crescent" /></div>
+              <div className="text-center p-8"><IonSpinner name="crescent" /></div>
             ) : recentOrders.length === 0 ? (
-              <IonCard className="orders-card"><IonCardContent><p style={{ textAlign: 'center', color: 'var(--ion-text-color-secondary)', margin: 0 }}>No orders yet</p></IonCardContent></IonCard>
+              <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No orders yet</p></IonCardContent></IonCard>
             ) : (
               <div style={{ display: 'grid', gap: '16px' }}>
                 {recentOrders.map(order => (
-                  <IonCard key={order.id} className="orders-card">
+                  <IonCard key={order.id} className="rounded-xl shadow">
                     <IonCardContent>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                         <div>
-                          <h3 style={{ margin: '0 0 4px', fontWeight: 700, color: 'var(--ion-text-color)' }}>#{order.id.slice(-5)}</h3>
-                          <p style={{ margin: 0, fontSize: '14px', color: 'var(--ion-text-color-secondary)' }}>{order.customerName || 'Unknown'}{order.customerPhone ? ` · ${order.customerPhone}` : ''}</p>
+                          <h3 className="m-0 mb-1 font-bold text-[var(--tw-text-color)]">#{order.id.slice(-5)}</h3>
+                          <p className="m-0 text-sm text-[var(--tw-text-secondary)]">{order.customerName || 'Unknown'}{order.customerPhone ? ` · ${order.customerPhone}` : ''}</p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className={`status-badge status-${order.status}`}>{order.status}</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                            order.status === 'pending' ? 'bg-[var(--ion-color-warning)]/10 text-[var(--ion-color-warning)]' :
+                            order.status === 'accepted' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
+                            order.status === 'preparing' ? 'bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)]' :
+                            order.status === 'ready' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
+                            'bg-[var(--ion-color-danger)]/10 text-[var(--ion-color-danger)]'
+                          }`}>{order.status}</span>
                           <IonButton fill="clear" size="small" style={{ '--color': '#8B5CF6', margin: 0, minHeight: 0, height: '28px' }} onClick={() => setDetailsOrder(order)}>
                             <IonIcon icon={documentTextOutline} slot="icon-only" />
                           </IonButton>
                         </div>
                       </div>
 
-                      <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '12px' }}>
+                      <div className="p-3 bg-[var(--tw-background-color)] rounded-lg mb-3">
                         {order.items.map((item, i) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', marginBottom: i < order.items.length - 1 ? '8px' : 0 }}>
-                            <span style={{ color: 'var(--ion-text-color)', flex: 1 }}>{item.name}</span>
-                            <span style={{ color: 'var(--ion-text-color-secondary)' }}>x{item.quantity}</span>
+                          <div key={i} className="flex items-center gap-2 text-sm" style={{ marginBottom: i < order.items.length - 1 ? '8px' : 0 }}>
+                            <span className="text-[var(--tw-text-color)] flex-1">{item.name}</span>
+                            <span className="text-[var(--tw-text-secondary)]">x{item.quantity}</span>
                           </div>
                         ))}
-                        <div style={{ borderTop: '1px solid var(--ion-border-color)', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ fontWeight: 600, color: 'var(--ion-text-color)' }}>Total</span>
-                          <span style={{ fontWeight: 700, color: '#8B5CF6' }}>₱{order.total.toFixed(2)}</span>
+                        <div className="border-t border-[var(--tw-border-color)] mt-2 pt-2 flex justify-between">
+                          <span className="font-semibold text-[var(--tw-text-color)]">Total</span>
+                          <span className="font-bold text-[#8B5CF6]">₱{order.total.toFixed(2)}</span>
                         </div>
                       </div>
 
                       {order.status === 'pending' && (
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="flex gap-2">
                           <IonButton
-                            style={{ flex: 1, '--background': '#10B981' }}
+                            className="flex-1"
+                            style={{ '--background': '#10B981' }}
                             disabled={isProcessing(order.id)}
                             onClick={() => handleAccept(order)}
                           >
@@ -227,7 +231,8 @@ const VendorDashboard: React.FC = () => {
                             Accept
                           </IonButton>
                           <IonButton
-                            style={{ flex: 1, '--background': '#EF4444' }}
+                            className="flex-1"
+                            style={{ '--background': '#EF4444' }}
                             disabled={isProcessing(order.id)}
                             onClick={() => openDeclineModal(order.id)}
                           >
@@ -237,10 +242,10 @@ const VendorDashboard: React.FC = () => {
                         </div>
                       )}
                       {(order.status === 'accepted' || order.status === 'preparing') && (
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="flex gap-2">
                           <IonButton
                             expand="block"
-                            style={{ '--background': '#6366F1' }}
+                            style={{ '--background': 'var(--ion-color-primary)' }}
                             disabled={isProcessing(order.id)}
                             onClick={async () => {
                               setProcessingOrders(prev => new Set(prev).add(order.id));
@@ -268,10 +273,9 @@ const VendorDashboard: React.FC = () => {
             )}
           </div>
         </div>
-        <AppFooter />
-      </IonContent>
 
-      <IonModal isOpen={declineModalOpen} onDidDismiss={() => setDeclineModalOpen(false)} className="decline-modal">
+
+      <IonModal isOpen={declineModalOpen} onDidDismiss={() => setDeclineModalOpen(false)}>
         <IonHeader className="ion-no-border">
           <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
             <IonButtons slot="start">
@@ -318,7 +322,13 @@ const VendorDashboard: React.FC = () => {
                   <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>#{detailsOrder.id.slice(-5)}</h2>
                   <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>{new Date(detailsOrder.createdAt).toLocaleString()}</p>
                 </div>
-                <span className={`status-badge status-${detailsOrder.status}`}>{detailsOrder.status}</span>
+                <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                  detailsOrder.status === 'pending' ? 'bg-[var(--ion-color-warning)]/10 text-[var(--ion-color-warning)]' :
+                  detailsOrder.status === 'accepted' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
+                  detailsOrder.status === 'preparing' ? 'bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)]' :
+                  detailsOrder.status === 'ready' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
+                  'bg-[var(--ion-color-danger)]/10 text-[var(--ion-color-danger)]'
+                }`}>{detailsOrder.status}</span>
               </div>
 
               {(detailsOrder.customerName || detailsOrder.customerPhone || detailsOrder.deliveryAddress) && (
@@ -413,7 +423,7 @@ const VendorDashboard: React.FC = () => {
         position="bottom"
         color="danger"
       />
-    </IonPage>
+    </>
   );
 };
 

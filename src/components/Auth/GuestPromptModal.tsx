@@ -50,7 +50,7 @@ const GuestPromptModal: React.FC<GuestPromptModalProps> = ({ isOpen, onClose, on
             style={{
               width: '80px',
               height: '80px',
-              background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+              background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -74,7 +74,7 @@ const GuestPromptModal: React.FC<GuestPromptModalProps> = ({ isOpen, onClose, on
             expand="block"
             className="rider-button"
             style={{ 
-              '--background': '#6366F1',
+              '--background': 'var(--ion-color-primary)',
               marginBottom: '12px',
               height: '50px',
               fontSize: '16px'
@@ -90,8 +90,8 @@ const GuestPromptModal: React.FC<GuestPromptModalProps> = ({ isOpen, onClose, on
             fill="outline"
             className="rider-button"
             style={{ 
-              '--border-color': '#6366F1',
-              '--color': '#6366F1',
+              '--border-color': 'var(--ion-color-primary)',
+              '--color': 'var(--ion-color-primary)',
               marginBottom: '12px',
               height: '50px',
               fontSize: '16px'

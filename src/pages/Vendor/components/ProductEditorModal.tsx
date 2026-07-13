@@ -15,7 +15,6 @@ import {
 } from '@ionic/react';
 import { closeOutline, addOutline, trashOutline, cameraOutline } from 'ionicons/icons';
 import { MenuItem, MenuItemOption, OptionChoice, MenuItemAddOn } from '../../../types';
-import './ProductEditorModal.css';
 
 interface ProductEditorModalProps {
   item: MenuItem;

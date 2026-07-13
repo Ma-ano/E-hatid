@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  IonPage, IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonBadge, IonSpinner,
+  IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonBadge, IonSpinner,
   IonModal, IonHeader, IonToolbar, IonButtons, IonTitle, IonTextarea, IonToast,
 } from '@ionic/react';
 import { checkmarkOutline, closeOutline, personOutline, callOutline, timeOutline, documentTextOutline, locationOutline } from 'ionicons/icons';
@@ -10,8 +10,6 @@ import { useAuth } from '../../context/AuthContext';
 import { updateOrderStatus, subscribeVendorOrders } from '../../services/orderService';
 import { useOrders } from '../../context/OrderContext';
 import { Order } from '../../types';
-import './VendorOrders.css';
-import AppFooter from '../../components/AppFooter';
 
 type FilterTab = 'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
@@ -110,7 +108,7 @@ const VendorOrders: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <PageHeader
         showLogo={true}
         showBack={true}
@@ -118,14 +116,13 @@ const VendorOrders: React.FC = () => {
         onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
       />
 
-      <IonContent className="vendor-content-fix" style={{ '--background': 'var(--ion-background-color)' } as any}>
-        <div className="orders-page">
-          <div className="page-header">
-            <h1>Orders</h1>
-            <p className="page-subtitle">View and manage incoming orders</p>
+        <div className="p-4">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-[var(--tw-text-color)]">Orders</h1>
+            <p className="text-sm text-[var(--tw-text-secondary)] mt-1">View and manage incoming orders</p>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', overflowX: 'auto' }}>
+          <div className="flex gap-3 mb-6 overflow-x-auto">
             {(['all', 'pending', 'in_progress', 'completed', 'cancelled'] as FilterTab[]).map(tab => (
               <IonButton
                 key={tab}
@@ -139,13 +136,13 @@ const VendorOrders: React.FC = () => {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '48px' }}><IonSpinner name="crescent" /></div>
+            <div className="text-center p-12"><IonSpinner name="crescent" /></div>
           ) : filteredOrders.length === 0 ? (
-            <IonCard className="orders-card"><IonCardContent><p style={{ textAlign: 'center', color: 'var(--ion-text-color-secondary)', margin: 0 }}>No orders yet</p></IonCardContent></IonCard>
+            <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No orders yet</p></IonCardContent></IonCard>
           ) : (
-            <div style={{ display: 'grid', gap: '16px' }}>
+            <div className="grid gap-4">
               {filteredOrders.map(order => (
-                <IonCard key={order.id} className={`orders-card ${order.status === 'cancelled' ? 'order-cancelled' : ''}`}>
+                <IonCard key={order.id} className={`rounded-xl shadow ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
                   <IonCardContent>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                       <div>
@@ -224,7 +221,7 @@ const VendorOrders: React.FC = () => {
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <IonButton
                           expand="block"
-                          style={{ '--background': '#6366F1' }}
+                          style={{ '--background': 'var(--ion-color-primary)' }}
                           disabled={isProcessing(order.id)}
                           onClick={async () => {
                             setProcessingOrders(prev => new Set(prev).add(order.id));
@@ -251,10 +248,9 @@ const VendorOrders: React.FC = () => {
             </div>
           )}
         </div>
-        <AppFooter />
-      </IonContent>
 
-      <IonModal isOpen={declineModalOpen} onDidDismiss={() => setDeclineModalOpen(false)} className="decline-modal">
+
+      <IonModal isOpen={declineModalOpen} onDidDismiss={() => setDeclineModalOpen(false)}>
         <IonHeader className="ion-no-border">
           <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
             <IonButtons slot="start">
@@ -402,7 +398,7 @@ const VendorOrders: React.FC = () => {
         position="bottom"
         color="danger"
       />
-    </IonPage>
+    </>
   );
 };
 
