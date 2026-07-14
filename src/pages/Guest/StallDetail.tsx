@@ -205,7 +205,7 @@ const StallDetail: React.FC = () => {
 
           {navItems.length > 1 && (
             <div className="sticky top-14 z-10 bg-[var(--ion-card-background)] border-b border-[var(--ion-border-color)]">
-              <div className="flex gap-2 bg-gray-100 dark:bg-slate-800 p-1 rounded-full w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-2">
+              <div className="flex gap-2 bg-light-200 dark:bg-dark-card p-1 rounded-full w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-2 overflow-hidden">
                 {navItems.map(nav => (
                   <button
                     key={nav.id}
@@ -214,14 +214,14 @@ const StallDetail: React.FC = () => {
                       const el = sectionRefMap.current.get(nav.id);
                       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
-                    className="relative flex-1 px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors"
+                    className="relative flex-1 px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors rounded-full"
                   >
                     {activeSection === nav.id && (
                       <motion.div
                         layoutId="active-section-pill"
                         layout="position"
                         className="absolute inset-0 bg-[var(--ion-color-primary)] rounded-full"
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 50, mass: 1.2 }}
                       />
                     )}
                     <span className={`relative z-10 block truncate ${activeSection === nav.id ? "text-white" : "text-[var(--ion-text-color-secondary)]"}`}>

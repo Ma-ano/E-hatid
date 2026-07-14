@@ -115,18 +115,18 @@ const CustomerHome: React.FC = () => {
 
         {/* Categories */}
         <div className="py-1 sm:py-2">
-          <div className="flex gap-2 bg-gray-100 dark:bg-slate-800 p-1 rounded-full w-full">
+          <div className="flex gap-2 bg-light-200 dark:bg-dark-card p-1 rounded-full w-full overflow-hidden">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className="relative flex-1 px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors"
+                className="relative flex-1 px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors rounded-full"
               >
                 {selectedCategory === cat && (
                   <motion.div
                     layoutId="active-pill"
                     className="absolute inset-0 bg-[var(--ion-color-primary)] rounded-full"
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 50, mass: 1.2 }}
                   />
                 )}
                 <span className={`relative z-10 block truncate ${selectedCategory === cat ? "text-white" : "text-gray-500 dark:text-gray-300"}`}>
