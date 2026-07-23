@@ -24,7 +24,7 @@ import {
   arrowBack,
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 
 const ReportIncident: React.FC = () => {
@@ -88,13 +88,7 @@ const ReportIncident: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        onProfileClick={() => {
-          logout();
-          history.push('/login');
-        }}
-      />
+      <Navbar />
 
         {/* Header with Back Button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>

@@ -1,22 +1,24 @@
 // src/components/LogoHeader.tsx
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 interface LogoHeaderProps {
   onClick?: () => void;
 }
 
 const LogoHeader: React.FC<LogoHeaderProps> = ({ onClick }) => {
+  const { isDarkMode } = useTheme();
+
   return (
     <div
-      className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-4 py-4 sm:py-6 md:py-8 cursor-pointer transition-opacity hover:opacity-80"
+      className="flex items-center justify-center px-3 sm:px-4 py-4 sm:py-6 md:py-8 cursor-pointer transition-opacity hover:opacity-80"
       onClick={onClick}
     >
-      <span className="text-xl xs:text-2xl sm:text-3xl font-extrabold text-[var(--ion-color-primary)]">
-        Logo
-      </span>
-      <span className="text-xl xs:text-2xl sm:text-3xl font-extrabold text-[var(--ion-text-color)]">
-        Tag
-      </span>
+      <img
+        src={isDarkMode ? '/Logo/E-hatid-dark-mode.png' : '/Logo/E-hatid-light-mode.png'}
+        alt="E-Hatid"
+        className="h-10 sm:h-12 object-contain"
+      />
     </div>
   );
 };

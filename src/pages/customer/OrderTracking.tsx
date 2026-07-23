@@ -21,7 +21,7 @@ import { getUserDocument } from '../../services/userService';
 import { fetchStallById } from '../../services/stallService';
 import { updateOrderStatus } from '../../services/orderService';
 import type { Order, User, Stall } from '../../types';
-import PageHeader from '../../components/PageHeader';
+
 
 const statusSteps: { label: string; icon: string; statuses: Order['status'][] }[] = [
   { label: 'Order Placed', icon: checkmarkCircle, statuses: ['pending'] },
@@ -126,7 +126,6 @@ const OrderTracking: React.FC = () => {
   if (!order) {
     return (
       <>
-        <PageHeader showLogo={true} cartCount={itemCount} />
         <div style={{ textAlign: 'center', padding: '48px' }}>
           <p style={{ color: 'var(--ion-text-color-secondary)' }}>Order not found</p>
           <IonButton style={{ '--background': 'var(--ion-color-primary)' }} onClick={() => history.push('/customer/home')}>
@@ -163,13 +162,6 @@ const OrderTracking: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        cartCount={itemCount}
-        onCartClick={() => history.push('/customer/cart')}
-        onOrdersClick={() => history.push('/customer/orders')}
-        onProfileClick={() => history.push('/customer/profile')}
-      />
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
           <div className="page-container" style={{ flex: 1, paddingTop: '24px', paddingBottom: '40px', textAlign: 'center' }}>
             <div style={{

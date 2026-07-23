@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IonCard, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonIcon, IonToggle, IonSpinner, IonToast } from '@ionic/react';
-import { storefrontOutline, timeOutline, bicycleOutline, cartOutline, notificationsOutline, colorPaletteOutline, cameraOutline, personOutline, callOutline, locationOutline } from 'ionicons/icons';
+import { storefrontOutline, timeOutline, bicycleOutline, cartOutline, notificationsOutline, colorPaletteOutline, cameraOutline, personOutline, callOutline, locationOutline, logOutOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 import { getStallByVendorId, createStall, updateStall } from '../../services/stallService';
 import { compressImage } from '../../utils/compressImage';
 
 const VendorSettings: React.FC = () => {
   const history = useHistory();
-  const { logout, user, updateUserProfile } = useAuth();
+  const { user, updateUserProfile, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [stallId, setStallId] = useState<string | null>(null);
@@ -150,7 +150,6 @@ const VendorSettings: React.FC = () => {
   if (loading) {
     return (
       <>
-        <PageHeader showLogo={true} showBack={true} backHref="/vendor/dashboard" />
         <IonSpinner name="crescent" />
       </>
     );
@@ -158,13 +157,7 @@ const VendorSettings: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        showBack={true}
-        backHref="/vendor/dashboard"
-        onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
-      />
-        <div className="settings-page">
+        <div className="settings-page max-w-3xl mx-auto">
           <div className="page-header">
             <h1>Settings</h1>
             <p className="page-subtitle">Manage your stall preferences</p>
@@ -351,6 +344,13 @@ const VendorSettings: React.FC = () => {
             position="bottom"
             color={toastMessage.includes('Failed') ? 'danger' : 'success'}
           />
+
+          <div className="md:hidden mt-4">
+            <IonButton expand="block" fill="outline" onClick={() => { logout(); history.push('/login'); }} style={{ '--border-color': '#EF4444', '--color': '#EF4444' } as any}>
+              <IonIcon icon={logOutOutline} slot="start" />
+              Sign Out
+            </IonButton>
+          </div>
         </div>
     </>
   );

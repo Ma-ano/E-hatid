@@ -10,7 +10,7 @@ import {
 import { locationOutline, bicycleOutline, cardOutline, logInOutline, personAddOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import CartItem from '../../components/Cart/CartItem';
-import PageHeader from '../../components/PageHeader';
+import Navbar from '../../components/Navbar';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -34,22 +34,7 @@ const GuestCart: React.FC = () => {
 
   return (
     <>
-      <PageHeader 
-        showLogo={true}
-        showBackButton={true}
-        backHref="/guest/home"
-        cartCount={itemCount}
-        onCartClick={() => history.push('/guest/cart')}
-        onOrdersClick={() => history.push('/customer/orders')}
-        onProfileClick={() => {
-          if (isGuest) {
-            history.push('/login');
-          } else {
-            logout();
-            history.push('/login');
-          }
-        }}
-      />
+      <Navbar />
 
 
         <div className="flex flex-col min-h-full">

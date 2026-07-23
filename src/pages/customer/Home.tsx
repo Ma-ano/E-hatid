@@ -8,7 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { fetchStalls, getCategories } from '../../services/stallService';
-import PageHeader from '../../components/PageHeader';
+
 import { StallCardSkeleton } from '../../components/ui/Skeleton';
 import { Stall } from '../../types/index';
 import {
@@ -74,15 +74,7 @@ const CustomerHome: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        cartCount={isAuthenticated ? itemCount : 0}
-        onCartClick={isAuthenticated ? () => history.push('/customer/cart') : undefined}
-        onOrdersClick={isAuthenticated ? () => history.push('/customer/orders') : undefined}
-        onProfileClick={isAuthenticated ? () => history.push('/customer/profile') : undefined}
-        onLoginClick={!isAuthenticated ? () => history.push('/login') : undefined}
-        onRegisterClick={!isAuthenticated ? () => history.push('/register') : undefined}
-      />
+
       <div className="pb-2 sm:pb-3">
         {/* Header Section */}
         <div className="pt-2 sm:pt-3 pb-2">
@@ -114,13 +106,13 @@ const CustomerHome: React.FC = () => {
         </div>
 
         {/* Categories */}
-        <div className="py-1 sm:py-2">
-          <div className="flex gap-2 bg-light-200 dark:bg-dark-card p-1 rounded-full w-full overflow-hidden">
+        <div className="py-1 sm:py-2 overflow-x-auto no-scrollbar">
+          <div className="flex gap-2 bg-light-200 dark:bg-dark-card p-1 rounded-full w-max min-w-full">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className="relative flex-1 px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors rounded-full"
+                className="relative min-w-[90px] px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors rounded-full"
               >
                 {selectedCategory === cat && (
                   <motion.div

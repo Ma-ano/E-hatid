@@ -14,94 +14,23 @@ import {
 } from '@ionic/react';
 import { mapOutline, cashOutline, checkmarkCircleOutline, timeOutline, navigateOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 
 const RiderHome: React.FC = () => {
   const history = useHistory();
   const { logout } = useAuth();
   const [isAvailable, setIsAvailable] = useState(false);
-  const [earnings, setEarnings] = useState(450.50);
-  const [completedDeliveries, setCompletedDeliveries] = useState(12);
-  const [rating, setRating] = useState(4.8);
+  const [earnings, setEarnings] = useState(0);
+  const [completedDeliveries, setCompletedDeliveries] = useState(0);
+  const [rating, setRating] = useState(0);
 
-  // Mock available orders
-  const availableOrders = [
-    {
-      id: '1',
-      stallName: 'Burger King',
-      customerName: 'John Doe',
-      distance: '2.3 km',
-      fee: 45,
-      pickupLocation: 'BGC, Taguig',
-      deliveryLocation: 'Fort Bonifacio, Taguig',
-    },
-    {
-      id: '2',
-      stallName: 'Sushi Master',
-      customerName: 'Jane Smith',
-      distance: '1.8 km',
-      fee: 38,
-      pickupLocation: 'Makati, Manila',
-      deliveryLocation: 'Paseo de Santa Rosa, Manila',
-    },
-    {
-      id: '3',
-      stallName: 'Pizza Palace',
-      customerName: 'Mike Johnson',
-      distance: '3.1 km',
-      fee: 52,
-      pickupLocation: 'Quezon City',
-      deliveryLocation: 'San Juan, Metro Manila',
-    },
-  ];
+  const availableOrders: any[] = [];
 
   return (
     <>
-      <PageHeader 
-        showLogo={true}
-        onProfileClick={() => {
-          logout();
-          history.push('/login');
-        }}
-      />
 
         <div className="max-w-4xl mx-auto">
-          {/* Rider Navigation */}
-          <div className="flex gap-2 p-3 sm:p-4 overflow-x-auto bg-[var(--ion-card-background)] rounded-b-xl">
-            <IonButton
-              expand="block"
-              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
-              style={{ '--background': 'var(--ion-color-primary)', '--color': '#FFFFFF', textTransform: 'none' }}
-            >
-              🏠 Home
-            </IonButton>
-            <IonButton
-              expand="block"
-              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
-              style={{ '--background': 'transparent', '--color': 'var(--ion-text-color)', textTransform: 'none', '--border-color': 'var(--ion-border-color)' }}
-              onClick={() => history.push('/rider/orders')}
-            >
-              📦 Orders
-            </IonButton>
-            <IonButton
-              expand="block"
-              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
-              style={{ '--background': 'transparent', '--color': 'var(--ion-text-color)', textTransform: 'none', '--border-color': 'var(--ion-border-color)' }}
-              onClick={() => history.push('/rider/earnings')}
-            >
-              💰 Earnings
-            </IonButton>
-            <IonButton
-              expand="block"
-              className="min-h-[44px] text-xs sm:text-sm font-semibold flex-1 min-w-[80px]"
-              style={{ '--background': 'transparent', '--color': 'var(--ion-text-color)', textTransform: 'none', '--border-color': 'var(--ion-border-color)' }}
-              onClick={() => history.push('/rider/profile')}
-            >
-              👤 Profile
-            </IonButton>
-          </div>
-
           {/* Quick Access Menu */}
           <div className="grid grid-cols-2 gap-2 sm:gap-3 p-3 sm:p-4">
             <div onClick={() => history.push('/activities')}

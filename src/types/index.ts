@@ -6,9 +6,16 @@ export interface User {
   age?: number;
   avatar?: string;
   address?: string;
-  role: 'user' | 'rider' | 'admin' | 'vendor';
+  role: 'customer' | 'rider' | 'admin' | 'vendor';
+  roles: ('customer' | 'rider' | 'admin' | 'vendor')[];
+  activeRole?: string;
   password?: string;
   token?: string;
+  isMasterAdmin?: boolean;
+  roleStatus: Record<string, 'none' | 'pending' | 'approved' | 'rejected'>;
+  emailVerified?: boolean;
+  created_at?: any;
+  accountStatus?: 'pending' | 'active' | 'rejected';
   verificationStatus?: 'pending' | 'approved' | 'rejected';
   stallName?: string;
   stallAddress?: string;
@@ -17,6 +24,8 @@ export interface User {
   licenseNumber?: string;
   bankAccount?: string;
   bankName?: string;
+  otpCode?: string;
+  otpExpiresAt?: any;
 }
 
 export interface Rider extends User {
@@ -44,6 +53,50 @@ export interface Admin {
   name: string;
   email: string;
   role: 'admin';
+}
+
+export type ApplicationType = 'individual' | 'business';
+
+export interface VendorApplication {
+  applicationType: ApplicationType;
+  displayName: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: string;
+  description: string;
+  category: string;
+  governmentIdType?: string;
+  governmentIdNumber?: string;
+  governmentIdImageUrl?: string;
+  businessName?: string;
+  businessRegistrationNumber?: string;
+  businessDocumentType?: string;
+  businessDocumentImageUrl?: string;
+  representativeName?: string;
+  representativeIdType?: string;
+  representativeIdNumber?: string;
+  representativeIdImageUrl?: string;
+  taxIdNumber?: string;
+}
+
+export interface RiderApplication {
+  applicationType: ApplicationType;
+  fullName: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: string;
+  vehicleType: 'bike' | 'motorcycle' | 'car';
+  governmentIdType?: string;
+  governmentIdNumber?: string;
+  governmentIdImageUrl?: string;
+  driverLicenseNumber?: string;
+  driverLicenseImageUrl?: string;
+  companyName?: string;
+  companyRegistrationNumber?: string;
+  businessDocumentImageUrl?: string;
+  assignedRiderName?: string;
+  assignedRiderLicenseNumber?: string;
+  assignedRiderLicenseImageUrl?: string;
 }
 
 export interface Stall {
@@ -233,4 +286,3 @@ export interface Review {
   date: string;
   likes: number;
 }
-

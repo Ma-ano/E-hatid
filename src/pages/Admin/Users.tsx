@@ -1,313 +1,443 @@
-// src/pages/Admin/Users.tsx
-import React, { useState } from 'react';
-import {
-  IonCard,
-  IonCardContent,
-  IonSearchbar,
-  IonIcon,
-  IonButton,
-  IonBadge,
-  IonToggle,
-  IonItem,
-  IonLabel,
-} from '@ionic/react';
-import { personOutline, trashOutline, lockOpenOutline, lockClosedOutline } from 'ionicons/icons';
+import React, { useState, useEffect } from 'react';
+import { IonCard, IonCardContent, IonIcon, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/react';
+import { searchOutline, closeOutline, checkmarkCircle, closeCircle, personOutline, bicycleOutline, storefrontOutline, shieldCheckmarkOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+import AdminPageShell from '../../components/admin/AdminPageShell';
+import { fetchAllUsers, getRoleProfile, setRoleStatus, updateUserRole, updateUserDocument, getUserDocument } from '../../services/userService';
+import { sendApprovedNotification, sendRejectedNotification } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
+import { User } from '../../types';
+
+const roleIcon: Record<string, any> = {
+  customer: personOutline,
+  rider: bicycleOutline,
+  vendor: storefrontOutline,
+  admin: shieldCheckmarkOutline,
+};
+
+const roleColor: Record<string, string> = {
+  customer: '#8B5CF6',
+  rider: '#F59E0B',
+  vendor: '#10B981',
+  admin: '#EF4444',
+};
+
+const statusBadge: Record<string, { label: string; color: string }> = {
+  approved: { label: 'Approved', color: '#10B981' },
+  pending: { label: 'Pending', color: '#F59E0B' },
+  rejected: { label: 'Rejected', color: '#EF4444' },
+};
 
 const AdminUsers: React.FC = () => {
   const history = useHistory();
-  const { logout } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [users, setUsers] = useState([
-    {
-      id: '1',
-      name: 'Maria Santos',
-      email: 'maria@example.com',
-      phone: '+63 910 123 4567',
-      joinedDate: '2024-01-15',
-      orders: 23,
-      isActive: true,
-      status: 'active',
-    },
-    {
-      id: '2',
-      name: 'Carlos Rodriguez',
-      email: 'carlos@example.com',
-      phone: '+63 911 234 5678',
-      joinedDate: '2024-02-10',
-      orders: 5,
-      isActive: true,
-      status: 'active',
-    },
-    {
-      id: '3',
-      name: 'Ana Cruz',
-      email: 'ana@example.com',
-      phone: '+63 912 345 6789',
-      joinedDate: '2023-12-20',
-      orders: 45,
-      isActive: false,
-      status: 'inactive',
-    },
-    {
-      id: '4',
-      name: 'Pedro Reyes',
-      email: 'pedro@example.com',
-      phone: '+63 913 456 7890',
-      joinedDate: '2024-01-05',
-      orders: 12,
-      isActive: true,
-      status: 'active',
-    },
-  ]);
+  const { user: currentUser } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [roleFilter, setRoleFilter] = useState('all');
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const all = await fetchAllUsers();
+        setUsers(all);
+      } catch { }
+      setLoading(false);
+    };
+    load();
+  }, []);
 
-  const toggleUserStatus = (userId: string) => {
-    setUsers(users.map(user =>
-      user.id === userId
-        ? { ...user, isActive: !user.isActive, status: user.isActive ? 'inactive' : 'active' }
-        : user
-    ));
+  const filtered = users.filter(u => {
+    const matchesSearch = u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase());
+    if (roleFilter === 'all') return matchesSearch;
+    return matchesSearch && u.roles?.includes(roleFilter as any);
+  });
+
+  const handleApprove = async (uid: string, role: string) => {
+    await setRoleStatus(uid, role, 'approved');
+    setUsers(prev => prev.map(u => u.id === uid ? { ...u, roleStatus: { ...u.roleStatus, [role]: 'approved' } } : u));
+    if (selectedUser?.id === uid) {
+      setSelectedUser(prev => prev ? { ...prev, roleStatus: { ...prev.roleStatus, [role]: 'approved' } } : null);
+    }
+    const u = users.find(x => x.id === uid);
+    if (u?.email) {
+      sendApprovedNotification(u.email, role).catch(() => {});
+    }
   };
 
-  const deleteUser = (userId: string) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(user => user.id !== userId));
+  const handleReject = async (uid: string, role: string) => {
+    await setRoleStatus(uid, role, 'rejected');
+    setUsers(prev => prev.map(u => u.id === uid ? { ...u, roleStatus: { ...u.roleStatus, [role]: 'rejected' } } : u));
+    if (selectedUser?.id === uid) {
+      setSelectedUser(prev => prev ? { ...prev, roleStatus: { ...prev.roleStatus, [role]: 'rejected' } } : null);
+    }
+    const u = users.find(x => x.id === uid);
+    if (u?.email) {
+      sendRejectedNotification(u.email, role).catch(() => {});
+    }
+  };
+
+  const handleAddAdmin = async (uid: string) => {
+    await updateUserRole(uid, 'admin' as any);
+    await updateUserDocument(uid, { isMasterAdmin: false } as any);
+    const fresh = await fetchAllUsers();
+    setUsers(fresh);
+    if (selectedUser?.id === uid) {
+      const updated = fresh.find(u => u.id === uid);
+      if (updated) setSelectedUser(updated);
     }
   };
 
   return (
     <>
-      <PageHeader 
-        showLogo={true}
-        onProfileClick={() => {
-          logout();
-          history.push('/login');
-        }}
-      />
-
-        <div className="page-container" style={{ paddingTop: '16px', paddingBottom: '40px' }}>
-        {/* Admin Navigation */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px',
-          padding: '16px',
-          overflowX: 'auto',
-          background: 'var(--ion-card-background)',
-          borderRadius: '12px'
-        }}>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '90px'
-            }}
-            onClick={() => history.push('/admin/dashboard')}
-          >
-            📊 Dashboard
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'var(--ion-color-primary)',
-              '--color': '#FFFFFF',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-          >
-            👥 Users
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '90px'
-            }}
-            onClick={() => history.push('/admin/riders')}
-          >
-            🚴 Riders
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/admin/orders')}
-          >
-            📦 Orders
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '90px'
-            }}
-            onClick={() => history.push('/admin/reports')}
-          >
-            ⚠️ Reports
-          </IonButton>
-        </div>
-
-        {/* Header */}
-        <div style={{ padding: '16px' }}>
-          <h2 style={{ margin: '0 0 16px', fontSize: '24px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-            Manage Users
-          </h2>
-          <IonSearchbar
-            value={searchQuery}
-            onIonChange={e => setSearchQuery(e.detail.value!)}
-            placeholder="Search users by name or email..."
-            style={{
-              '--background': 'var(--ion-card-background)',
-              '--border-radius': '12px',
-              '--border': '1px solid var(--ion-border-color)',
-              '--placeholder-color': 'var(--ion-text-color-secondary)',
-              '--icon-color': 'var(--ion-color-primary)',
-              '--color': 'var(--ion-text-color)',
-              padding: '0',
-              height: '48px',
-            } as any}
-          />
-        </div>
-
-        {/* Stats */}
+      <AdminPageShell title="Users" subtitle="Manage all users, riders, vendors">
         <div style={{ padding: '0 16px 16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Total Users</p>
-                <h3 style={{ margin: '8px 0 0', fontSize: '24px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-                  {users.length}
-                </h3>
-              </IonCardContent>
-            </IonCard>
-            <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Active Users</p>
-                <h3 style={{ margin: '8px 0 0', fontSize: '24px', fontWeight: 700, color: '#10B981' }}>
-                  {users.filter(u => u.isActive).length}
-                </h3>
-              </IonCardContent>
-            </IonCard>
+          <div style={{ position: 'relative', marginBottom: '16px' }}>
+            <IonIcon icon={searchOutline} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ion-text-color-secondary)', fontSize: '16px' }} />
+            <input type="text" placeholder="Search users..." value={search} onChange={e => setSearch(e.target.value)}
+              style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '8px', border: '1px solid var(--ion-border-color)', background: 'var(--ion-card-background)', color: 'var(--ion-text-color)', fontSize: '14px', outline: 'none' }} />
           </div>
-        </div>
 
-        {/* Users List */}
-        <div style={{ padding: '0 16px 16px' }}>
-          {filteredUsers.length === 0 ? (
-            <IonCard style={{ margin: 0, background: 'var(--ion-card-background)', textAlign: 'center', padding: '40px 20px' }}>
-              <p style={{ color: 'var(--ion-text-color-secondary)' }}>No users found</p>
-            </IonCard>
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
+            {['all', 'customer', 'vendor', 'rider', 'admin'].map(r => (
+              <button key={r} onClick={() => setRoleFilter(r)}
+                style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: roleFilter === r ? 'var(--ion-color-primary)' : 'var(--ion-card-background)', color: roleFilter === r ? 'white' : 'var(--ion-text-color-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
+                {r === 'all' ? 'All' : r}
+              </button>
+            ))}
+          </div>
+
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>No users found</div>
           ) : (
-            filteredUsers.map(user => (
-              <IonCard key={user.id} style={{ margin: '0 0 12px', background: 'var(--ion-card-background)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {filtered.map(u => (
+                <IonCard key={u.id} className="cursor-pointer hover:shadow-lg transition-shadow duration-200" style={{ margin: 0, background: 'var(--ion-card-background)' }} onClick={() => setSelectedUser(u)}>
+                  <IonCardContent style={{ padding: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{u.name || 'Unnamed'}</p>
+                        <p style={{ margin: '2px 0 4px', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>{u.email}</p>
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                          {(u.roles || []).map(r => {
+                            if (r === 'customer') {
+                              const verified = u.emailVerified;
+                              return (
+                                <span key={r} style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 600, background: `${roleColor[r]}20`, color: roleColor[r] }}>
+                                  <IonIcon icon={roleIcon[r]} style={{ fontSize: '11px' }} />
+                                  Customer
+                                  <span style={{ marginLeft: 2, color: verified ? '#10B981' : '#F59E0B' }}>({verified ? 'Verified' : 'Unverified'})</span>
+                                </span>
+                              );
+                            }
+                            if (r === 'admin' && u.isMasterAdmin) {
+                              return (
+                                <span key={r} style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 600, background: `${roleColor[r]}20`, color: roleColor[r] }}>
+                                  <IonIcon icon={roleIcon[r]} style={{ fontSize: '11px' }} />
+                                  Master Admin
+                                </span>
+                              );
+                            }
+                            const st = u.roleStatus?.[r];
+                            const badge = statusBadge[st || 'pending'];
+                            const label = r === 'admin' ? 'Admin' : r;
+                            return (
+                              <span key={r} style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 600, background: `${roleColor[r] || '#999'}20`, color: roleColor[r] || '#999', textTransform: 'capitalize' }}>
+                                <IonIcon icon={roleIcon[r] || personOutline} style={{ fontSize: '11px' }} />
+                                {label}
+                                {badge && <span style={{ marginLeft: 2, color: badge.color }}>({badge.label})</span>}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <IonIcon icon={closeOutline} style={{ fontSize: '16px', color: 'var(--ion-text-color-secondary)', transform: 'rotate(45deg)' }} />
+                    </div>
+                  </IonCardContent>
+                </IonCard>
+              ))}
+            </div>
+          )}
+        </div>
+      </AdminPageShell>
+
+      <IonModal isOpen={!!selectedUser} onDidDismiss={() => setSelectedUser(null)}>
+        <IonHeader>
+          <IonToolbar style={{ '--background': 'var(--ion-card-background)' } as any}>
+            <IonButton slot="start" fill="clear" onClick={() => setSelectedUser(null)}><IonIcon icon={closeOutline} /></IonButton>
+            <IonTitle>User Details</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent style={{ '--background': 'var(--ion-background-color)' } as any}>
+          {selectedUser && (
+            <div style={{ padding: '16px' }}>
+              <IonCard style={{ margin: '0 0 16px', background: 'var(--ion-card-background)' }}>
                 <IonCardContent style={{ padding: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-                        {user.name}
-                      </h3>
-                      <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-                        {user.email}
-                      </p>
-                    </div>
-                    <IonBadge 
-                      style={{
-                        '--background': user.isActive ? '#10B981' : '#EF4444',
-                        color: 'white',
-                        marginLeft: 'auto'
-                      }}
-                    >
-                      {user.status}
-                    </IonBadge>
+                  <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>{selectedUser.name || 'Unnamed'}</h2>
+                  <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>{selectedUser.email}</p>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, background: selectedUser.emailVerified ? '#10B98120' : '#F59E0B20', color: selectedUser.emailVerified ? '#10B981' : '#F59E0B', marginBottom: '12px' }}>
+                    <IonIcon icon={selectedUser.emailVerified ? checkmarkCircleOutline : closeCircleOutline} style={{ fontSize: '12px' }} />
+                    {selectedUser.emailVerified ? 'Verified' : 'Unverified'}
                   </div>
-
-                  <div style={{
-                    padding: '12px',
-                    background: 'var(--ion-background-color)',
-                    borderRadius: '8px',
-                    marginBottom: '12px',
-                    fontSize: '13px'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ color: 'var(--ion-text-color-secondary)' }}>Phone:</span>
-                      <span style={{ color: 'var(--ion-text-color)', fontWeight: 600 }}>{user.phone}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ color: 'var(--ion-text-color-secondary)' }}>Joined:</span>
-                      <span style={{ color: 'var(--ion-text-color)', fontWeight: 600 }}>{user.joinedDate}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--ion-text-color-secondary)' }}>Orders:</span>
-                      <span style={{ color: 'var(--ion-text-color)', fontWeight: 600 }}>{user.orders}</span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <IonButton
-                      fill="outline"
-                      size="small"
-                      style={{
-                        '--border-color': user.isActive ? '#EF4444' : '#10B981',
-                        '--color': user.isActive ? '#EF4444' : '#10B981',
-                        flex: 1
-                      }}
-                      onClick={() => toggleUserStatus(user.id)}
-                    >
-                      <IonIcon slot="start" icon={user.isActive ? lockOpenOutline : lockClosedOutline} />
-                      {user.isActive ? 'Deactivate' : 'Activate'}
-                    </IonButton>
-                    <IonButton
-                      fill="outline"
-                      size="small"
-                      style={{ '--border-color': '#EF4444', '--color': '#EF4444' }}
-                      onClick={() => deleteUser(user.id)}
-                    >
-                      <IonIcon icon={trashOutline} />
-                    </IonButton>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {selectedUser.phone && <span style={{ padding: '4px 10px', background: 'var(--ion-background-color)', borderRadius: '6px', fontSize: '12px', color: 'var(--ion-text-color)' }}>📞 {selectedUser.phone}</span>}
+                    {selectedUser.age ? <span style={{ padding: '4px 10px', background: 'var(--ion-background-color)', borderRadius: '6px', fontSize: '12px', color: 'var(--ion-text-color)' }}>Age: {selectedUser.age}</span> : null}
+                    {selectedUser.address && <span style={{ width: '100%', padding: '4px 10px', background: 'var(--ion-background-color)', borderRadius: '6px', fontSize: '12px', color: 'var(--ion-text-color)' }}>📍 {selectedUser.address}</span>}
                   </div>
                 </IonCardContent>
               </IonCard>
-            ))
+
+              <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)' }}>Roles & Status</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                {(selectedUser.roles || []).map(r => {
+                  if (r === 'customer') {
+                    const verified = selectedUser.emailVerified;
+                    return (
+                      <div key={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--ion-card-background)', borderRadius: '8px', border: '1px solid var(--ion-border-color)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <IonIcon icon={roleIcon[r]} style={{ fontSize: '18px', color: roleColor[r] }} />
+                          <div>
+                            <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)', textTransform: 'capitalize' }}>Customer</p>
+                            <span style={{ fontSize: '11px', fontWeight: 600, color: verified ? '#10B981' : '#F59E0B' }}>{verified ? 'Verified' : 'Unverified'}</span>
+                          </div>
+                        </div>
+                        {verified && <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>✓ Active</span>}
+                      </div>
+                    );
+                  }
+                  if (r === 'admin' && selectedUser.isMasterAdmin) {
+                    return (
+                      <div key={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--ion-card-background)', borderRadius: '8px', border: '1px solid var(--ion-border-color)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <IonIcon icon={roleIcon[r]} style={{ fontSize: '18px', color: roleColor[r] }} />
+                          <div>
+                            <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>Master Admin</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  const st = selectedUser.roleStatus?.[r] || 'none';
+                  const isPending = st === 'pending';
+                  const isRejected = st === 'rejected';
+                  const isNone = st === 'none';
+                  const label = r === 'admin' ? 'Admin' : r;
+                  return (
+                    <div key={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--ion-card-background)', borderRadius: '8px', border: '1px solid var(--ion-border-color)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <IonIcon icon={roleIcon[r] || personOutline} style={{ fontSize: '18px', color: roleColor[r] || '#999' }} />
+                        <div>
+                          <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)', textTransform: 'capitalize' }}>{label}</p>
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: statusBadge[st]?.color || '#999' }}>{statusBadge[st]?.label || st}</span>
+                        </div>
+                      </div>
+                      {(r === 'vendor' || r === 'rider') && (isPending || isRejected) && (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button onClick={() => handleApprove(selectedUser.id, r)}
+                            style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: '#10B981', color: 'white', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>
+                            <IonIcon icon={checkmarkCircle} style={{ marginRight: 4 }} />Approve
+                          </button>
+                          <button onClick={() => handleReject(selectedUser.id, r)}
+                            style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: '#EF4444', color: 'white', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>
+                            <IonIcon icon={closeCircle} style={{ marginRight: 4 }} />Reject
+                          </button>
+                        </div>
+                      )}
+                      {!isPending && !isRejected && !isNone && (
+                        <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>✓ Approved</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {currentUser?.isMasterAdmin && !selectedUser.roles.includes('admin') && (
+                <div style={{ marginBottom: '16px' }}>
+                  <IonButton expand="block" onClick={() => handleAddAdmin(selectedUser.id)}
+                    style={{ '--background': '#EF4444', '--border-radius': '8px' } as any}>
+                    <IonIcon icon={shieldCheckmarkOutline} style={{ marginRight: 8 }} />
+                    Add as Admin
+                  </IonButton>
+                </div>
+              )}
+
+              <UserRoleTabs user={selectedUser} />
+
+              <IonButton expand="block" fill="outline" onClick={() => setSelectedUser(null)} style={{ '--border-color': 'var(--ion-border-color)', '--color': 'var(--ion-text-color-secondary)' } as any}>
+                Close
+              </IonButton>
+            </div>
           )}
-        </div>
-      </div>
+        </IonContent>
+      </IonModal>
     </>
+  );
+};
+
+const SECTION_LABELS: Record<string, string> = {
+  applicationType: 'Application Type',
+  displayName: 'Store / Display Name',
+  fullName: 'Full Name',
+  contactEmail: 'Contact Email',
+  contactPhone: 'Contact Phone',
+  address: 'Address',
+  description: 'Description',
+  category: 'Category',
+  vehicleType: 'Vehicle Type',
+  governmentIdType: 'Government ID Type',
+  governmentIdNumber: 'Government ID Number',
+  governmentIdImageUrl: 'Government ID Image',
+  driverLicenseNumber: 'Driver License Number',
+  driverLicenseImageUrl: 'Driver License Image',
+  businessName: 'Registered Business Name',
+  businessRegistrationNumber: 'Business Registration Number',
+  businessDocumentType: 'Business Document Type',
+  businessDocumentImageUrl: 'Business Document Image',
+  representativeName: 'Representative Name',
+  representativeIdType: 'Representative ID Type',
+  representativeIdNumber: 'Representative ID Number',
+  representativeIdImageUrl: 'Representative ID Image',
+  taxIdNumber: 'Tax ID Number (TIN)',
+  companyName: 'Company Name',
+  companyRegistrationNumber: 'Company Registration Number',
+  companyDocumentImageUrl: 'Company Document Image',
+  assignedRiderName: 'Assigned Rider Name',
+  assignedRiderLicenseNumber: 'Assigned Rider License Number',
+  assignedRiderLicenseImageUrl: 'Assigned Rider License Image',
+};
+
+const isImageUrlField = (key: string) =>
+  /image(?:Url)?$/i.test(key) && typeof key === 'string';
+
+const APPLICATION_INFO_FIELDS = ['displayName', 'fullName', 'contactEmail', 'contactPhone', 'address', 'description', 'category', 'vehicleType'];
+const INDIVIDUAL_ID_FIELDS = ['governmentIdType', 'governmentIdNumber', 'governmentIdImageUrl', 'driverLicenseNumber', 'driverLicenseImageUrl'];
+const BUSINESS_FIELDS = ['businessName', 'businessRegistrationNumber', 'businessDocumentType', 'businessDocumentImageUrl', 'representativeName', 'representativeIdType', 'representativeIdNumber', 'representativeIdImageUrl', 'taxIdNumber', 'companyName', 'companyRegistrationNumber', 'companyDocumentImageUrl', 'assignedRiderName', 'assignedRiderLicenseNumber', 'assignedRiderLicenseImageUrl'];
+
+const ProfileSection: React.FC<{ title: string; fields: { label: string; value: string }[] }> = ({ title, fields }) => {
+  const visible = fields.filter(f => f.value);
+  if (visible.length === 0) return null;
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h4 style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase' }}>{title}</h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {visible.map(f => (
+          <div key={f.label}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>{f.label}</span>
+            {isImageUrlField(f.label) ? (
+              f.value.startsWith('http') ? (
+                <img src={f.value} alt={f.label} className="w-full max-h-48 object-contain rounded mt-1" />
+              ) : (
+                <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{f.value}</p>
+              )
+            ) : (
+              <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{f.value}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const renderProfileContent = (profile: any, role: string) => {
+  if (!profile) return <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>No additional profile data</p>;
+
+  const appType = profile.applicationType || 'individual';
+  const sections: React.ReactNode[] = [];
+  const commonFields: { label: string; value: string }[] = [];
+
+  APPLICATION_INFO_FIELDS.forEach(key => {
+    if (key === 'driverLicenseNumber' || key === 'driverLicenseImageUrl') return;
+    const found = Object.keys(profile).find(k => k.toLowerCase() === key.toLowerCase());
+    if (found && profile[found]) {
+      commonFields.push({ label: SECTION_LABELS[found] || found, value: String(profile[found]) });
+    }
+  });
+
+  sections.push(<ProfileSection key="info" title="Applicant Info" fields={commonFields} />);
+
+  if (appType === 'individual') {
+    const idFields: { label: string; value: string }[] = [];
+    INDIVIDUAL_ID_FIELDS.forEach(key => {
+      const found = Object.keys(profile).find(k => k.toLowerCase() === key.toLowerCase());
+      if (found && profile[found]) {
+        idFields.push({ label: SECTION_LABELS[found] || found, value: String(profile[found]) });
+      }
+    });
+    sections.push(<ProfileSection key="id" title="ID Verification" fields={idFields} />);
+  } else if (appType === 'business') {
+    const bizFields: { label: string; value: string }[] = [];
+    BUSINESS_FIELDS.forEach(key => {
+      const found = Object.keys(profile).find(k => k.toLowerCase() === key.toLowerCase());
+      if (found && profile[found]) {
+        bizFields.push({ label: SECTION_LABELS[found] || found, value: String(profile[found]) });
+      }
+    });
+    sections.push(<ProfileSection key="business" title="Business / Company Info" fields={bizFields} />);
+  }
+
+  const legacyFields = Object.entries(profile)
+    .filter(([key]) => !['status', 'submittedAt', 'applicationType', ...APPLICATION_INFO_FIELDS, ...INDIVIDUAL_ID_FIELDS, ...BUSINESS_FIELDS].includes(key as any))
+    .filter(([key]) => key !== 'status' && key !== 'submittedAt' && key !== 'applicationType')
+    .map(([key, val]) => ({ label: SECTION_LABELS[key] || key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' '), value: String(val) }));
+
+  if (legacyFields.length > 0) {
+    sections.push(<ProfileSection key="legacy" title="Additional Info" fields={legacyFields} />);
+  }
+
+  return <>{sections}</>;
+};
+
+const UserRoleTabs: React.FC<{ user: User }> = ({ user }) => {
+  const [tab, setTab] = useState('');
+  const [profile, setProfile] = useState<any>(null);
+
+  const roleTabs = (user.roles || []).filter(r => r !== 'admin' && r !== 'customer');
+
+  useEffect(() => {
+    if (!tab && roleTabs.length > 0) setTab(roleTabs[0]);
+  }, [user]);
+
+  useEffect(() => {
+    if (!tab) { setProfile(null); return; }
+    (async () => {
+      const data = await getRoleProfile(user.id, tab);
+      setProfile(data);
+    })();
+  }, [tab, user.id]);
+
+  const allTabs = ['customer', ...roleTabs];
+
+  if (allTabs.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)' }}>Role Details</h3>
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', overflowX: 'auto' }}>
+        {allTabs.map(r => (
+          <button key={r} onClick={() => setTab(r)}
+            style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: tab === r ? 'var(--ion-color-primary)' : 'var(--ion-card-background)', color: tab === r ? 'white' : 'var(--ion-text-color-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
+            {r === 'customer' ? 'Customer Info' : `${r.charAt(0).toUpperCase() + r.slice(1)} Info`}
+          </button>
+        ))}
+      </div>
+      <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
+        <IonCardContent style={{ padding: '14px' }}>
+          {tab === 'customer' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Name</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.name || '-'}</p></div>
+              <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Email</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.email || '-'}</p></div>
+              <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Phone</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.phone || '-'}</p></div>
+              <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Age</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.age || '-'}</p></div>
+              <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Address</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.address || '-'}</p></div>
+            </div>
+          ) : (
+            renderProfileContent(profile, tab)
+          )}
+        </IonCardContent>
+      </IonCard>
+    </div>
   );
 };
 

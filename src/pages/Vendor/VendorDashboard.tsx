@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { IonContent, IonCard, IonCardContent, IonIcon, IonButton, IonSpinner, IonModal, IonHeader, IonToolbar, IonButtons, IonTitle, IonTextarea, IonToast } from '@ionic/react';
 import { trendingUpOutline, cartOutline, starOutline, peopleOutline, storefrontOutline, cashOutline, settingsOutline, clipboardOutline, checkmarkOutline, closeOutline, documentTextOutline, locationOutline, personOutline, callOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 import { getEarningsStats, updateOrderStatus, subscribeVendorOrders } from '../../services/orderService';
 import { getReviewStats } from '../../services/reviewService';
@@ -34,7 +34,7 @@ const VendorDashboard: React.FC = () => {
     { label: 'Orders', icon: clipboardOutline, route: '/vendor/orders', color: '#10B981' },
     { label: 'Earnings', icon: cashOutline, route: '/vendor/earnings', color: '#F59E0B' },
     { label: 'Reviews', icon: starOutline, route: '/vendor/reviews', color: '#EC4899' },
-    { label: 'Settings', icon: settingsOutline, route: '/vendor/settings', color: '#14B8A6' },
+    { label: 'Profile', icon: settingsOutline, route: '/vendor/settings', color: '#14B8A6' },
   ];
 
   const loadStats = useCallback(async () => {
@@ -123,10 +123,6 @@ const VendorDashboard: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
-      />
 
         <div className="p-4 space-y-6">
           <div>
@@ -159,7 +155,7 @@ const VendorDashboard: React.FC = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
               {quickLinks.map((link, i) => (
                 <IonCard key={i} button onClick={() => history.push(link.route)}
-                  className="m-0 rounded-xl" style={{ borderTop: `3px solid ${link.color}` }}>
+                  className="m-0 rounded-xl hover:shadow-lg transition-shadow duration-200" style={{ borderTop: `3px solid ${link.color}` }}>
                   <IonCardContent className="text-center p-4">
                     <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ background: `${link.color}20` }}>
                       <IonIcon icon={link.icon} className="text-xl" style={{ color: link.color }} />
@@ -181,7 +177,7 @@ const VendorDashboard: React.FC = () => {
             {loading ? (
               <div className="text-center p-8"><IonSpinner name="crescent" /></div>
             ) : recentOrders.length === 0 ? (
-              <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No orders yet</p></IonCardContent></IonCard>
+              <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">You don't have any orders yet</p></IonCardContent></IonCard>
             ) : (
               <div style={{ display: 'grid', gap: '16px' }}>
                 {recentOrders.map(order => (

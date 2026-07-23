@@ -5,7 +5,7 @@ import {
 } from '@ionic/react';
 import { checkmarkOutline, closeOutline, personOutline, callOutline, timeOutline, documentTextOutline, locationOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 import { updateOrderStatus, subscribeVendorOrders } from '../../services/orderService';
 import { useOrders } from '../../context/OrderContext';
@@ -109,12 +109,6 @@ const VendorOrders: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        showBack={true}
-        backHref="/vendor/dashboard"
-        onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
-      />
 
         <div className="p-4">
           <div className="mb-6">
@@ -138,7 +132,7 @@ const VendorOrders: React.FC = () => {
           {loading ? (
             <div className="text-center p-12"><IonSpinner name="crescent" /></div>
           ) : filteredOrders.length === 0 ? (
-            <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No orders yet</p></IonCardContent></IonCard>
+            <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">You don't have any orders yet</p></IonCardContent></IonCard>
           ) : (
             <div className="grid gap-4">
               {filteredOrders.map(order => (

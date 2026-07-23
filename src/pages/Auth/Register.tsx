@@ -1,27 +1,20 @@
 // src/pages/Auth/Register.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonContent,
   IonButton,
   IonInput,
   IonItem,
   IonIcon,
   IonText,
-  IonBackButton,
-  IonButtons,
   IonLoading,
   IonCheckbox,
   IonLabel,
 } from '@ionic/react';
-import { personOutline, mailOutline, lockClosedOutline, callOutline, eyeOutline, eyeOffOutline, calendarOutline } from 'ionicons/icons';
+import { personOutline, mailOutline, lockClosedOutline, callOutline, eyeOutline, eyeOffOutline, calendarOutline, arrowBackOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getAuthErrorMessage } from '../../services/authService';
-import AppFooter from '../../components/AppFooter';
 
 const COUNTRY_CODES = [
   { code: '+63', label: 'PH +63' },
@@ -78,7 +71,8 @@ const Register: React.FC = () => {
         address: formData.address,
         password: formData.password,
       });
-      history.push('/customer/home');
+      history.push('/verify-otp');
+      return;
     } catch (err) {
       setError(getAuthErrorMessage(err));
     } finally {
@@ -87,16 +81,15 @@ const Register: React.FC = () => {
   };
 
   return (
-    <IonPage>
-      <IonHeader className="ion-no-border page-header-constrained page-header-auth">
-        <IonToolbar style={{ '--background': 'var(--ion-card-background)' } as any}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/guest/home" color="primary" />
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-
-      <IonContent className="ion-padding" style={{ '--background': 'var(--ion-background-color)' } as any}>
+    <>
+      <div className="sticky top-0 z-20 bg-[var(--ion-card-background)] border-b border-[var(--ion-border-color)]">
+        <button
+          onClick={() => history.goBack()}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--ion-color-primary)]"
+        >
+          <IonIcon icon={arrowBackOutline} className="text-lg" />
+        </button>
+      </div>
         <div style={{ maxWidth: '400px', margin: '0 auto', paddingTop: '40px', paddingBottom: '140px' }}>
           {/* Header */}
           <div style={{ marginBottom: '40px', textAlign: 'center' }}>
@@ -300,9 +293,7 @@ const Register: React.FC = () => {
           By registering, you agree to our Terms of Service and Privacy Policy
         </p>
         <IonLoading isOpen={loading} message="Creating account..." />
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+    </>
   );
 };
 

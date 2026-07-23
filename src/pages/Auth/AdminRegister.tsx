@@ -1,26 +1,19 @@
 // src/pages/Auth/AdminRegister.tsx
 import React, { useState } from 'react';
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonContent,
   IonButton,
   IonInput,
   IonItem,
   IonIcon,
   IonText,
-  IonBackButton,
-  IonButtons,
   IonLoading,
   IonCheckbox,
   IonLabel,
 } from '@ionic/react';
-import { personOutline, mailOutline, lockClosedOutline, callOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { arrowBackOutline, personOutline, mailOutline, lockClosedOutline, callOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import AppFooter from '../../components/AppFooter';
 
 const AdminRegister: React.FC = () => {
   const history = useHistory();
@@ -39,16 +32,17 @@ const AdminRegister: React.FC = () => {
   const [error, setError] = useState('');
 
   return (
-    <IonPage>
-      <IonHeader className="ion-no-border">
-        <IonToolbar style={{ '--background': 'var(--ion-card-background)' } as any}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/guest/home" color="primary" />
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+    <>
+      <div className="sticky top-0 z-20 bg-[var(--ion-card-background)] border-b border-[var(--ion-border-color)]">
+        <button
+          onClick={() => history.push('/guest/home')}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--ion-color-primary)]"
+        >
+          <IonIcon icon={arrowBackOutline} className="text-lg" />
+        </button>
+      </div>
 
-      <IonContent className="ion-padding" style={{ '--background': 'var(--ion-background-color)' } as any}>
+
         <div style={{ maxWidth: '400px', margin: '0 auto', paddingTop: '40px', paddingBottom: '140px' }}>
           {/* Header */}
           <div style={{ marginBottom: '40px', textAlign: 'center' }}>
@@ -113,7 +107,7 @@ const AdminRegister: React.FC = () => {
               fontWeight: 700,
               marginBottom: '24px'
             }}
-            onClick={() => history.push('/admin/login')}
+            onClick={() => history.push('/login')}
           >
             Back to Admin Login
           </IonButton>
@@ -123,7 +117,7 @@ const AdminRegister: React.FC = () => {
               Not an admin?{' '}
               <span 
                 style={{ color: 'var(--ion-color-primary)', fontWeight: 700, cursor: 'pointer' }}
-                onClick={() => history.push('/guest/home')}
+          onClick={() => history.goBack()}
               >
                 Go Back
               </span>
@@ -135,9 +129,8 @@ const AdminRegister: React.FC = () => {
           Admin area - Authorized access only
         </p>
         <IonLoading isOpen={loading} message="Processing..." />
-      <AppFooter />
-      </IonContent>
-    </IonPage>
+
+    </>
   );
 };
 

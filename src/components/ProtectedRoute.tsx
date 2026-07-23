@@ -1,22 +1,18 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { roleHomePaths } from '../config/routesByRole';
+import { getRoleRedirect } from '../services/roleGuard';
 import FullScreenLoader from './FullScreenLoader';
+import { isVerifiedOrAdmin } from '../utils/isVerifiedOrAdmin';
 
 interface ProtectedRouteProps {
   path: string;
   exact?: boolean;
   children: React.ReactNode;
   requireAuth?: boolean;
-  requiredRole?: string;
+  requiredRole?: string | string[];
 }
-
-const roleLoginPaths: Record<string, string> = {
-  vendor: '/vendor/login',
-  admin: '/admin/login',
-  rider: '/rider/login',
-  customer: '/login',
-};
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   path,
@@ -25,20 +21,62 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requiredRole,
 }) => {
-  const { user, authLoading } = useAuth();
+  const { user, authLoading, activeRole, roles } = useAuth();
 
   if (authLoading) {
     return <FullScreenLoader />;
   }
 
+  const homePath = activeRole ? (roleHomePaths[activeRole] || '/') : '/select-role';
+
+  if (requireAuth && !user) {
+    return <Route exact={exact} path={path}><Redirect to="/login" /></Route>;
+  }
+
+  // Email verification redirect — always send to /verify-otp (skip otp page itself)
+  const skipEmailPaths = ['/verify-otp', '/select-role', '/register', '/login', '/apply/vendor', '/apply/rider', '/approval-pending', '/application-rejected'];
+  if (requireAuth && user && !isVerifiedOrAdmin(user) && !skipEmailPaths.includes(path)) {
+    return <Route exact={exact} path={path}><Redirect to="/verify-otp" /></Route>;
+  }
+
+  // Route access blocks
+  const skipGuardPaths = ['/approval-pending', '/application-rejected', '/select-role', '/verify-otp', '/apply/vendor', '/apply/rider'];
+  if (requireAuth && user && activeRole && !skipGuardPaths.includes(path) && !requiredRole) {
+    const redirect = getRoleRedirect(user, activeRole);
+    if (redirect) return <Route exact={exact} path={path}><Redirect to={redirect} /></Route>;
+  }
+
+  // Role-based route blocking
+  if (requireAuth && user) {
+    const isVendorRoute = path.startsWith('/vendor/');
+    const isRiderRoute = path.startsWith('/rider/');
+    const isAdminRoute = path.startsWith('/admin/');
+
+    if (isVendorRoute && user.roleStatus?.vendor !== 'approved') {
+      const redirect = getRoleRedirect(user, 'vendor');
+      return <Route exact={exact} path={path}><Redirect to={redirect || '/apply/vendor'} /></Route>;
+    }
+    if (isRiderRoute && user.roleStatus?.rider !== 'approved') {
+      const redirect = getRoleRedirect(user, 'rider');
+      return <Route exact={exact} path={path}><Redirect to={redirect || '/apply/rider'} /></Route>;
+    }
+    if (isAdminRoute && !roles.includes('admin')) {
+      return <Route exact={exact} path={path}><Redirect to="/" /></Route>;
+    }
+  }
+
   return (
     <Route exact={exact} path={path}>
       {requireAuth && !user ? (
-        <Redirect to={roleLoginPaths[requiredRole || ''] || '/login'} />
-      ) : requiredRole && user?.role !== requiredRole ? (
-        <Redirect to="/" />
+        <Redirect to="/login" />
+      ) : requiredRole && (
+        Array.isArray(requiredRole)
+          ? !requiredRole.some(r => roles.includes(r as any)) || (roles.length > 1 && (!activeRole || !requiredRole.includes(activeRole as any)))
+          : !roles.includes(requiredRole as any) || (roles.length > 1 && activeRole !== requiredRole)
+      ) ? (
+        <Redirect to={homePath} />
       ) : !requireAuth && user ? (
-        <Redirect to="/customer/home" />
+        <Redirect to={homePath} />
       ) : (
         children
       )}

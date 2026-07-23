@@ -4,9 +4,9 @@ import {
   IonButton,
   IonIcon,
 } from '@ionic/react';
-import { personOutline, mailOutline, callOutline, locationOutline, logOutOutline, cameraOutline } from 'ionicons/icons';
+import { personOutline, mailOutline, callOutline, locationOutline, logOutOutline, cameraOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 
@@ -110,17 +110,9 @@ const UserProfile: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        title="My Profile"
-        showBack={true}
-        backHref="/customer/home"
-        cartCount={itemCount}
-        onCartClick={() => history.push('/customer/cart')}
-        onOrdersClick={() => history.push('/customer/orders')}
-        onProfileClick={() => history.push('/customer/profile')}
-      />
 
-        <div className="page-container" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
+
+        <div className="page-container max-w-3xl mx-auto" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
           {/* Avatar */}
           <div style={{ textAlign: 'center', marginBottom: '32px', paddingTop: '16px' }}>
             <div
@@ -194,6 +186,10 @@ const UserProfile: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                 <IonIcon icon={mailOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)' }} />
                 <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Email</span>
+                <span style={{ marginLeft: '8px', display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 600, background: user?.emailVerified ? '#10B98120' : '#F59E0B20', color: user?.emailVerified ? '#10B981' : '#F59E0B' }}>
+                  <IonIcon icon={user?.emailVerified ? checkmarkCircleOutline : closeCircleOutline} style={{ fontSize: '11px' }} />
+                  {user?.emailVerified ? 'Verified' : 'Unverified'}
+                </span>
               </div>
               <input type="email" value={email} onChange={e => { setEmail(e.target.value); setEmailError(isValidEmail(e.target.value) ? '' : 'Invalid email address'); }}
                 style={{
@@ -285,7 +281,7 @@ const UserProfile: React.FC = () => {
           </IonButton>
 
           {/* Sign Out */}
-          <IonButton expand="block" color="danger" onClick={() => { logout(); history.push('/guest/home'); }}
+          <IonButton expand="block" color="danger" className="md:hidden" onClick={() => { logout(); history.push('/guest/home'); }}
             style={{
               '--border-radius': '8px', height: '48px', fontSize: '16px', fontWeight: 600,
             }}

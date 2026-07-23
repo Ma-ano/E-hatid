@@ -1,22 +1,18 @@
 import React from 'react';
 import { IonIcon } from '@ionic/react';
-import { carOutline, logoFacebook, logoTwitter, logoInstagram } from 'ionicons/icons';
+import { logoFacebook, logoTwitter, logoInstagram } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 const quickLinks = [
   { label: 'Home', path: '/guest/home' },
   { label: 'Browse Stalls', path: '/guest/home' },
-  { label: 'Become a Vendor', path: '/vendor/register' },
-  { label: 'Become a Rider', path: '/rider/register' },
+  { label: 'Apply as a Vendor', path: '/apply/vendor' },
+  { label: 'Apply as a Rider', path: '/apply/rider' },
 ];
 
 const supportLinks = [
-  { label: 'Contact Us', path: '/contact' },
-  { label: 'FAQ', path: '/faq' },
-  { label: 'Help Center', path: '/help' },
   { label: 'Report an Issue', path: '/report' },
-  { label: 'Privacy Policy', path: '/privacy' },
-  { label: 'Terms of Service', path: '/terms' },
 ];
 
 const socialLinks = [
@@ -27,6 +23,7 @@ const socialLinks = [
 
 const AppFooter: React.FC = () => {
   const history = useHistory();
+  const { isDarkMode } = useTheme();
 
   return (
     <footer className="bg-[var(--tw-card-background)] border-t border-[var(--tw-border-color)] py-8 sm:py-12 mt-auto">
@@ -34,12 +31,11 @@ const AppFooter: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 mb-8 sm:mb-10">
           {/* Brand */}
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-[var(--ion-color-primary)] flex items-center justify-center shrink-0">
-                <IonIcon icon={carOutline} className="text-lg text-white" />
-              </div>
-              <span className="text-lg sm:text-xl font-bold text-[var(--tw-text-color)]">E-Hatid</span>
-            </div>
+            <img
+              src={isDarkMode ? '/Logo/E-hatid-dark-mode.png' : '/Logo/E-hatid-light-mode.png'}
+              alt="E-Hatid"
+              className="h-8 sm:h-9 object-contain"
+            />
             <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)] leading-relaxed max-w-xs">
               Your favorite food, delivered fast. Order from the best local restaurants and stalls near you.
             </p>

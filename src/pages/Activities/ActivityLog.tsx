@@ -29,7 +29,7 @@ import {
   arrowBack,
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 import { Activity } from '../../types';
 
@@ -160,13 +160,11 @@ const ActivityLog: React.FC = () => {
     return d.toLocaleDateString();
   };
 
-  // Filter activities by role
+  const userRoles = user?.roles || (user?.role ? [user.role] : []);
   const roleBasedActivities = allActivities.filter(activity => {
-    if (user?.role === 'admin') {
-      // Admin sees all activities
+    if (userRoles.includes('admin')) {
       return true;
-    } else if (user?.role === 'rider') {
-      // Riders see order deliveries, earnings, and rider-specific events
+    } else if (userRoles.includes('rider')) {
       return (
         activity.type.startsWith('order_') ||
         activity.type === 'rider_online' ||
@@ -174,7 +172,6 @@ const ActivityLog: React.FC = () => {
         activity.type === 'payment_made'
       );
     } else {
-      // Users see their orders, payments, and reports
       return (
         activity.type.startsWith('order_') ||
         activity.type === 'payment_made' ||
@@ -196,13 +193,7 @@ const ActivityLog: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        onProfileClick={() => {
-          logout();
-          history.push('/login');
-        }}
-      />
+      <Navbar />
 
         {/* Header with Back Button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>

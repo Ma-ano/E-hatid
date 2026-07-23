@@ -1,12 +1,14 @@
 import React from 'react';
-import { IonIcon, IonButton } from '@ionic/react';
-import { carOutline, bicycleOutline, restaurantOutline, storefrontOutline, chevronForwardOutline } from 'ionicons/icons';
+import { IonButton, IonIcon } from '@ionic/react';
+import { bicycleOutline, restaurantOutline, storefrontOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const Landing: React.FC = () => {
   const history = useHistory();
   const { isAuthenticated } = useAuth();
+  const { isDarkMode } = useTheme();
 
   if (isAuthenticated) {
     history.replace('/customer/home');
@@ -17,13 +19,12 @@ const Landing: React.FC = () => {
     <div className="min-h-full flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 max-w-lg mx-auto w-full text-center">
         {/* Logo */}
-        <div className="w-20 h-20 rounded-2xl bg-[var(--ion-color-primary)] flex items-center justify-center mb-6 shadow-lg shadow-[var(--ion-color-primary)]/20">
-          <IonIcon icon={carOutline} className="text-4xl text-white" />
-        </div>
+        <img
+          src={isDarkMode ? '/Logo/E-hatid-dark-mode.png' : '/Logo/E-hatid-light-mode.png'}
+          alt="E-Hatid"
+          className="h-16 sm:h-20 object-contain mb-6"
+        />
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--ion-text-color)] mb-3">
-          E-Hatid
-        </h1>
         <p className="text-base sm:text-lg text-[var(--ion-text-color-secondary)] mb-8 max-w-sm">
           Your favorite food, delivered fast. Order from the best local restaurants near you.
         </p>
@@ -31,7 +32,7 @@ const Landing: React.FC = () => {
         {/* CTA Buttons */}
         <div className="w-full space-y-3">
           <button
-            onClick={() => history.push('/customer/login')}
+            onClick={() => history.push('/login')}
             className="w-full h-12 bg-[var(--ion-color-primary)] text-white font-semibold rounded-xl
                        transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
@@ -42,7 +43,7 @@ const Landing: React.FC = () => {
           </button>
 
           <button
-            onClick={() => history.push('/customer/register')}
+            onClick={() => history.push('/register')}
             className="w-full h-12 border-2 border-[var(--ion-border-color)] text-[var(--ion-text-color)] font-semibold rounded-xl
                        transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >

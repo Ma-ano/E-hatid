@@ -15,7 +15,7 @@ import {
 } from '@ionic/react';
 import { personOutline, callOutline, mailOutline, carOutline, starOutline, saveOutline, logOutOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 
 const RiderProfile: React.FC = () => {
@@ -25,16 +25,16 @@ const RiderProfile: React.FC = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const [profile, setProfile] = useState({
-    name: 'Juan Dela Cruz',
-    email: 'juan@example.com',
-    phone: '+63 912 345 6789',
-    vehicle: 'Honda CB500F',
-    licensePlate: 'XYZ-1234',
-    licenseNumber: '123456789',
-    rating: 4.8,
-    totalDeliveries: 245,
-    bankAccount: '1234567890',
-    bankName: 'Philippine National Bank',
+    name: '',
+    email: '',
+    phone: '',
+    vehicle: '',
+    licensePlate: '',
+    licenseNumber: '',
+    rating: 0,
+    totalDeliveries: 0,
+    bankAccount: '',
+    bankName: '',
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -47,86 +47,7 @@ const RiderProfile: React.FC = () => {
   };
 
   return (
-    <>
-      <PageHeader 
-        showLogo={true}
-        onProfileClick={handleLogout}
-      />
-
-        {/* Rider Navigation */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px',
-          padding: '16px',
-          overflowX: 'auto',
-          background: 'var(--ion-card-background)',
-          borderBottomLeftRadius: '12px',
-          borderBottomRightRadius: '12px'
-        }}>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/home')}
-          >
-            🏠 Home
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/orders')}
-          >
-            📦 Orders
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/earnings')}
-          >
-            💰 Earnings
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'var(--ion-color-primary)',
-              '--color': '#FFFFFF',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-          >
-            👤 Profile
-          </IonButton>
-        </div>
+    <div className="max-w-3xl mx-auto">
 
         {/* Quick Access Menu */}
         <div style={{
@@ -352,6 +273,7 @@ const RiderProfile: React.FC = () => {
           <IonButton 
             expand="block" 
             fill="outline"
+            className="md:hidden"
             style={{ '--border-color': '#EF4444', '--color': '#EF4444', margin: 0 }}
             onClick={handleLogout}
           >
@@ -359,7 +281,7 @@ const RiderProfile: React.FC = () => {
             Logout
           </IonButton>
         </div>
-    </>
+    </div>
   );
 };
 

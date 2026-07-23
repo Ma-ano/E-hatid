@@ -137,3 +137,84 @@ ion-button {
   --outline: none;
   outline: none !important;
 }
+
+.ion-item-clean {
+  --background: transparent !important;
+  --border-color: transparent !important;
+  --inner-border-width: 0 !important;
+  --inner-box-shadow: none !important;
+  --min-height: 38px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --highlight-height: 0;
+  border: 1px solid var(--tw-border-color);
+  border-radius: 8px;
+  --background-hover: transparent;
+  font-size: 13px;
+}
+
+.product-editor-modal {
+  --backdrop-opacity: 0.6 !important;
+}
+
+.product-editor-modal ion-content {
+  --overflow: auto;
+}
+
+.product-editor-content {
+  --padding-bottom: 0;
+}
+
+.product-editor-page {
+  --background: var(--tw-background-color);
+}
+
+.product-editor-page ion-content {
+  --padding-bottom: 0;
+}
+
+.product-editor-modal ion-item::part(native),
+.product-editor-page ion-item::part(native) {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.product-editor-modal ion-toggle::part(track),
+.product-editor-page ion-toggle::part(track) {
+  height: 22px;
+  width: 40px;
+}
+
+.product-editor-modal ion-toggle::part(handle),
+.product-editor-page ion-toggle::part(handle) {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 767px) {
+.hide-on-desktop {
+  display: block;
+}
+.hide-on-mobile {
+  display: none;
+}
+}
+
+@media (min-width: 768px) {
+  .hide-on-desktop {
+    display: none !important;
+  }
+  .hide-on-mobile {
+    display: block !important;
+  }
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 639px) {
+.ion-item-clean {
+    --min-height: 36px;
+  }
+}

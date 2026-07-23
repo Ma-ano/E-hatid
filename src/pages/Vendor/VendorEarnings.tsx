@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IonCard, IonCardContent, IonIcon, IonSpinner } from '@ionic/react';
 import { trendingUpOutline, cashOutline, cardOutline, walletOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 import { fetchOrdersByVendor, getEarningsStats } from '../../services/orderService';
 import { Order } from '../../types';
@@ -43,12 +43,6 @@ const VendorEarnings: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        showBack={true}
-        backHref="/vendor/dashboard"
-        onLogoutClick={() => { logout(); history.push('/vendor/login'); }}
-      />
 
         <div className="p-4">
           <div className="mb-6">

@@ -13,7 +13,7 @@ import { db } from '../../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 
 import CartItem from '../../components/Cart/CartItem';
-import PageHeader from '../../components/PageHeader';
+
 import { useCart } from '../../context/CartContext';
 import { useOrders } from '../../context/OrderContext';
 import { useAuth } from '../../context/AuthContext';
@@ -72,15 +72,7 @@ const UserCart: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        showBackButton={true}
-        backHref="/customer/home"
-        cartCount={itemCount}
-        onCartClick={() => history.push('/customer/cart')}
-        onOrdersClick={() => history.push('/customer/orders')}
-        onProfileClick={() => history.push('/customer/profile')}
-      />
+
 
         <div className="flex flex-col min-h-full">
         <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pb-10 sm:pb-16">
@@ -161,18 +153,37 @@ const UserCart: React.FC = () => {
               </div>
 
               {items.length > 0 && (
-                <IonButton
-                  expand="block" size="large"
-                  className="mt-6 min-h-[48px] sm:min-h-[56px]"
-                  style={{
-                    '--background': 'var(--ion-color-primary)', '--border-radius': '8px',
-                    fontSize: '15px', fontWeight: 700,
-                  }}
-                  onClick={handlePayment}
-                  disabled={loading}
-                >
-                  {loading ? 'Processing...' : `Pay ₱${finalTotal.toFixed(2)}`}
-                </IonButton>
+                <div className="mt-6 space-y-3">
+                  {user?.emailVerified !== true && (
+                    <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg p-3 text-center">
+                      <p className="m-0 text-xs sm:text-sm text-amber-700 dark:text-amber-300 font-medium">
+                        Verify your email to place orders
+                      </p>
+                      <IonButton
+                        size="small"
+                        fill="outline"
+                        className="mt-2 min-h-[36px]"
+                        style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)' }}
+                        onClick={() => history.push('/verify-otp')}
+                      >
+                        Go to Verification
+                      </IonButton>
+                    </div>
+                  )}
+                  <IonButton
+                    expand="block" size="large"
+                    className="min-h-[48px] sm:min-h-[56px]"
+                    style={{
+                      '--background': user?.emailVerified === true ? 'var(--ion-color-primary)' : '#9CA3AF',
+                      '--border-radius': '8px',
+                      fontSize: '15px', fontWeight: 700,
+                    }}
+                    onClick={handlePayment}
+                    disabled={loading || user?.emailVerified !== true}
+                  >
+                    {loading ? 'Processing...' : user?.emailVerified === true ? `Pay ₱${finalTotal.toFixed(2)}` : 'Verify email to order'}
+                  </IonButton>
+                </div>
               )}
             </>
           )}

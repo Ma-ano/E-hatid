@@ -1,0 +1,158 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // Helper functions
+    // ============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function getUserData(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated()
+        && getUserData(request.auth.uid).roles.hasAny(['admin']);
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserData(request.auth.uid).roles.hasAny([role]);
+    }
+
+    function roleStatusIs(role, status) {
+      return isAuthenticated()
+        && getUserData(request.auth.uid).roleStatus[role] == status;
+    }
+
+    // ============================================================
+    // users/{uid}
+    // - User can read/write their own document
+    // - Admin can read/write any user document
+    // ============================================================
+    match /users/{uid} {
+      allow read: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // Role subcollections (users/{uid}/customerProfile, vendorProfile, riderProfile)
+    // - Owner can read/write their own subcollection
+    // - Admin can read/write any
+    // ============================================================
+    match /users/{uid}/{roleProfile}/{document=**} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow write: if isOwner(uid) || isAdmin();
+    }
+
+    // ============================================================
+    // stalls/{stallId}
+    // ============================================================
+    match /stalls/{stallId} {
+
+      allow read: if true;
+
+      allow create: if (isAuthenticated() && hasRole('vendor')
+                      && roleStatusIs('vendor', 'approved'))
+                  && request.resource.data.vendorId == request.auth.uid
+                  && request.resource.data.keys().hasAll(['id', 'name', 'vendorId'])
+                  && request.resource.data.name is string
+                  && request.resource.data.name.size() > 0;
+
+      allow update: if isAuthenticated()
+                  && (
+                    (resource.data.vendorId == request.auth.uid && hasRole('vendor'))
+                    || isAdmin()
+                  )
+                  && request.resource.data.name is string
+                  && request.resource.data.name.size() > 0;
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // orders/{orderId}
+    // ============================================================
+    match /orders/{orderId} {
+
+      allow read: if isAuthenticated()
+                  && (
+                    resource.data.userId == request.auth.uid
+                    || resource.data.vendorId == request.auth.uid
+                    || resource.data.riderId == request.auth.uid
+                    || isAdmin()
+                  );
+
+      allow create: if isAuthenticated()
+                  && request.resource.data.userId == request.auth.uid
+                  && request.resource.data.keys().hasAll(['userId', 'items', 'total', 'status', 'stallId']);
+
+      allow update: if isAuthenticated()
+                  && (
+                    (resource.data.vendorId == request.auth.uid && hasRole('vendor'))
+                    || (resource.data.riderId == request.auth.uid && hasRole('rider'))
+                    || (resource.data.userId == request.auth.uid
+                        && request.resource.data.status == 'cancelled'
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cancelledReason']))
+                    || isAdmin()
+                  );
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // reviews/{reviewId}
+    // ============================================================
+    match /reviews/{reviewId} {
+
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+                  && request.resource.data.userId == request.auth.uid
+                  && request.resource.data.keys().hasAll(['userId', 'stallId', 'rating', 'comment']);
+
+      allow update: if false;
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // applications/{docId}
+    // - User can create their own application
+    // - Admin can read all applications
+    // - No updates or deletes by non-admin
+    // ============================================================
+    match /applications/{docId} {
+
+      allow create: if isAuthenticated()
+                  && request.resource.data.userId == request.auth.uid
+                  && request.resource.data.keys().hasAll(['userId', 'role', 'status'])
+                  && request.resource.data.role in ['vendor', 'rider']
+                  && request.resource.data.status == 'pending';
+
+      allow read: if isAuthenticated();
+
+      allow update: if isAdmin()
+                  && request.resource.data.diff(resource.data).affectedKeys()
+                      .hasOnly(['status', 'reviewedAt', 'reviewedBy', 'rejectionReason']);
+
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // Deny all other collections and operations by default
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -7,7 +7,10 @@ const ORDERS_BASE_KEY = 'user_orders';
 
 function getOrdersKey(user: User | null, isGuest: boolean): string {
   if (isGuest) return `${ORDERS_BASE_KEY}_guest`;
-  if (user?.id) return `${ORDERS_BASE_KEY}_${user.role}_${user.id}`;
+  if (user?.id) {
+    const role = user.roles?.[0] || user.role || 'user';
+    return `${ORDERS_BASE_KEY}_${role}_${user.id}`;
+  }
   return `${ORDERS_BASE_KEY}_temp`;
 }
 

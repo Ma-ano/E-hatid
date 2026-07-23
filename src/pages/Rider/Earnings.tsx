@@ -12,7 +12,7 @@ import {
 } from '@ionic/react';
 import { cashOutline, trendingUpOutline, downloadOutline, calendarOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 
 const RiderEarnings: React.FC = () => {
@@ -20,47 +20,12 @@ const RiderEarnings: React.FC = () => {
   const { logout } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('today');
 
-  const earningsData = {
-    today: {
-      total: 450.50,
-      trips: 12,
-      average: 37.54,
-    },
-    week: {
-      total: 2150.75,
-      trips: 58,
-      average: 37.08,
-    },
-    month: {
-      total: 8925.30,
-      trips: 245,
-      average: 36.43,
-    },
-  };
-
-  const earnings = earningsData[selectedPeriod as keyof typeof earningsData];
-
-  const weeklyEarnings = [
-    { day: 'Mon', amount: 350, trips: 10 },
-    { day: 'Tue', amount: 420, trips: 12 },
-    { day: 'Wed', amount: 380, trips: 11 },
-    { day: 'Thu', amount: 450, trips: 13 },
-    { day: 'Fri', amount: 550, trips: 16 },
-    { day: 'Sat', amount: 600, trips: 18 },
-    { day: 'Sun', amount: 450, trips: 12 },
-  ];
-
-  const maxEarning = Math.max(...weeklyEarnings.map(e => e.amount));
+  const earnings = { total: 0, trips: 0, average: 0 };
+  const weeklyEarnings: { day: string; amount: number; trips: number }[] = [];
+  const maxEarning = 1;
 
   return (
     <>
-      <PageHeader 
-        showLogo={true}
-        onProfileClick={() => {
-          logout();
-          history.push('/login');
-        }}
-      />
 
         {/* Rider Navigation */}
         <div style={{ 

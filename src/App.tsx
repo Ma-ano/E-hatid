@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { IonApp, IonRouterOutlet, IonSpinner, IonPage, IonContent, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
-import { GuestLayout, CustomerLayout, RiderLayout, AdminLayout, VendorLayout } from './layouts';
+import { AppLayout, RoleLayout } from './layouts';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -26,10 +26,6 @@ const GuestCart = lazy(() => import('./pages/Guest/Cart'));
 const GuestLocationPicker = lazy(() => import('./pages/Guest/LocationPicker'));
 const Login = lazy(() => import('./pages/Auth/Login'));
 const Register = lazy(() => import('./pages/Auth/Register'));
-const RiderLogin = lazy(() => import('./pages/Auth/RiderLogin'));
-const RiderRegister = lazy(() => import('./pages/Auth/RiderRegister'));
-const AdminLogin = lazy(() => import('./pages/Auth/AdminLogin'));
-const AdminRegister = lazy(() => import('./pages/Auth/AdminRegister'));
 const CustomerProfile = lazy(() => import('./pages/customer/Profile'));
 const CustomerCart = lazy(() => import('./pages/customer/Cart'));
 const CustomerLocationPicker = lazy(() => import('./pages/customer/LocationPicker'));
@@ -41,11 +37,10 @@ const RiderEarnings = lazy(() => import('./pages/Rider/Earnings'));
 const RiderProfile = lazy(() => import('./pages/Rider/Profile'));
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
 const AdminUsers = lazy(() => import('./pages/Admin/Users'));
-const AdminRiders = lazy(() => import('./pages/Admin/Riders'));
 const AdminOrders = lazy(() => import('./pages/Admin/Orders'));
 const AdminReports = lazy(() => import('./pages/Admin/Reports'));
-const VendorLogin = lazy(() => import('./pages/Auth/VendorLogin'));
-const VendorRegister = lazy(() => import('./pages/Auth/VendorRegister'));
+const VendorApply = lazy(() => import('./pages/apply/ApplyVendor'));
+const RiderApply = lazy(() => import('./pages/apply/ApplyRider'));
 const VendorDashboard = lazy(() => import('./pages/Vendor/VendorDashboard'));
 const VendorProducts = lazy(() => import('./pages/Vendor/VendorProducts'));
 const VendorOrders = lazy(() => import('./pages/Vendor/VendorOrders'));
@@ -55,9 +50,13 @@ const VendorSettings = lazy(() => import('./pages/Vendor/VendorSettings'));
 const ActivityLog = lazy(() => import('./pages/Activities/ActivityLog'));
 const Messages = lazy(() => import('./pages/Messages/Messages'));
 const ReportIncident = lazy(() => import('./pages/Reports/ReportIncident'));
+const RoleSelection = lazy(() => import('./pages/Auth/RoleSelection'));
+const EmailVerification = lazy(() => import('./pages/Auth/EmailVerification'));
+const OtpVerification = lazy(() => import('./pages/Auth/OtpVerification'));
+const ApprovalPending = lazy(() => import('./pages/Auth/ApprovalPending'));
+const ApplicationRejected = lazy(() => import('./pages/Auth/ApplicationRejected'));
 import ProtectedRoute from './components/ProtectedRoute';
 import StorageConsent from './components/StorageConsent';
-import ThemeToggle from './components/ThemeToggle';
 
 setupIonicReact({
   mode: 'ios',
@@ -76,12 +75,16 @@ const PageLoader: React.FC = () => (
   </IonPage>
 );
 
+const L: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <AppLayout><RoleLayout>{children}</RoleLayout></AppLayout>
+);
+
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <Suspense fallback={<PageLoader />}>
         <IonRouterOutlet>
-          {/* Landing — standalone, no layout wrapper */}
+          {/* Landing - standalone, no layout wrapper */}
           <Route exact path="/">
             <IonPage>
               <IonContent className="ion-content-center">
@@ -92,136 +95,137 @@ const App: React.FC = () => (
 
           {/* Guest Routes */}
           <ProtectedRoute exact path="/guest/home" requireAuth={false}>
-            <GuestLayout><CustomerHome /></GuestLayout>
+            <L><CustomerHome /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/guest/cart" requireAuth={false}>
-            <GuestLayout><GuestCart /></GuestLayout>
+            <L><GuestCart /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/guest/location" requireAuth={false}>
-            <GuestLayout><GuestLocationPicker /></GuestLayout>
+            <L><GuestLocationPicker /></L>
           </ProtectedRoute>
 
-          {/* Stall Detail (accessible to all) */}
+          {/* Stall Detail (public) */}
           <Route exact path="/stall/:id/menu">
-            <GuestLayout><StallDetail /></GuestLayout>
+            <L><StallDetail /></L>
           </Route>
 
           {/* Customer Routes */}
-          <ProtectedRoute exact path="/customer/home">
-            <CustomerLayout><CustomerHome /></CustomerLayout>
+          <ProtectedRoute exact path="/customer/home" requiredRole="customer">
+            <L><CustomerHome /></L>
           </ProtectedRoute>
-          <ProtectedRoute exact path="/customer/profile">
-            <CustomerLayout><CustomerProfile /></CustomerLayout>
+          <ProtectedRoute exact path="/customer/profile" requiredRole="customer">
+            <L><CustomerProfile /></L>
           </ProtectedRoute>
-          <ProtectedRoute exact path="/customer/cart">
-            <CustomerLayout><CustomerCart /></CustomerLayout>
+          <ProtectedRoute exact path="/customer/cart" requiredRole="customer">
+            <L><CustomerCart /></L>
           </ProtectedRoute>
-          <ProtectedRoute exact path="/customer/orders">
-            <CustomerLayout><CustomerOrders /></CustomerLayout>
+          <ProtectedRoute exact path="/customer/orders" requiredRole="customer">
+            <L><CustomerOrders /></L>
           </ProtectedRoute>
-          <ProtectedRoute exact path="/customer/location">
-            <CustomerLayout><CustomerLocationPicker /></CustomerLayout>
+          <ProtectedRoute exact path="/customer/location" requiredRole="customer">
+            <L><CustomerLocationPicker /></L>
           </ProtectedRoute>
-          <ProtectedRoute exact path="/customer/order-tracking">
-            <CustomerLayout><CustomerOrderTracking /></CustomerLayout>
+          <ProtectedRoute exact path="/customer/order-tracking" requiredRole="customer">
+            <L><CustomerOrderTracking /></L>
           </ProtectedRoute>
 
           {/* Auth Routes */}
           <ProtectedRoute exact path="/login" requireAuth={false}>
-            <Login />
+            <L><Login /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/register" requireAuth={false}>
-            <Register />
+            <L><Register /></L>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/select-role" requireAuth={true}>
+            <L><RoleSelection /></L>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/verify-email" requireAuth={true}>
+            <Redirect to="/verify-otp" />
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/approval-pending" requireAuth={true}>
+            <IonPage><IonContent className="ion-content-center"><ApprovalPending /></IonContent></IonPage>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/application-rejected" requireAuth={true}>
+            <IonPage><IonContent className="ion-content-center"><ApplicationRejected /></IonContent></IonPage>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/verify-otp" requireAuth={true}>
+            <L><OtpVerification /></L>
+          </ProtectedRoute>
+
+          {/* Apply Routes */}
+          <ProtectedRoute exact path="/apply/vendor" requireAuth={true}>
+            <IonPage><IonContent className="ion-content-center"><VendorApply /></IonContent></IonPage>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/apply/rider" requireAuth={true}>
+            <IonPage><IonContent className="ion-content-center"><RiderApply /></IonContent></IonPage>
           </ProtectedRoute>
 
           {/* Rider Routes */}
           <ProtectedRoute exact path="/rider/home" requiredRole="rider">
-            <RiderLayout><RiderHome /></RiderLayout>
+            <L><RiderHome /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/rider/orders" requiredRole="rider">
-            <RiderLayout><RiderOrders /></RiderLayout>
+            <L><RiderOrders /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/rider/earnings" requiredRole="rider">
-            <RiderLayout><RiderEarnings /></RiderLayout>
+            <L><RiderEarnings /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/rider/profile" requiredRole="rider">
-            <RiderLayout><RiderProfile /></RiderLayout>
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/rider/login" requireAuth={false}>
-            <RiderLogin />
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/rider/register" requireAuth={false}>
-            <RiderRegister />
+            <L><RiderProfile /></L>
           </ProtectedRoute>
 
           {/* Admin Routes */}
           <ProtectedRoute exact path="/admin/dashboard" requiredRole="admin">
-            <AdminLayout><AdminDashboard /></AdminLayout>
+            <L><AdminDashboard /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/admin/users" requiredRole="admin">
-            <AdminLayout><AdminUsers /></AdminLayout>
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/admin/riders" requiredRole="admin">
-            <AdminLayout><AdminRiders /></AdminLayout>
+            <L><AdminUsers /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/admin/orders" requiredRole="admin">
-            <AdminLayout><AdminOrders /></AdminLayout>
+            <L><AdminOrders /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/admin/reports" requiredRole="admin">
-            <AdminLayout><AdminReports /></AdminLayout>
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/admin/login" requireAuth={false}>
-            <AdminLogin />
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/admin/register" requireAuth={false}>
-            <AdminRegister />
+            <L><AdminReports /></L>
           </ProtectedRoute>
 
           {/* Vendor Routes */}
           <ProtectedRoute exact path="/vendor/dashboard" requiredRole="vendor">
-            <VendorLayout><VendorDashboard /></VendorLayout>
+            <L><VendorDashboard /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/vendor/products" requiredRole="vendor">
-            <VendorLayout><VendorProducts /></VendorLayout>
+            <L><VendorProducts /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/vendor/orders" requiredRole="vendor">
-            <VendorLayout><VendorOrders /></VendorLayout>
+            <L><VendorOrders /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/vendor/earnings" requiredRole="vendor">
-            <VendorLayout><VendorEarnings /></VendorLayout>
+            <L><VendorEarnings /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/vendor/reviews" requiredRole="vendor">
-            <VendorLayout><VendorReviews /></VendorLayout>
+            <L><VendorReviews /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/vendor/settings" requiredRole="vendor">
-            <VendorLayout><VendorSettings /></VendorLayout>
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/vendor/login" requireAuth={false}>
-            <VendorLogin />
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/vendor/register" requireAuth={false}>
-            <VendorRegister />
+            <L><VendorSettings /></L>
           </ProtectedRoute>
 
           {/* Activity & Messages Routes */}
-          <Route exact path="/activities">
-            <GuestLayout><ActivityLog /></GuestLayout>
-          </Route>
-          <Route exact path="/messages">
-            <GuestLayout><Messages /></GuestLayout>
-          </Route>
+          <ProtectedRoute exact path="/activities" requireAuth={true}>
+            <L><ActivityLog /></L>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/messages" requireAuth={true}>
+            <L><Messages /></L>
+          </ProtectedRoute>
 
           {/* Report Routes */}
-          <Route exact path="/report">
-            <GuestLayout><ReportIncident /></GuestLayout>
-          </Route>
+          <ProtectedRoute exact path="/report" requireAuth={true}>
+            <L><ReportIncident /></L>
+          </ProtectedRoute>
 
           {/* Legacy redirects */}
           <Route exact path="/guest/stall/:id" render={({match}) => <Redirect to={`/stall/`+(match.params as any).id+`/menu`} />} />
         </IonRouterOutlet>
       </Suspense>
       <StorageConsent />
-      <ThemeToggle />
     </IonReactRouter>
   </IonApp>
 );

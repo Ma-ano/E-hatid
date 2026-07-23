@@ -12,7 +12,7 @@ import { useCart } from '../../context/CartContext';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import PageHeader from '../../components/PageHeader';
+import Navbar from '../../components/Navbar';
 
 interface Suggestion {
   display: string;
@@ -168,17 +168,7 @@ const GuestLocationPicker: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        showBack={true}
-        cartCount={itemCount}
-        onCartClick={() => history.push('/guest/cart')}
-        onOrdersClick={() => history.push('/customer/orders')}
-        {...(isAuthenticated
-          ? { onProfileClick: () => history.push('/customer/profile') }
-          : { onLoginClick: () => history.push('/login'), onRegisterClick: () => history.push('/register') }
-        )}
-      />
+      <Navbar />
 
 
         <div className="flex flex-col min-h-full">

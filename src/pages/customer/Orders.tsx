@@ -5,7 +5,7 @@ import {
 } from '@ionic/react';
 import { receiptOutline, bicycleOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useOrders } from '../../context/OrderContext';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -23,12 +23,7 @@ const UserOrders: React.FC = () => {
 
   return (
     <>
-      <PageHeader
-        showLogo={true}
-        showBackButton={true}
-        backHref="/customer/home"
-        onProfileClick={() => history.push('/customer/profile')}
-      />
+
 
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
         <div className="page-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', paddingBottom: '40px' }}>
@@ -50,7 +45,7 @@ const UserOrders: React.FC = () => {
               }}>
                 <IonIcon icon={receiptOutline} style={{ fontSize: '48px', color: 'var(--ion-color-primary)' }} />
               </div>
-              <h2 style={{ margin: '0 0 8px', fontWeight: 700, color: 'var(--ion-text-color)' }}>No orders yet</h2>
+              <h2 style={{ margin: '0 0 8px', fontWeight: 700, color: 'var(--ion-text-color)' }}>You don't have any orders yet</h2>
               <p style={{ margin: 0, color: 'var(--ion-text-color-secondary)' }}>Place an order to see it here!</p>
               <IonButton
                 style={{ marginTop: '24px', '--background': 'var(--ion-color-primary)', '--border-radius': '8px' }}

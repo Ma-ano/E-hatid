@@ -12,7 +12,7 @@ import {
 } from '@ionic/react';
 import { timeOutline, checkmarkCircleOutline, navigateOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
+
 import { useAuth } from '../../context/AuthContext';
 
 const RiderOrders: React.FC = () => {
@@ -20,49 +20,8 @@ const RiderOrders: React.FC = () => {
   const { logout } = useAuth();
   const [selectedTab, setSelectedTab] = useState('active');
 
-  const activeOrders = [
-    {
-      id: '1',
-      stallName: 'Burger King',
-      customerName: 'John Doe',
-      status: 'picking_up',
-      distance: '2.3 km',
-      fee: 45,
-      estimatedTime: '12 min',
-      deliveryAddress: 'Fort Bonifacio, Taguig',
-    },
-    {
-      id: '2',
-      stallName: 'Sushi Master',
-      customerName: 'Jane Smith',
-      status: 'delivering',
-      distance: '1.8 km',
-      fee: 38,
-      estimatedTime: '8 min',
-      deliveryAddress: 'Paseo de Santa Rosa, Manila',
-    },
-  ];
-
-  const completedOrders = [
-    {
-      id: '3',
-      stallName: 'Pizza Palace',
-      customerName: 'Mike Johnson',
-      status: 'delivered',
-      fee: 52,
-      completedAt: '2:30 PM',
-      rating: 5,
-    },
-    {
-      id: '4',
-      stallName: 'Chicken Fried Shop',
-      customerName: 'Sarah Lee',
-      status: 'delivered',
-      fee: 40,
-      completedAt: '1:15 PM',
-      rating: 4.5,
-    },
-  ];
+  const activeOrders: any[] = [];
+  const completedOrders: any[] = [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -84,89 +43,6 @@ const RiderOrders: React.FC = () => {
 
   return (
     <>
-      <PageHeader 
-        showLogo={true}
-        onProfileClick={() => {
-          logout();
-          history.push('/login');
-        }}
-      />
-
-        {/* Rider Navigation */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px',
-          padding: '16px',
-          overflowX: 'auto',
-          background: 'var(--ion-card-background)',
-          borderBottomLeftRadius: '12px',
-          borderBottomRightRadius: '12px'
-        }}>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              border: '1px solid var(--ion-color-primary)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/home')}
-          >
-            🏠 Home
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'var(--ion-color-primary)',
-              '--color': '#FFFFFF',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-          >
-            📦 Orders
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/earnings')}
-          >
-            💰 Earnings
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/profile')}
-          >
-            👤 Profile
-          </IonButton>
-        </div>
 
         {/* Quick Access Menu */}
         <div style={{
@@ -240,7 +116,9 @@ const RiderOrders: React.FC = () => {
           <div style={{ padding: '0 16px 16px' }}>
             {activeOrders.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <p style={{ color: 'var(--ion-text-color-secondary)' }}>No active orders</p>
+                <div className="text-4xl mb-3">📦</div>
+                <p style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>You don't have any active deliveries</p>
+                <p style={{ margin: 0, color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>New orders will appear here</p>
               </div>
             ) : (
               activeOrders.map(order => (

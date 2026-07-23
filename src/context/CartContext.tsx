@@ -8,7 +8,10 @@ const CART_BASE_KEY = 'foodie_cart';
 
 function getCartKey(user: User | null, isGuest: boolean): string {
   if (isGuest) return `${CART_BASE_KEY}_guest`;
-  if (user?.id) return `${CART_BASE_KEY}_${user.role}_${user.id}`;
+  if (user?.id) {
+    const role = user.roles?.[0] || user.role || 'user';
+    return `${CART_BASE_KEY}_${role}_${user.id}`;
+  }
   return `${CART_BASE_KEY}_temp`;
 }
 
