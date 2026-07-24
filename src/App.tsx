@@ -15,8 +15,6 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
-import './theme/variables.css';
-import './theme/global.css';
 
 /* Lazy-loaded pages */
 const Landing = lazy(() => import('./pages/Guest/Landing'));
@@ -31,7 +29,8 @@ const CustomerCart = lazy(() => import('./pages/customer/Cart'));
 const CustomerLocationPicker = lazy(() => import('./pages/customer/LocationPicker'));
 const CustomerOrders = lazy(() => import('./pages/customer/Orders'));
 const CustomerOrderTracking = lazy(() => import('./pages/customer/OrderTracking'));
-const RiderHome = lazy(() => import('./pages/Rider/Home'));
+const CustomerReview = lazy(() => import('./pages/customer/Review'));
+const RiderDashboard = lazy(() => import('./pages/Rider/Dashboard'));
 const RiderOrders = lazy(() => import('./pages/Rider/Orders'));
 const RiderEarnings = lazy(() => import('./pages/Rider/Earnings'));
 const RiderProfile = lazy(() => import('./pages/Rider/Profile'));
@@ -128,6 +127,9 @@ const App: React.FC = () => (
           <ProtectedRoute exact path="/customer/order-tracking" requiredRole="customer">
             <L><CustomerOrderTracking /></L>
           </ProtectedRoute>
+          <ProtectedRoute exact path="/customer/review/:id" requiredRole="customer">
+            <L><CustomerReview /></L>
+          </ProtectedRoute>
 
           {/* Auth Routes */}
           <ProtectedRoute exact path="/login" requireAuth={false}>
@@ -161,8 +163,8 @@ const App: React.FC = () => (
           </ProtectedRoute>
 
           {/* Rider Routes */}
-          <ProtectedRoute exact path="/rider/home" requiredRole="rider">
-            <L><RiderHome /></L>
+          <ProtectedRoute exact path="/rider/dashboard" requiredRole="rider">
+            <L><RiderDashboard /></L>
           </ProtectedRoute>
           <ProtectedRoute exact path="/rider/orders" requiredRole="rider">
             <L><RiderOrders /></L>

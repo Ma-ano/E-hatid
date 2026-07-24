@@ -4,7 +4,7 @@ import { addOutline, createOutline, star, starOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
-import { getStallByVendorId, updateStallMenu } from '../../services/stallService';
+import { getStallByVendorId, updateStallMenu, createStall } from '../../services/stallService';
 import { MenuItem } from '../../types';
 import ProductEditorModal from './components/ProductEditorModal';
 
@@ -23,7 +23,12 @@ const VendorProducts: React.FC = () => {
         const stall = await getStallByVendorId(user.id);
         if (stall) {
           setStallId(stall.id);
-          if (stall.menu) setProducts(stall.menu);
+          if (stall.menu) {
+            setProducts(stall.menu);
+            console.log('Fetched menu from stall:', stall.menu.length, 'items');
+          }
+        } else {
+          console.log('No stall found for vendor, products will create one on save');
         }
       } catch (err) {
         console.error('Error loading products:', err);
@@ -36,7 +41,34 @@ const VendorProducts: React.FC = () => {
 
   const saveMenu = async (newMenu: MenuItem[]) => {
     setProducts(newMenu);
-    if (stallId) await updateStallMenu(stallId, newMenu);
+    try {
+      if (!stallId && user) {
+        const newStallId = user.id;
+        await createStall({
+          id: newStallId,
+          name: user.stallName || `${user.name}'s Stall`,
+          description: '',
+          image: '/default-stall.jpg',
+          rating: 0,
+          deliveryTime: '08:00 - 22:00',
+          deliveryFee: 30,
+          vendorId: user.id,
+          category: 'Fast Food',
+          logo: '',
+          accentColor: '#6366F1',
+          active: true,
+          address: user.stallAddress || '',
+          menu: newMenu,
+        } as any);
+        setStallId(newStallId);
+        console.log('Stall auto-created with menu');
+      } else if (stallId) {
+        await updateStallMenu(stallId, newMenu);
+        console.log('Products saved to Firestore:', newMenu.length, 'items');
+      }
+    } catch (err) {
+      console.error('Failed to save menu:', err);
+    }
   };
 
   const toggleAvailable = (id: string) => {
@@ -54,7 +86,7 @@ const VendorProducts: React.FC = () => {
       price: 0,
       category: '',
       available: true,
-      stallId: stallId || '',
+      stallId: stallId || user?.id || '',
       popular: false,
       description: '',
       options: [],

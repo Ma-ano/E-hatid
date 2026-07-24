@@ -50,7 +50,7 @@ const RiderEarnings: React.FC = () => {
               flex: '1',
               minWidth: '80px'
             }}
-            onClick={() => history.push('/rider/home')}
+            onClick={() => history.push('/rider/dashboard')}
           >
             🏠 Home
           </IonButton>

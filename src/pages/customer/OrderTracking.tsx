@@ -11,11 +11,10 @@ import {
   IonButtons,
   IonTitle,
 } from '@ionic/react';
-import { checkmarkCircle, bicycleOutline, homeOutline, restaurantOutline, storefrontOutline, cartOutline, documentTextOutline, personOutline, callOutline, locationOutline, closeCircleOutline, closeOutline } from 'ionicons/icons';
+import { checkmarkCircle, bicycleOutline, homeOutline, restaurantOutline, storefrontOutline, documentTextOutline, callOutline, locationOutline, closeCircleOutline, closeOutline, star } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import { useCart } from '../../context/CartContext';
 import { useOrders } from '../../context/OrderContext';
 import { getUserDocument } from '../../services/userService';
 import { fetchStallById } from '../../services/stallService';
@@ -34,7 +33,6 @@ const statusSteps: { label: string; icon: string; statuses: Order['status'][] }[
 
 const OrderTracking: React.FC = () => {
   const history = useHistory<{ order?: Order }>();
-  const { itemCount } = useCart();
   const initialOrder = history.location.state?.order;
   const [order, setOrder] = useState<Order | null>(initialOrder || null);
   const [vendorUser, setVendorUser] = useState<User | null>(null);
@@ -74,7 +72,7 @@ const OrderTracking: React.FC = () => {
 
   const activeStep = order ? (() => {
     if (order.status === 'delivered') return 5;
-    if (order.status === 'ready' && order.pickedUpAt) return 4;
+    if (order.status === 'delivering') return 4;
     if (order.status === 'ready') return 3;
     if (order.status === 'preparing') return 2;
     if (order.status === 'accepted') return 1;
@@ -126,8 +124,8 @@ const OrderTracking: React.FC = () => {
   if (!order) {
     return (
       <>
-        <div style={{ textAlign: 'center', padding: '48px' }}>
-          <p style={{ color: 'var(--ion-text-color-secondary)' }}>Order not found</p>
+        <div className="text-center p-12">
+          <p className="text-[var(--ion-text-color-secondary)]">Order not found</p>
           <IonButton style={{ '--background': 'var(--ion-color-primary)' }} onClick={() => history.push('/customer/home')}>
             Back to Home
           </IonButton>
@@ -153,8 +151,8 @@ const OrderTracking: React.FC = () => {
       if (order.status === 'pending') return 'Waiting for vendor to accept';
       if (order.status === 'accepted') return 'Vendor is preparing your order';
       if (order.status === 'preparing') return 'Your food is being cooked';
-      if (order.status === 'ready' && !order.pickedUpAt) return 'Waiting for rider to pick up';
-      if (order.status === 'ready' && order.pickedUpAt) return 'Rider is on the way';
+      if (order.status === 'ready') return 'Waiting for rider to pick up';
+      if (order.status === 'delivering') return 'Rider is on the way';
     }
     if (i < activeStep) return 'Completed';
     return null;
@@ -162,40 +160,36 @@ const OrderTracking: React.FC = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-          <div className="page-container" style={{ flex: 1, paddingTop: '24px', paddingBottom: '40px', textAlign: 'center' }}>
-            <div style={{
-              width: '88px', height: '88px', borderRadius: '50%',
-              background: order.status === 'cancelled' ? '#EF4444' : '#10B981',
-              margin: '0 auto 16px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <IonIcon icon={checkmarkCircle} style={{ fontSize: '48px', color: '#fff' }} />
+      <div className="flex flex-col min-h-full">
+        <div className="page-container flex-1 pt-6 pb-10 text-center">
+            <div className="w-[88px] h-[88px] rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: order.status === 'cancelled' ? '#EF4444' : '#10B981' }}>
+              <IonIcon icon={checkmarkCircle} className="text-5xl text-white" />
             </div>
 
-            <h1 style={{ margin: '0 0 4px', fontSize: '24px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
+            <h1 className="m-0 mb-1 text-2xl font-bold text-[var(--ion-text-color)]">
               {order.status === 'cancelled' ? 'Order Cancelled' : 'Order Tracking'}
             </h1>
-            <p style={{ margin: '0 0 4px', fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
+            <p className="m-0 mb-1 text-sm text-[var(--ion-text-color-secondary)]">
               {order.id}
             </p>
-            <p style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--ion-text-color-secondary)' }}>
+            <p className="m-0 mb-6 text-sm text-[var(--ion-text-color-secondary)]">
               {order.estimatedDeliveryTime || (order.status === 'cancelled' ? '' : 'Estimated delivery in 25-35 minutes')}
             </p>
 
             {order.cancelledReason && (
-              <div style={{ maxWidth: '360px', margin: '0 auto 16px', padding: '12px 16px', background: '#FEE2E2', borderRadius: '12px', fontSize: '14px', color: '#DC2626', textAlign: 'left' }}>
-                <strong style={{ display: 'block', marginBottom: '4px' }}>Reason:</strong>
+              <div className="max-w-[360px] mx-auto mb-4 p-3 bg-red-100 rounded-xl text-sm text-red-600 text-left">
+                <strong className="block mb-1">Reason:</strong>
                 {order.cancelledReason}
               </div>
             )}
 
             {order.status === 'pending' && (
-              <div style={{ maxWidth: '360px', margin: '0 auto 24px' }}>
+              <div className="max-w-[360px] mx-auto mb-6">
                 <IonButton
                   expand="block"
                   fill="outline"
-                  style={{ '--border-color': '#EF4444', '--color': '#EF4444', '--border-radius': '8px', height: '44px', fontSize: '14px', fontWeight: 600 }}
+                  style={{ '--border-color': '#EF4444', '--color': '#EF4444', '--border-radius': '8px' }}
+                  className="h-11 text-sm font-semibold"
                   onClick={() => setShowCancelAlert(true)}
                   disabled={cancelling}
                 >
@@ -205,78 +199,101 @@ const OrderTracking: React.FC = () => {
               </div>
             )}
 
+            {order.status === 'ready' && (
+              <div className="max-w-[360px] mx-auto mb-6 text-center py-3 px-4 bg-[var(--ion-card-background)] rounded-2xl border border-[var(--ion-border-color)]">
+                <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">
+                  Order is ready for pickup. Waiting for a rider to accept.
+                </p>
+              </div>
+            )}
+
+            {order.status === 'delivering' && (
+              <div className="max-w-[360px] mx-auto mb-6 text-center py-3 px-4 bg-[var(--ion-card-background)] rounded-2xl border border-[var(--ion-border-color)]">
+                <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">
+                  Your rider is on the way!
+                </p>
+              </div>
+            )}
+
+            {order.status === 'delivered' && (
+              <div className="max-w-[360px] mx-auto mb-6">
+                <IonButton
+                  expand="block"
+                  style={{ '--background': '#8B5CF6', '--border-radius': '8px' }}
+                  className="h-11 text-sm font-semibold"
+                  onClick={() => history.push(`/customer/review/${order.id}`, { order })}
+                >
+                  <IonIcon icon={star} slot="start" />
+                  Leave a Review
+                </IonButton>
+              </div>
+            )}
+
             {/* Order Items */}
-            <div style={{ maxWidth: '360px', margin: '0 auto 32px', textAlign: 'left', background: 'var(--ion-card-background)', borderRadius: '16px', padding: '16px', border: '1px solid var(--ion-border-color)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Order Items</p>
-                <IonButton fill="clear" size="small" style={{ '--color': '#8B5CF6', margin: 0, minHeight: 0, height: '28px' }} onClick={() => setDetailsOrder(order)}>
+            <div className="max-w-[360px] mx-auto mb-8 text-left bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+              <div className="flex justify-between items-center mb-3">
+                <p className="m-0 text-sm font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">Order Items</p>
+                <IonButton fill="clear" size="small" style={{ '--color': '#8B5CF6' }} className="m-0 min-h-0 h-7" onClick={() => setDetailsOrder(order)}>
                   <IonIcon icon={documentTextOutline} slot="icon-only" />
                 </IonButton>
               </div>
               {order.items.map((item, i) => {
                 const customization = customizationText(item);
                 return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: i < order.items.length - 1 ? '12px' : 0 }}>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div key={i} className="flex items-center gap-3" style={{ marginBottom: i < order.items.length - 1 ? '12px' : 0 }}>
+                    <div className="w-11 h-11 rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}>
                       {item.image ? (
-                        <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
-                        <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>{item.name.charAt(0)}</span>
+                        <span className="text-base text-white/60 font-bold">{item.name.charAt(0)}</span>
                       )}
                     </div>
-                    <div style={{ flex: 1, textAlign: 'left' }}>
-                      <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{item.name}</p>
+                    <div className="flex-1 text-left">
+                      <p className="m-0 text-sm font-semibold text-[var(--ion-text-color)]">{item.name}</p>
                       {customization && (
-                        <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--ion-text-color-secondary)' }}>{customization}</p>
+                        <p className="mt-0.5 text-xs text-[var(--ion-text-color-secondary)]">{customization}</p>
                       )}
                       {item.specialInstructions && (
-                        <p style={{ margin: '2px 0 0', fontSize: '11px', fontStyle: 'italic', color: 'var(--ion-text-color-secondary)' }}>&quot;{item.specialInstructions}&quot;</p>
+                        <p className="mt-0.5 text-xs italic text-[var(--ion-text-color-secondary)]">&quot;{item.specialInstructions}&quot;</p>
                       )}
-                      <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>x{item.quantity}</p>
+                      <p className="mt-0.5 text-xs text-[var(--ion-text-color-secondary)]">x{item.quantity}</p>
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ion-text-color)' }}>₱{(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="text-sm font-bold text-[var(--ion-text-color)]">₱{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 );
               })}
-              <div style={{ borderTop: '1px solid var(--ion-border-color)', marginTop: '12px', paddingTop: '12px', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Total</span>
-                <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>₱{order.total.toFixed(2)}</span>
+              <div className="border-t border-[var(--ion-border-color)] mt-3 pt-3 flex justify-between">
+                <span className="text-sm font-semibold text-[var(--ion-text-color-secondary)]">Total</span>
+                <span className="text-base font-bold text-[var(--ion-text-color)]">₱{order.total.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Status Steps */}
             {isMobile ? (
-              <div style={{ maxWidth: '360px', margin: '0 auto 32px' }}>
+              <div className="max-w-[360px] mx-auto mb-8">
                 {statusSteps.map((step, i) => {
                   const isActive = i <= activeStep;
                   const isLast = i === statusSteps.length - 1;
                   const cancelled = order.status === 'cancelled';
                   return (
-                    <div key={step.label} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: isLast ? 0 : 0 }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{
-                          width: '34px', height: '34px', borderRadius: '50%',
+                    <div key={step.label} className="flex items-start gap-3">
+                      <div className="flex flex-col items-center">
+                        <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300" style={{
                           background: cancelled ? (isActive ? '#EF4444' : 'var(--ion-card-background)') : (isActive ? 'var(--ion-color-primary)' : 'var(--ion-card-background)'),
                           border: isActive ? 'none' : '2px solid var(--ion-border-color)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          transition: 'all 0.3s ease', flexShrink: 0,
                         }}>
-                          <IonIcon icon={step.icon} style={{ fontSize: '16px', color: isActive ? '#fff' : 'var(--ion-text-color-secondary)' }} />
+                          <IonIcon icon={step.icon} className="text-base" style={{ color: isActive ? '#fff' : 'var(--ion-text-color-secondary)' }} />
                         </div>
                         {!isLast && (
-                          <div style={{
-                            width: '2px', height: '36px',
-                            background: isActive && !cancelled ? 'var(--ion-color-primary)' : 'var(--ion-border-color)',
-                            transition: 'background 0.3s ease',
-                          }} />
+                          <div className="w-0.5 h-9 transition-[background] duration-300" style={{ background: isActive && !cancelled ? 'var(--ion-color-primary)' : 'var(--ion-border-color)' }} />
                         )}
                       </div>
-                      <div style={{ paddingTop: '6px', textAlign: 'left' }}>
-                        <p style={{ margin: 0, fontWeight: 600, fontSize: '13px', color: isActive ? 'var(--ion-text-color)' : 'var(--ion-text-color-secondary)' }}>
+                      <div className="pt-1.5 text-left">
+                        <p className="m-0 font-semibold text-sm" style={{ color: isActive ? 'var(--ion-text-color)' : 'var(--ion-text-color-secondary)' }}>
                           {step.label}
                         </p>
                         {isActive && !cancelled && (
-                          <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--ion-color-primary)' }}>
+                          <p className="mt-0.5 text-xs text-[var(--ion-color-primary)]">
                             {stepSubtext(i)}
                           </p>
                         )}
@@ -286,41 +303,34 @@ const OrderTracking: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div style={{ maxWidth: '100%', margin: '0 auto 32px', overflowX: 'auto', paddingBottom: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0', minWidth: 'fit-content', justifyContent: 'center' }}>
+              <div className="max-w-full mx-auto mb-8 overflow-x-auto pb-2">
+                <div className="flex items-start min-w-fit justify-center">
                   {statusSteps.map((step, i) => {
                     const isActive = i <= activeStep;
                     const isLast = i === statusSteps.length - 1;
                     const cancelled = order.status === 'cancelled';
                     return (
-                      <div key={step.label} style={{ display: 'flex', alignItems: 'center', flex: isLast ? 0 : 1, minWidth: '80px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                          <div style={{
-                            width: '34px', height: '34px', borderRadius: '50%',
+                      <div key={step.label} className="flex items-center" style={{ flex: isLast ? 0 : 1, minWidth: '80px' }}>
+                        <div className="flex flex-col items-center gap-1.5">
+                          <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300" style={{
                             background: cancelled ? (isActive ? '#EF4444' : 'var(--ion-card-background)') : (isActive ? 'var(--ion-color-primary)' : 'var(--ion-card-background)'),
                             border: isActive ? 'none' : '2px solid var(--ion-border-color)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            transition: 'all 0.3s ease', flexShrink: 0,
                           }}>
-                            <IonIcon icon={step.icon} style={{ fontSize: '16px', color: isActive ? '#fff' : 'var(--ion-text-color-secondary)' }} />
+                            <IonIcon icon={step.icon} className="text-base" style={{ color: isActive ? '#fff' : 'var(--ion-text-color-secondary)' }} />
                           </div>
-                          <div style={{ textAlign: 'center', maxWidth: '90px' }}>
-                            <p style={{ margin: 0, fontWeight: 600, fontSize: '12px', color: isActive ? 'var(--ion-text-color)' : 'var(--ion-text-color-secondary)', whiteSpace: 'nowrap' }}>
+                          <div className="text-center max-w-[90px]">
+                            <p className="m-0 font-semibold text-xs whitespace-nowrap" style={{ color: isActive ? 'var(--ion-text-color)' : 'var(--ion-text-color-secondary)' }}>
                               {step.label}
                             </p>
                             {isActive && !cancelled && (
-                              <p style={{ margin: '2px 0 0', fontSize: '10px', color: 'var(--ion-color-primary)', whiteSpace: 'nowrap' }}>
+                              <p className="mt-0.5 text-[10px] text-[var(--ion-color-primary)] whitespace-nowrap">
                                 {stepSubtext(i)}
                               </p>
                             )}
                           </div>
                         </div>
                         {!isLast && (
-                          <div style={{
-                            flex: 1, height: '2px', margin: '0 8px', marginBottom: '24px',
-                            background: isActive && !cancelled ? 'var(--ion-color-primary)' : 'var(--ion-border-color)',
-                            transition: 'background 0.3s ease',
-                          }} />
+                          <div className="flex-1 h-0.5 mx-2 mb-6 transition-[background] duration-300" style={{ background: isActive && !cancelled ? 'var(--ion-color-primary)' : 'var(--ion-border-color)' }} />
                         )}
                       </div>
                     );
@@ -331,20 +341,20 @@ const OrderTracking: React.FC = () => {
 
             {/* Vendor Info */}
             {loading && (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div className="text-center py-5">
                 <IonSpinner name="crescent" />
               </div>
             )}
             {!loading && vendorUser && (
-              <div style={{ maxWidth: '360px', margin: '0 auto 20px', textAlign: 'left', background: 'var(--ion-card-background)', borderRadius: '16px', padding: '16px', border: '1px solid var(--ion-border-color)' }}>
-                <p style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-                  <IonIcon icon={restaurantOutline} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+              <div className="max-w-[360px] mx-auto mb-5 text-left bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+                <p className="m-0 mb-3 text-sm font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">
+                  <IonIcon icon={restaurantOutline} className="align-middle mr-1.5" />
                   Vendor
                 </p>
-                <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{vendorUser.name}</p>
+                <p className="m-0 mb-1 text-base font-semibold text-[var(--ion-text-color)]">{vendorUser.name}</p>
                 {vendorUser.phone && (
-                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-                    <IonIcon icon={callOutline} style={{ verticalAlign: 'middle', fontSize: '14px', marginRight: '4px' }} />
+                  <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">
+                    <IonIcon icon={callOutline} className="align-middle text-sm mr-1" />
                     {vendorUser.phone}
                   </p>
                 )}
@@ -353,27 +363,27 @@ const OrderTracking: React.FC = () => {
 
             {/* Stall Info */}
             {!loading && stall && (
-              <div style={{ maxWidth: '360px', margin: '0 auto 20px', textAlign: 'left', background: 'var(--ion-card-background)', borderRadius: '16px', padding: '16px', border: '1px solid var(--ion-border-color)' }}>
-                <p style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-                  <IonIcon icon={storefrontOutline} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+              <div className="max-w-[360px] mx-auto mb-5 text-left bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+                <p className="m-0 mb-3 text-sm font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">
+                  <IonIcon icon={storefrontOutline} className="align-middle mr-1.5" />
                   Stall
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="flex items-center gap-3">
                   {stall.logo && (
-                    <div style={{ width: '44px', height: '44px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: '#f0f0f0' }}>
-                      <img src={stall.logo} alt={stall.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div className="w-11 h-11 rounded-[10px] overflow-hidden shrink-0 bg-gray-100">
+                      <img src={stall.logo} alt={stall.name} className="w-full h-full object-cover" />
                     </div>
                   )}
-                  <div style={{ flex: 1 }}>
-                    <p style={{ margin: '0 0 2px', fontSize: '15px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{stall.name}</p>
+                  <div className="flex-1">
+                    <p className="m-0 mb-0.5 text-base font-semibold text-[var(--ion-text-color)]">{stall.name}</p>
                     {stall.address && (
-                      <p style={{ margin: '0 0 2px', fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-                        <IonIcon icon={locationOutline} style={{ verticalAlign: 'middle', fontSize: '14px', marginRight: '4px' }} />
+                      <p className="m-0 mb-0.5 text-sm text-[var(--ion-text-color-secondary)]">
+                        <IonIcon icon={locationOutline} className="align-middle text-sm mr-1" />
                         {stall.address}
                       </p>
                     )}
                     {stall.category && (
-                      <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>{stall.category}</p>
+                      <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">{stall.category}</p>
                     )}
                   </div>
                 </div>
@@ -382,21 +392,21 @@ const OrderTracking: React.FC = () => {
 
             {/* Rider Info */}
             {!loading && riderUser && activeStep >= 4 && (
-              <div style={{ maxWidth: '360px', margin: '0 auto 20px', textAlign: 'left', background: 'var(--ion-card-background)', borderRadius: '16px', padding: '16px', border: '1px solid var(--ion-border-color)' }}>
-                <p style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-                  <IonIcon icon={bicycleOutline} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+              <div className="max-w-[360px] mx-auto mb-5 text-left bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+                <p className="m-0 mb-3 text-sm font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">
+                  <IonIcon icon={bicycleOutline} className="align-middle mr-1.5" />
                   Delivering
                 </p>
-                <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{riderUser.name}</p>
+                <p className="m-0 mb-1 text-base font-semibold text-[var(--ion-text-color)]">{riderUser.name}</p>
                 {riderUser.phone && (
-                  <p style={{ margin: '0 0 4px', fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-                    <IonIcon icon={callOutline} style={{ verticalAlign: 'middle', fontSize: '14px', marginRight: '4px' }} />
+                  <p className="m-0 mb-1 text-sm text-[var(--ion-text-color-secondary)]">
+                    <IonIcon icon={callOutline} className="align-middle text-sm mr-1" />
                     {riderUser.phone}
                   </p>
                 )}
                 {riderUser.licensePlate && (
-                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>
-                    <IonIcon icon={bicycleOutline} style={{ verticalAlign: 'middle', fontSize: '14px', marginRight: '4px' }} />
+                  <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">
+                    <IonIcon icon={bicycleOutline} className="align-middle text-sm mr-1" />
                     Plate: {riderUser.licensePlate}
                   </p>
                 )}
@@ -404,7 +414,8 @@ const OrderTracking: React.FC = () => {
             )}
 
             <IonButton expand="block" size="large"
-              style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px', height: '48px', fontSize: '16px', fontWeight: 600, marginTop: '40px' }}
+              className="h-12 text-base font-semibold mt-10"
+              style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px' }}
               onClick={() => history.push('/customer/home')}
             >
               Back to Home
@@ -436,56 +447,56 @@ const OrderTracking: React.FC = () => {
         </IonHeader>
         <IonContent style={{ '--background': 'var(--ion-background-color)' }}>
           {detailsOrder && (
-            <div style={{ padding: '16px' }}>
-              <div style={{ marginBottom: '16px' }}>
-                <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Items</p>
+            <div className="p-4">
+              <div className="mb-4">
+                <p className="m-0 mb-2 text-xs font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">Items</p>
                 {detailsOrder.items.map((item, i) => {
                   const optionsTotal = item.selectedOptions?.reduce((s, o) => s + o.choicePrice, 0) || 0;
                   const addonsTotal = item.selectedAddOns?.reduce((s, a) => s + a.price, 0) || 0;
                   const basePrice = item.price - optionsTotal - addonsTotal;
                   const qty = item.quantity;
                   return (
-                    <div key={i} style={{ padding: '12px', background: 'var(--ion-card-background)', borderRadius: '10px', marginBottom: '8px', border: '1px solid var(--ion-border-color)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)', flex: 1 }}>{item.name}</span>
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color-secondary)', margin: '0 12px' }}>x{qty}</span>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ion-text-color)' }}>₱{basePrice.toFixed(2)}</span>
+                    <div key={i} className="p-3 bg-[var(--ion-card-background)] rounded-[10px] mb-2 border border-[var(--ion-border-color)]">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-semibold text-[var(--ion-text-color)] flex-1">{item.name}</span>
+                        <span className="text-sm font-semibold text-[var(--ion-text-color-secondary)] mx-3">x{qty}</span>
+                        <span className="text-sm font-bold text-[var(--ion-text-color)]">₱{basePrice.toFixed(2)}</span>
                       </div>
                       {item.selectedOptions?.map((opt, oi) => {
                         const optTotal = opt.choicePrice * qty;
                         return optTotal > 0 ? (
-                          <p key={oi} style={{ margin: '2px 0 0 12px', fontSize: '12px', color: 'var(--ion-text-color-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+                          <p key={oi} className="mt-0.5 ml-3 text-xs text-[var(--ion-text-color-secondary)] flex justify-between">
                             <span>{opt.choiceName}</span>
                             <span>₱{optTotal.toFixed(2)}</span>
                           </p>
                         ) : (
-                          <p key={oi} style={{ margin: '2px 0 0 12px', fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>{opt.choiceName}</p>
+                          <p key={oi} className="mt-0.5 ml-3 text-xs text-[var(--ion-text-color-secondary)]">{opt.choiceName}</p>
                         );
                       })}
                       {item.selectedAddOns?.map((addon, ai) => {
                         const addonTotal = addon.price * qty;
                         return (
-                          <p key={ai} style={{ margin: '2px 0 0 12px', fontSize: '12px', color: 'var(--ion-text-color-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+                          <p key={ai} className="mt-0.5 ml-3 text-xs text-[var(--ion-text-color-secondary)] flex justify-between">
                             <span>+ {addon.name}</span>
                             <span>₱{addonTotal.toFixed(2)}</span>
                           </p>
                         );
                       })}
-                      <div style={{ borderTop: '1px dashed var(--ion-border-color)', marginTop: '6px', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>
+                      <div className="border-t border-dashed border-[var(--ion-border-color)] mt-1.5 pt-1.5 flex justify-between text-sm font-semibold text-[var(--ion-text-color)]">
                         <span>Item subtotal</span>
                         <span>₱{(item.price * qty).toFixed(2)}</span>
                       </div>
                       {item.specialInstructions && (
-                        <p style={{ margin: '4px 0 0', fontSize: '12px', fontStyle: 'italic', color: 'var(--ion-text-color-secondary)' }}>&quot;{item.specialInstructions}&quot;</p>
+                        <p className="mt-1 text-xs italic text-[var(--ion-text-color-secondary)]">&quot;{item.specialInstructions}&quot;</p>
                       )}
                     </div>
                   );
                 })}
               </div>
 
-              <div style={{ padding: '12px', background: 'var(--ion-card-background)', borderRadius: '10px', border: '1px solid var(--ion-border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--ion-text-color)' }}>Total</span>
-                <span style={{ fontSize: '18px', fontWeight: 700, color: '#8B5CF6' }}>₱{detailsOrder.total.toFixed(2)}</span>
+              <div className="p-3 bg-[var(--ion-card-background)] rounded-[10px] border border-[var(--ion-border-color)] flex justify-between items-center">
+                <span className="text-base font-bold text-[var(--ion-text-color)]">Total</span>
+                <span className="text-lg font-bold text-[#8B5CF6]">₱{detailsOrder.total.toFixed(2)}</span>
               </div>
             </div>
           )}

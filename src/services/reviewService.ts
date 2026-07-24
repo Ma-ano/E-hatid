@@ -1,6 +1,45 @@
 import { db } from '../firebaseConfig';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
 import { Review } from '../types';
+
+export const createReview = async (data: {
+  stallId: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+}): Promise<void> => {
+  try {
+    await addDoc(collection(db, 'reviews'), {
+      ...data,
+      date: new Date().toISOString(),
+      likes: 0,
+    });
+    console.log('Review created');
+  } catch (err) {
+    console.error('Error creating review:', err);
+    throw err;
+  }
+};
+
+export const createRiderReview = async (data: {
+  riderId: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+}): Promise<void> => {
+  try {
+    await addDoc(collection(db, 'riderReviews'), {
+      ...data,
+      date: new Date().toISOString(),
+    });
+    console.log('Rider review created');
+  } catch (err) {
+    console.error('Error creating rider review:', err);
+    throw err;
+  }
+};
 
 export const fetchReviewsByStall = async (stallId: string): Promise<Review[]> => {
   try {

@@ -111,144 +111,102 @@ const UserProfile: React.FC = () => {
   return (
     <>
 
-
-        <div className="page-container max-w-3xl mx-auto" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
+        <div className="page-container max-w-3xl mx-auto pt-6 pb-6">
           {/* Avatar */}
-          <div style={{ textAlign: 'center', marginBottom: '32px', paddingTop: '16px' }}>
+          <div className="text-center mb-8 pt-4">
             <div
               onClick={() => fileInputRef.current?.click()}
-              style={{
-                width: '88px', height: '88px', borderRadius: '50%',
-                margin: '0 auto 16px', cursor: 'pointer', position: 'relative',
-                overflow: 'hidden', background: 'var(--ion-color-primary)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
+              className="w-[88px] h-[88px] rounded-full mx-auto mb-4 cursor-pointer relative overflow-hidden bg-[var(--ion-color-primary)] flex items-center justify-center"
             >
               {user?.avatar ? (
-                <img src={user.avatar} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <IonIcon icon={personOutline} style={{ fontSize: '44px', color: '#fff' }} />
+                <IonIcon icon={personOutline} className="text-[44px] text-white" />
               )}
-              <div style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                background: 'rgba(0,0,0,0.4)', padding: '4px 0',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <IonIcon icon={cameraOutline} style={{ fontSize: '14px', color: '#fff' }} />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/40 py-1 flex items-center justify-center">
+                <IonIcon icon={cameraOutline} className="text-sm text-white" />
               </div>
             </div>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              style={{ display: 'none' }}
+              className="hidden"
               onChange={handleImageUpload}
             />
-            <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--ion-text-color)', margin: '0 0 4px 0' }}>
+            <h1 className="text-2xl font-bold text-[var(--ion-text-color)] m-0 mb-1">
               {name}
             </h1>
-            <p style={{ fontSize: '14px', color: 'var(--ion-text-color-secondary)', margin: 0 }}>
+            <p className="text-sm text-[var(--ion-text-color-secondary)] m-0">
               Member since 2024
             </p>
           </div>
 
           {/* Contact Info */}
-          <div style={{
-            background: 'var(--ion-card-background)', borderRadius: '12px',
-            padding: '16px', marginBottom: '24px',
-            border: '1px solid var(--ion-border-color)',
-          }}>
-            <h3 style={{
-              fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)',
-              marginBottom: '16px', textTransform: 'uppercase', opacity: 0.7,
-            }}>
+          <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-6 border border-[var(--ion-border-color)]">
+            <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">
               Contact Information
             </h3>
 
             {/* Name */}
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <IonIcon icon={personOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)' }} />
-                <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Full Name</span>
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <IonIcon icon={personOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">Full Name</span>
               </div>
               <input type="text" value={name} onChange={e => setName(e.target.value)}
-                style={{
-                  width: '100%', padding: '10px', borderRadius: '8px',
-                  border: '1px solid var(--ion-border-color)',
-                  background: 'var(--ion-background-color)', color: 'var(--ion-text-color)',
-                  fontFamily: 'inherit', fontSize: '14px',
-                }}
+                className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
               />
             </div>
 
             {/* Email */}
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <IonIcon icon={mailOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)' }} />
-                <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Email</span>
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <IonIcon icon={mailOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">Email</span>
                 <span style={{ marginLeft: '8px', display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 600, background: user?.emailVerified ? '#10B98120' : '#F59E0B20', color: user?.emailVerified ? '#10B981' : '#F59E0B' }}>
                   <IonIcon icon={user?.emailVerified ? checkmarkCircleOutline : closeCircleOutline} style={{ fontSize: '11px' }} />
                   {user?.emailVerified ? 'Verified' : 'Unverified'}
                 </span>
               </div>
               <input type="email" value={email} onChange={e => { setEmail(e.target.value); setEmailError(isValidEmail(e.target.value) ? '' : 'Invalid email address'); }}
-                style={{
-                  width: '100%', padding: '10px', borderRadius: '8px',
-                  border: '1px solid var(--ion-border-color)',
-                  background: 'var(--ion-background-color)', color: 'var(--ion-text-color)',
-                  fontFamily: 'inherit', fontSize: '14px',
-                }}
+                className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
               />
-              {emailError && <span style={{ color: 'var(--ion-color-danger)', fontSize: '12px', marginTop: '4px', display: 'block' }}>{emailError}</span>}
+              {emailError && <span className="text-[var(--ion-color-danger)] text-xs mt-1 block">{emailError}</span>}
             </div>
 
             {/* Address */}
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <IonIcon icon={locationOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)' }} />
-                <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Delivery Address</span>
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <IonIcon icon={locationOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">Delivery Address</span>
               </div>
               <input type="text" value={address} onChange={e => setAddress(e.target.value)}
                 placeholder="Enter your delivery address"
-                style={{
-                  width: '100%', padding: '10px', borderRadius: '8px',
-                  border: '1px solid var(--ion-border-color)',
-                  background: 'var(--ion-background-color)', color: 'var(--ion-text-color)',
-                  fontFamily: 'inherit', fontSize: '14px',
-                }}
+                className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
               />
             </div>
 
             {/* Age */}
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Age</span>
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">Age</span>
               </div>
               <input type="number" value={age} onChange={e => setAge(e.target.value)}
                 placeholder="Your age"
-                style={{
-                  width: '100%', padding: '10px', borderRadius: '8px',
-                  border: '1px solid var(--ion-border-color)',
-                  background: 'var(--ion-background-color)', color: 'var(--ion-text-color)',
-                  fontFamily: 'inherit', fontSize: '14px',
-                }}
+                className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
               />
             </div>
 
             {/* Phone */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                <IonIcon icon={callOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)' }} />
-                <span style={{ fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Phone</span>
+              <div className="flex items-center mb-2">
+                <IonIcon icon={callOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">Phone</span>
               </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div className="flex gap-2">
                 <select value={countryCode} onChange={e => setCountryCode(e.target.value)}
-                  style={{
-                    padding: '8px', borderRadius: '8px', flexShrink: 0,
-                    border: '1px solid var(--ion-border-color)',
-                    background: 'var(--ion-background-color)', color: 'var(--ion-text-color)',
-                    fontFamily: 'inherit', fontSize: '14px', cursor: 'pointer',
-                  }}
+                  className="p-2 rounded-lg shrink-0 border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm cursor-pointer"
                 >
                   {COUNTRY_CODES.map(c => (
                     <option key={c.code} value={c.code}>{c.label}</option>
@@ -256,34 +214,28 @@ const UserProfile: React.FC = () => {
                 </select>
                 <input type="tel" value={phoneNumber} onChange={e => { const digits = e.target.value.replace(/\D/g, ''); setPhoneNumber(formatPhone(digits, countryCode)); setPhoneError(digits.length >= 7 ? '' : digits.length === 0 ? 'Phone is required' : 'Phone must be at least 7 digits'); }}
                   placeholder="9123456789"
-                  style={{
-                    flex: 1, padding: '10px', borderRadius: '8px',
-                    border: '1px solid var(--ion-border-color)',
-                    background: 'var(--ion-background-color)', color: 'var(--ion-text-color)',
-                    fontFamily: 'inherit', fontSize: '14px',
-                  }}
+                  className="flex-1 p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
                 />
               </div>
-              {phoneError && <span style={{ color: 'var(--ion-color-danger)', fontSize: '12px', marginTop: '4px', display: 'block' }}>{phoneError}</span>}
+              {phoneError && <span className="text-[var(--ion-color-danger)] text-xs mt-1 block">{phoneError}</span>}
             </div>
           </div>
 
           {/* Save Button */}
           <IonButton expand="block" onClick={handleSave} disabled={!!emailError || !!phoneError || !name.trim() || !email.trim()}
+            className="h-12 text-base font-semibold mb-3"
             style={{
               '--background': 'var(--ion-color-primary)',
               '--border-radius': '8px',
-              height: '48px', fontSize: '16px', fontWeight: 600,
-              marginBottom: '12px',
             }}
           >
             Save Changes
           </IonButton>
 
           {/* Sign Out */}
-          <IonButton expand="block" color="danger" className="md:hidden" onClick={() => { logout(); history.push('/guest/home'); }}
+          <IonButton expand="block" color="danger" className="md:hidden h-12 text-base font-semibold" onClick={() => { logout(); history.push('/guest/home'); }}
             style={{
-              '--border-radius': '8px', height: '48px', fontSize: '16px', fontWeight: 600,
+              '--border-radius': '8px',
             }}
           >
             <IonIcon icon={logOutOutline} slot="start" />

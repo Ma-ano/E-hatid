@@ -56,17 +56,19 @@ const Navbar: React.FC<NavbarProps> = ({ title, showBack, backHref }) => {
                 <button
                   key={link.path}
                   onClick={() => history.push(link.path)}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[36px] whitespace-nowrap ${
-                    isActive(link.path)
-                      ? 'bg-[var(--ion-color-primary)]/20 text-[var(--ion-color-primary)]'
-                      : 'text-[var(--ion-text-color-secondary)] hover:bg-[var(--tw-border-color)]/30'
-                  }`}
+                  className="flex flex-1 items-center justify-center min-h-[36px]"
                 >
-                  <IonIcon icon={isActive(link.path) ? link.activeIcon : link.icon} className="text-base shrink-0" />
-                  <span>{link.label}</span>
-                  {link.badge === 'cart' && cartCount > 0 && (
-                    <IonBadge className="cart-badge text-[10px] min-w-[18px] h-[18px]">{cartCount > 99 ? '99+' : cartCount}</IonBadge>
-                  )}
+                  <div className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    isActive(link.path)
+                      ? 'bg-[var(--ion-color-primary)] text-white'
+                      : 'text-[var(--ion-text-color-secondary)] hover:bg-[var(--tw-border-color)]/30'
+                  }`}>
+                    <IonIcon icon={isActive(link.path) ? link.activeIcon : link.icon} className="text-base shrink-0" />
+                    <span>{link.label}</span>
+                    {link.badge === 'cart' && cartCount > 0 && (
+                      <IonBadge className="cart-badge text-[10px] min-w-[18px] h-[18px]">{cartCount > 99 ? '99+' : cartCount}</IonBadge>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
@@ -108,14 +110,14 @@ const Navbar: React.FC<NavbarProps> = ({ title, showBack, backHref }) => {
                 <button
                   key={link.path}
                   onClick={() => history.push(link.path)}
-                  className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[44px] px-2 rounded-xl transition-all duration-200 ${
-                    active ? 'bg-[var(--ion-color-primary)]/15' : ''
+                  className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[44px] rounded-full transition-all duration-200 ${
+                    active ? 'bg-[var(--ion-color-primary)] px-3 py-1.5' : ''
                   }`}
                 >
                   <div className={`relative transition-transform duration-200 ${active ? 'scale-110' : ''}`}>
                     <IonIcon
                       icon={active ? link.activeIcon : link.icon}
-                      className={`text-xl ${active ? 'text-[var(--ion-color-primary)]' : 'text-[var(--ion-text-color-secondary)]'}`}
+                      className={`text-xl ${active ? 'text-white' : 'text-[var(--ion-text-color-secondary)]'}`}
                     />
                     {link.badge === 'cart' && cartCount > 0 && (
                       <IonBadge className="cart-badge absolute -top-1.5 -right-1.5 text-[9px] min-w-[16px] h-[16px] flex items-center justify-center">
@@ -123,8 +125,8 @@ const Navbar: React.FC<NavbarProps> = ({ title, showBack, backHref }) => {
                       </IonBadge>
                     )}
                   </div>
-                  <span className={`text-[10px] font-medium leading-tight ${
-                    active ? 'text-[var(--ion-color-primary)] font-semibold' : 'text-[var(--ion-text-color-secondary)]'
+                  <span className={`text-xs font-medium leading-tight ${
+                    active ? 'text-white font-semibold' : 'text-[var(--ion-text-color-secondary)]'
                   }`}>
                     {link.label}
                   </span>

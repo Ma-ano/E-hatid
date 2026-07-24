@@ -24,7 +24,6 @@ import {
   arrowBack,
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 
 const ReportIncident: React.FC = () => {
@@ -88,7 +87,6 @@ const ReportIncident: React.FC = () => {
 
   return (
     <>
-      <Navbar />
 
         {/* Header with Back Button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid var(--ion-border-color)' }}>

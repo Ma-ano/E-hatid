@@ -54,8 +54,15 @@ export const updateUserDocument = async (uid: string, data: Partial<User>) => {
 };
 
 export const setRoleStatus = async (uid: string, role: string, status: 'approved' | 'rejected') => {
+  const snap = await getDoc(doc(db, 'users', uid));
+  const current = snap.data();
+  const currentRoles: string[] = current?.roles || (current?.role ? [current.role] : []);
+  const updatedRoles = status === 'approved' && !currentRoles.includes(role)
+    ? [...currentRoles, role]
+    : currentRoles;
   await updateDoc(doc(db, 'users', uid), {
     [`roleStatus.${role}`]: status,
+    roles: updatedRoles,
   });
 };
 

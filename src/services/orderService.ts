@@ -71,6 +71,41 @@ export const fetchOrdersToday = async (vendorId: string): Promise<Order[]> => {
   }
 };
 
+export const subscribeAvailableOrders = (callback: (orders: Order[]) => void, onError?: (err: Error) => void): Unsubscribe => {
+  const q = query(collection(db, 'orders'), where('status', '==', 'ready'));
+  return onSnapshot(q, (snapshot) => {
+    const orders = snapshot.docs.map(d => {
+      const data = convertTimestamps<Order>(d.data());
+      return { ...data, id: d.id };
+    });
+    callback(orders.filter(o => !o.riderId));
+  }, (err) => {
+    console.error('subscribeAvailableOrders error:', err);
+    if (onError) onError(err);
+    else callback([]);
+  });
+};
+
+export const subscribeRiderOrders = (riderId: string, callback: (orders: Order[]) => void, onError?: (err: Error) => void): Unsubscribe => {
+  const q = query(collection(db, 'orders'), where('riderId', '==', riderId));
+  return onSnapshot(q, (snapshot) => {
+    const orders = snapshot.docs.map(d => {
+      const data = convertTimestamps<Order>(d.data());
+      return { ...data, id: d.id };
+    });
+    orders.sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+    callback(orders);
+  }, (err) => {
+    console.error('subscribeRiderOrders error:', err);
+    if (onError) onError(err);
+    else callback([]);
+  });
+};
+
 export const getEarningsStats = async (vendorId: string) => {
   try {
     const orders = await fetchOrdersByVendor(vendorId);
@@ -86,7 +121,12 @@ export const getEarningsStats = async (vendorId: string) => {
       .filter(o => o.status === 'delivered')
       .reduce((sum, o) => sum + o.total, 0);
     const uniqueCustomers = new Set(delivered.map(o => o.userId)).size;
-    return { totalRevenue, thisMonthRevenue, pendingPayout, totalCustomers: uniqueCustomers, ordersToday: 0 };
+    const ordersToday = delivered.filter(o => {
+      const d = new Date(o.createdAt);
+      const now = new Date();
+      return d.toDateString() === now.toDateString();
+    }).length;
+    return { totalRevenue, thisMonthRevenue, pendingPayout, totalCustomers: uniqueCustomers, ordersToday };
   } catch (err) {
     console.error('Error computing earnings:', err);
     return { totalRevenue: 0, thisMonthRevenue: 0, pendingPayout: 0, totalCustomers: 0, ordersToday: 0 };

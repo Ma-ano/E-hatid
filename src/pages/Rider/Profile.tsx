@@ -1,5 +1,5 @@
 // src/pages/Rider/Profile.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonCard,
   IonCardContent,
@@ -8,21 +8,25 @@ import {
   IonItem,
   IonLabel,
   IonInput,
-  IonSelect,
-  IonSelectOption,
   IonToggle,
-  IonBadge,
+  IonSpinner,
+  IonToast,
 } from '@ionic/react';
 import { personOutline, callOutline, mailOutline, carOutline, starOutline, saveOutline, logOutOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
+import { getRoleProfile, updateRoleProfile, updateUserDocument } from '../../services/userService';
 
 const RiderProfile: React.FC = () => {
   const history = useHistory();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const [profile, setProfile] = useState({
     name: '',
@@ -37,14 +41,88 @@ const RiderProfile: React.FC = () => {
     bankName: '',
   });
 
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    const loadProfile = async () => {
+      try {
+        const profileData = await getRoleProfile(user.id, 'rider');
+        setProfile({
+          name: user.name || profileData?.fullName || '',
+          email: user.email || profileData?.contactEmail || '',
+          phone: user.phone || profileData?.contactPhone || '',
+          vehicle: profileData?.vehicleType || user.vehicle || '',
+          licensePlate: profileData?.licensePlate || user.licensePlate || '',
+          licenseNumber: profileData?.driverLicenseNumber || user.licenseNumber || '',
+          rating: profileData?.rating || 0,
+          totalDeliveries: profileData?.totalDeliveries || 0,
+          bankAccount: user.bankAccount || profileData?.bankAccount || '',
+          bankName: user.bankName || profileData?.bankName || '',
+        });
+        console.log('Rider profile loaded from Firestore');
+      } catch (err) {
+        console.error('Error loading rider profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+  }, [user]);
+
   const handleInputChange = (field: string, value: string) => {
     setProfile({ ...profile, [field]: value });
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      await updateUserDocument(user.id, {
+        name: profile.name,
+        phone: profile.phone,
+        vehicle: profile.vehicle,
+        licensePlate: profile.licensePlate,
+        licenseNumber: profile.licenseNumber,
+        bankAccount: profile.bankAccount,
+        bankName: profile.bankName,
+      } as any);
+      await updateRoleProfile(user.id, 'rider', {
+        fullName: profile.name,
+        contactEmail: profile.email,
+        contactPhone: profile.phone,
+        vehicleType: profile.vehicle,
+        licensePlate: profile.licensePlate,
+        driverLicenseNumber: profile.licenseNumber,
+        bankAccount: profile.bankAccount,
+        bankName: profile.bankName,
+      });
+      console.log('Rider profile saved to Firestore');
+      setToastMessage('Profile saved successfully');
+      setShowToast(true);
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error saving rider profile:', err);
+      setToastMessage('Failed to save profile');
+      setShowToast(true);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleLogout = () => {
     logout();
     history.push('/login');
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <IonSpinner name="crescent" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -264,10 +342,12 @@ const RiderProfile: React.FC = () => {
           {isEditing && (
             <IonButton 
               expand="block" 
+              disabled={saving}
+              onClick={handleSave}
               style={{ '--background': 'var(--ion-color-primary)', margin: '0 0 12px' }}
             >
               <IonIcon slot="start" icon={saveOutline} />
-              Save Changes
+              {saving ? 'Saving...' : 'Save Changes'}
             </IonButton>
           )}
           <IonButton 
@@ -281,6 +361,14 @@ const RiderProfile: React.FC = () => {
             Logout
           </IonButton>
         </div>
+        <IonToast
+          isOpen={showToast}
+          message={toastMessage}
+          duration={3000}
+          onDidDismiss={() => setShowToast(false)}
+          position="bottom"
+          color={toastMessage.includes('Failed') ? 'danger' : 'success'}
+        />
     </div>
   );
 };

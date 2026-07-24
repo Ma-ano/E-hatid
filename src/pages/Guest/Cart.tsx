@@ -10,7 +10,6 @@ import {
 import { locationOutline, bicycleOutline, cardOutline, logInOutline, personAddOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import CartItem from '../../components/Cart/CartItem';
-import Navbar from '../../components/Navbar';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -34,8 +33,6 @@ const GuestCart: React.FC = () => {
 
   return (
     <>
-      <Navbar />
-
 
         <div className="flex flex-col min-h-full">
         <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pb-10 sm:pb-16">

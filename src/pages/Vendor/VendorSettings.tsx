@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import { getStallByVendorId, createStall, updateStall } from '../../services/stallService';
+import { getRoleProfile } from '../../services/userService';
 import { compressImage } from '../../utils/compressImage';
 
 const VendorSettings: React.FC = () => {
@@ -41,7 +42,7 @@ const VendorSettings: React.FC = () => {
     setVendorName(user.name || '');
     setVendorPhone(user.phone || '');
     setStallAddress(user.stallAddress || '');
-    const loadStall = async () => {
+    const loadData = async () => {
       try {
         const stall = await getStallByVendorId(user.id);
         if (stall) {
@@ -56,22 +57,30 @@ const VendorSettings: React.FC = () => {
           if (stall.address) setStallAddress(stall.address);
           if (stall.deliveryTime) {
             const parts = stall.deliveryTime.split(' - ');
-            if (parts.length === 2) {
-              setOpenTime(parts[0]);
-              setCloseTime(parts[1]);
-            }
+            if (parts.length === 2) { setOpenTime(parts[0]); setCloseTime(parts[1]); }
           }
+          console.log('Stall data loaded:', stall.name);
         } else {
-          if (user.stallName) setStallName(user.stallName);
-          if (user.stallAddress) setStallAddress(user.stallAddress);
+          const profile = await getRoleProfile(user.id, 'vendor');
+          if (profile) {
+            if (profile.businessName || profile.displayName) setStallName(profile.businessName || profile.displayName);
+            if (profile.description) setDescription(profile.description);
+            if (profile.address) setStallAddress(profile.address);
+            if (profile.displayName) setVendorName(profile.displayName);
+            if (profile.contactPhone) setVendorPhone(profile.contactPhone);
+            console.log('Vendor profile used to pre-fill settings');
+          } else {
+            if (user.stallName) setStallName(user.stallName);
+            if (user.stallAddress) setStallAddress(user.stallAddress);
+          }
         }
       } catch (err) {
-        console.error('Error loading stall:', err);
+        console.error('Error loading stall or profile:', err);
       } finally {
         setLoading(false);
       }
     };
-    loadStall();
+    loadData();
   }, [user]);
 
   const handleSave = async () => {

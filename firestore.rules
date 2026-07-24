@@ -33,6 +33,10 @@ service cloud.firestore {
         && getUserData(request.auth.uid).roleStatus[role] == status;
     }
 
+    function isRole(role) {
+      return hasRole(role) || roleStatusIs(role, 'approved');
+    }
+
     // ============================================================
     // users/{uid}
     // - User can read/write their own document
@@ -45,7 +49,7 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // Role subcollections (users/{uid}/customerProfile, vendorProfile, riderProfile)
+    // Role subcollections (users/{uid}/vendorProfile, riderProfile, etc.)
     // - Owner can read/write their own subcollection
     // - Admin can read/write any
     // ============================================================
@@ -56,13 +60,17 @@ service cloud.firestore {
 
     // ============================================================
     // stalls/{stallId}
+    // - Anyone can read a stall (public listing)
+    // - Vendor can create if they have the vendor role
+    // - Vendor can update their own stall
+    // - Admin can do everything
     // ============================================================
     match /stalls/{stallId} {
 
       allow read: if true;
 
-      allow create: if (isAuthenticated() && hasRole('vendor')
-                      && roleStatusIs('vendor', 'approved'))
+      allow create: if isAuthenticated()
+                  && isRole('vendor')
                   && request.resource.data.vendorId == request.auth.uid
                   && request.resource.data.keys().hasAll(['id', 'name', 'vendorId'])
                   && request.resource.data.name is string
@@ -70,7 +78,7 @@ service cloud.firestore {
 
       allow update: if isAuthenticated()
                   && (
-                    (resource.data.vendorId == request.auth.uid && hasRole('vendor'))
+                    (resource.data.vendorId == request.auth.uid && isRole('vendor'))
                     || isAdmin()
                   )
                   && request.resource.data.name is string
@@ -81,6 +89,12 @@ service cloud.firestore {
 
     // ============================================================
     // orders/{orderId}
+    // - Customer, vendor, rider, and admin can read relevant orders
+    // - Customer creates orders
+    // - Vendor updates order fulfillment
+    // - Rider updates delivery status
+    // - Customer can cancel their own order
+    // - Admin can do everything
     // ============================================================
     match /orders/{orderId} {
 
@@ -89,6 +103,7 @@ service cloud.firestore {
                     resource.data.userId == request.auth.uid
                     || resource.data.vendorId == request.auth.uid
                     || resource.data.riderId == request.auth.uid
+                    || (roleStatusIs('rider', 'approved') && resource.data.status == 'ready')
                     || isAdmin()
                   );
 
@@ -98,8 +113,12 @@ service cloud.firestore {
 
       allow update: if isAuthenticated()
                   && (
-                    (resource.data.vendorId == request.auth.uid && hasRole('vendor'))
-                    || (resource.data.riderId == request.auth.uid && hasRole('rider'))
+                    (resource.data.vendorId == request.auth.uid && isRole('vendor'))
+                    || (resource.data.riderId == request.auth.uid && isRole('rider'))
+                    || (resource.data.status == 'ready' && resource.data.riderId == null
+                        && roleStatusIs('rider', 'approved')
+                        && request.resource.data.riderId == request.auth.uid
+                        && request.resource.data.status == 'delivering')
                     || (resource.data.userId == request.auth.uid
                         && request.resource.data.status == 'cancelled'
                         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cancelledReason']))
@@ -126,10 +145,31 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // riderReviews/{reviewId}
+    // ============================================================
+    match /riderReviews/{reviewId} {
+
+      allow read: if isAuthenticated()
+                && (
+                  request.auth.uid == resource.data.riderId
+                  || isAdmin()
+                );
+
+      allow create: if isAuthenticated()
+                  && request.resource.data.userId == request.auth.uid
+                  && request.resource.data.keys().hasAll(['userId', 'riderId', 'rating', 'comment']);
+
+      allow update: if false;
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
     // applications/{docId}
-    // - User can create their own application
-    // - Admin can read all applications
-    // - No updates or deletes by non-admin
+    // - User can create their own application with pending status
+    // - Any authenticated user can read (for status checks)
+    // - Admin can update status (approve/reject)
+    // - No deletes by non-admin
     // ============================================================
     match /applications/{docId} {
 

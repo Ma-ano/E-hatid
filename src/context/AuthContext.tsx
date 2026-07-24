@@ -41,7 +41,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const normalizeUser = (data: any): User => {
   const mapRole = (r: string) => r === 'user' ? 'customer' : r;
   const rawRole = mapRole(data.role || 'customer');
-  const roles = (data.roles || [rawRole]).map((r: string) => mapRole(r));
+  const roles = data.roles?.length ? data.roles.map((r: string) => mapRole(r)) : [rawRole];
   const activeRole = data.activeRole
     ? mapRole(data.activeRole)
     : (rawRole === 'admin' ? 'admin' : (roles[0] || rawRole));
@@ -86,9 +86,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
         const normalized = normalizeUser(userData);
-        if (normalized.roles && normalized.roles.length > 1) {
-          delete normalized.activeRole;
-        }
         setUser(normalized);
         localStorage.setItem('user', JSON.stringify(normalized));
       } else {
@@ -146,8 +143,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         const userRoles = normalized.roles;
         if (!userRoles || userRoles.length === 0) {
-          isLoggingInRef.current = false;
-          throw new Error('NO_ROLES');
+          normalized.roles = ['customer'];
+          normalized.activeRole = 'customer';
         }
         // Multi-role → role selector on next load
         if (userRoles.length > 1) {

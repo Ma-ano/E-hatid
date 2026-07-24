@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getEarningsStats, updateOrderStatus, subscribeVendorOrders } from '../../services/orderService';
 import { getReviewStats } from '../../services/reviewService';
+import { getStallByVendorId } from '../../services/stallService';
 import { useOrders } from '../../context/OrderContext';
 import { Order } from '../../types';
 
@@ -40,13 +41,14 @@ const VendorDashboard: React.FC = () => {
   const loadStats = useCallback(async () => {
     if (!user) return;
     try {
-      const [earnings, reviews] = await Promise.all([
+      const [earnings, stall] = await Promise.all([
         getEarningsStats(user.id),
-        getReviewStats(user.id),
+        getStallByVendorId(user.id),
       ]);
+      const reviews = stall ? await getReviewStats(stall.id) : { average: 0, total: 0, distribution: [0,0,0,0,0] };
       setStats(prev => [
         { ...prev[0], value: `₱${earnings.totalRevenue.toLocaleString()}` },
-        prev[1],
+        { ...prev[1], value: String(earnings.ordersToday ?? 0) },
         { ...prev[2], value: String(reviews.average) },
         { ...prev[3], value: String(earnings.totalCustomers) },
       ]);

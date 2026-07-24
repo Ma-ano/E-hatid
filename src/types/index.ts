@@ -189,7 +189,7 @@ export interface Order {
   vendorId?: string;
   items: OrderItem[];
   total: number;
-  status: 'pending' | 'accepted' | 'preparing' | 'ready' | 'delivered' | 'cancelled' | 'rejected' | 'completed' | 'ready_for_pickup';
+  status: 'pending' | 'accepted' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled' | 'rejected' | 'completed' | 'ready_for_pickup';
   createdAt: string | Date;
   deliveryAddress?: string;
   riderId?: string;

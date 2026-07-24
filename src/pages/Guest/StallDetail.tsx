@@ -81,8 +81,8 @@ const StallDetail: React.FC = () => {
     selectedAddOns: SelectedAddOn[];
     specialInstructions: string;
   }) => {
-    addToCart(input);
-  }, [addToCart]);
+    addToCart({ ...input, item: { ...input.item, stallId: id } });
+  }, [addToCart, id]);
 
   const handleCloseModal = useCallback(() => {
     setSelectedItem(null);

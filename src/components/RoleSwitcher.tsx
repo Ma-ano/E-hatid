@@ -51,7 +51,7 @@ const RoleSwitcher: React.FC = () => {
             minWidth: '200px', zIndex: 100, padding: '4px',
           }}>
             {roles.map(role => {
-              const st = user.roleStatus?.[role] || 'pending';
+              const st = role === 'customer' ? (user.emailVerified ? 'approved' : 'pending') : (user.roleStatus?.[role] || 'pending');
               const disabled = st === 'pending' || st === 'rejected';
               const active = role === activeRole;
               return (

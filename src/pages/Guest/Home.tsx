@@ -7,7 +7,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { fetchStalls, getCategories } from '../../services/stallService';
 import { Stall } from '../../types/index';
-import Navbar from '../../components/Navbar';
 import { StallCardSkeleton } from '../../components/ui/Skeleton';
 
 const GuestHome: React.FC = () => {
@@ -52,7 +51,6 @@ const GuestHome: React.FC = () => {
 
   return (
     <>
-      <Navbar />
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header Section */}
         <div className="pt-4 sm:pt-6 md:pt-8 pb-2">

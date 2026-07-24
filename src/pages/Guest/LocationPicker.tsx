@@ -12,7 +12,6 @@ import { useCart } from '../../context/CartContext';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import Navbar from '../../components/Navbar';
 
 interface Suggestion {
   display: string;
@@ -168,8 +167,6 @@ const GuestLocationPicker: React.FC = () => {
 
   return (
     <>
-      <Navbar />
-
 
         <div className="flex flex-col min-h-full">
         <div className="flex-1 max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pt-4 sm:pt-6 pb-6 sm:pb-8">

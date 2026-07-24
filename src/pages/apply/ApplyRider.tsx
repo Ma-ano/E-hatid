@@ -123,7 +123,7 @@ const ApplyRider: React.FC = () => {
           <p className="text-sm text-[var(--ion-text-color-secondary)] mb-6">
             Your rider application has been approved.
           </p>
-          <IonButton expand="block" onClick={() => history.push('/rider/home')}>
+          <IonButton expand="block" onClick={() => history.push('/rider/dashboard')}>
             Go to Rider Dashboard
           </IonButton>
         </div>

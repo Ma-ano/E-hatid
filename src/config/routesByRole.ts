@@ -28,7 +28,7 @@ export const navItemsByRole: Record<string, NavItem[]> = {
     { label: 'Profile', path: '/customer/profile', icon: personOutline, activeIcon: person },
   ],
   rider: [
-    { label: 'Home', path: '/rider/home', icon: homeOutline, activeIcon: home },
+    { label: 'Home', path: '/rider/dashboard', icon: homeOutline, activeIcon: home },
     { label: 'Orders', path: '/rider/orders', icon: documentTextOutline, activeIcon: documentText },
     { label: 'Earnings', path: '/rider/earnings', icon: cashOutline, activeIcon: cash },
     { label: 'Profile', path: '/rider/profile', icon: personOutline, activeIcon: person },

@@ -20,7 +20,7 @@ export function getRoleRedirect(user: User, role: string): string | null {
   if (role === 'rider') {
     if (status === 'pending') return '/approval-pending?role=rider';
     if (status === 'rejected') return '/application-rejected?role=rider';
-    if (status === 'approved') return '/rider/home';
+    if (status === 'approved') return '/rider/dashboard';
     return '/apply/rider';
   }
 
