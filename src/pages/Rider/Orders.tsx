@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import {
-  IonSegment,
-  IonSegmentButton,
-  IonLabel,
-  IonCard,
-  IonCardContent,
-  IonBadge,
-  IonIcon,
   IonButton,
+  IonIcon,
   IonSpinner,
   IonToast,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonTitle,
+  IonContent,
 } from '@ionic/react';
-import { timeOutline, navigateOutline, checkmarkCircleOutline, cashOutline, personOutline, storefrontOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, closeOutline, storefrontOutline, personOutline, callOutline, locationOutline, cashOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { subscribeAvailableOrders, subscribeRiderOrders, updateOrderStatus } from '../../services/orderService';
 import type { Order } from '../../types';
+import OrderCard from '../../components/Rider/OrderCard';
+import RiderActionButton from '../../components/Rider/RiderActionButton';
+import RiderPageHeader from '../../components/Rider/RiderPageHeader';
+import SegmentTabs from '../../components/Rider/SegmentTabs';
+import EmptyState from '../../components/Rider/EmptyState';
+import { useDeclinedOrders } from '../../hooks/useDeclinedOrders';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   ready: { label: 'Ready', color: '#F59E0B' },
@@ -23,6 +30,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 };
 
 const RiderOrders: React.FC = () => {
+  const history = useHistory();
   const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState('available');
   const [availableOrders, setAvailableOrders] = useState<Order[]>([]);
@@ -33,6 +41,9 @@ const RiderOrders: React.FC = () => {
   const [deliveringId, setDeliveringId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [detailsOrder, setDetailsOrder] = useState<Order | null>(null);
+
+  const { declineOrder, filterDeclined } = useDeclinedOrders(user?.id);
 
   useEffect(() => {
     const unsubAvailable = subscribeAvailableOrders(orders => {
@@ -57,6 +68,7 @@ const RiderOrders: React.FC = () => {
 
   const activeOrders = riderOrders.filter(o => o.status === 'delivering');
   const completedOrders = riderOrders.filter(o => o.status === 'delivered');
+  const filteredAvailable = filterDeclined(availableOrders);
 
   const handleAccept = async (order: Order) => {
     if (!user) return;
@@ -89,64 +101,12 @@ const RiderOrders: React.FC = () => {
     }
   };
 
-  const renderOrderCard = (order: Order, actions?: React.ReactNode) => {
-    const config = STATUS_CONFIG[order.status] || { label: order.status, color: '#9CA3AF' };
-    return (
-      <IonCard key={order.id} style={{ margin: '0 0 12px', background: 'var(--ion-card-background)', borderRadius: '12px' }}>
-        <IonCardContent style={{ padding: '14px' }}>
-          <div className="flex justify-between items-start mb-3">
-            <div className="flex-1 min-w-0 mr-3">
-              <h3 className="m-0 mb-0.5 text-base font-bold text-[var(--ion-text-color)] truncate">
-                <IonIcon icon={storefrontOutline} className="mr-1.5 align-middle" />
-                {order.stallName || 'Stall'}
-              </h3>
-              <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">
-                <IonIcon icon={personOutline} className="mr-1 align-middle" />
-                {order.customerName || 'Customer'}
-              </p>
-            </div>
-            <IonBadge style={{ '--background': config.color, color: 'white', fontSize: '11px', padding: '4px 10px', borderRadius: '20px' }}>
-              {config.label}
-            </IonBadge>
-          </div>
-
-          <div className="p-3 rounded-lg bg-[var(--ion-background-color)] mb-3 text-xs">
-            <div className="flex items-center gap-2 mb-1.5 text-[var(--ion-text-color-secondary)]">
-              <IonIcon icon={timeOutline} className="text-sm" />
-              <span>{order.items?.length || 0} item(s)</span>
-              <span className="font-bold text-[var(--ion-color-primary)]">₱{order.total?.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center gap-2 text-[var(--ion-text-color-secondary)]">
-              <IonIcon icon={navigateOutline} className="text-sm" />
-              <span className="truncate">{order.deliveryAddress || 'No address'}</span>
-            </div>
-          </div>
-
-          {actions}
-        </IonCardContent>
-      </IonCard>
-    );
+  const handleDecline = (e: React.MouseEvent, orderId: string) => {
+    e.stopPropagation();
+    declineOrder(orderId);
+    setToastMessage('Order hidden');
+    setShowToast(true);
   };
-
-  const renderTabButtons = () => (
-    <div className="px-4 pb-1">
-      <IonSegment
-        value={selectedTab}
-        onIonChange={e => setSelectedTab(e.detail.value as string)}
-        style={{ '--background': 'transparent' }}
-      >
-        <IonSegmentButton value="available" style={{ '--color-checked': '#FFFFFF', '--border-radius': '8px', '--indicator-color': 'transparent' }}>
-          <IonLabel>Available</IonLabel>
-        </IonSegmentButton>
-        <IonSegmentButton value="active" style={{ '--color-checked': '#FFFFFF', '--border-radius': '8px', '--indicator-color': 'transparent' }}>
-          <IonLabel>Active</IonLabel>
-        </IonSegmentButton>
-        <IonSegmentButton value="completed" style={{ '--color-checked': '#FFFFFF', '--border-radius': '8px', '--indicator-color': 'transparent' }}>
-          <IonLabel>Completed</IonLabel>
-        </IonSegmentButton>
-      </IonSegment>
-    </div>
-  );
 
   if (loading) {
     return (
@@ -158,99 +118,206 @@ const RiderOrders: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-        <div className="text-5xl mb-4 opacity-60">⚠️</div>
-        <p className="m-0 mb-1 text-base font-bold text-[var(--ion-text-color)]">{error}</p>
-        <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">Check the console for details</p>
-      </div>
+      <EmptyState
+        icon="warning-outline"
+        title={error}
+        subtitle="Check the console for details"
+      />
     );
   }
 
+  const tabs = [
+    { value: 'available', label: 'Available', count: filteredAvailable.length },
+    { value: 'active', label: 'Active', count: activeOrders.length },
+    { value: 'completed', label: 'Completed' },
+  ];
+
   return (
     <>
-      <div className="px-4 pt-5 pb-2">
-        <h2 className="m-0 text-[28px] font-bold text-[var(--ion-text-color)]">Orders</h2>
+      <div className="pb-2">
+        <RiderPageHeader title="Orders" subtitle="Manage your deliveries" />
       </div>
 
-      {renderTabButtons()}
+      <SegmentTabs tabs={tabs} selected={selectedTab} onChange={setSelectedTab} />
 
-      {/* Available */}
       {selectedTab === 'available' && (
-        <div className="px-4 pb-4">
-          {availableOrders.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-5xl mb-4 opacity-60">📦</div>
-              <p className="m-0 mb-1 text-base font-bold text-[var(--ion-text-color)]">No available orders</p>
-              <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">Waiting for vendors to mark orders as ready</p>
-            </div>
+        <div className="pb-4 space-y-4">
+          {filteredAvailable.length === 0 ? (
+            <EmptyState
+              icon="cube-outline"
+              title="No available orders"
+              subtitle="Waiting for vendors to mark orders as ready"
+            />
           ) : (
-            availableOrders.map(order => renderOrderCard(
-              order,
-              <IonButton
-                expand="block"
-                style={{ '--background': '#10B981', '--border-radius': '8px', margin: 0 }}
-                onClick={() => handleAccept(order)}
-                disabled={claimingId === order.id}
-              >
-                {claimingId === order.id ? <IonSpinner name="crescent" /> : <IonIcon icon={checkmarkCircleOutline} slot="start" />}
-                {claimingId === order.id ? 'Accepting...' : 'Accept'}
-              </IonButton>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* Active */}
-      {selectedTab === 'active' && (
-        <div className="px-4 pb-4">
-          {activeOrders.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-5xl mb-4 opacity-60">🛵</div>
-              <p className="m-0 mb-1 text-base font-bold text-[var(--ion-text-color)]">No active deliveries</p>
-              <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">Accept an available order to start delivering</p>
-            </div>
-          ) : (
-            activeOrders.map(order => renderOrderCard(
-              order,
-              <IonButton
-                expand="block"
-                style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px', margin: 0 }}
-                onClick={() => handleDelivered(order)}
-                disabled={deliveringId === order.id}
-              >
-                {deliveringId === order.id ? <IonSpinner name="crescent" /> : <IonIcon icon={checkmarkCircleOutline} slot="start" />}
-                {deliveringId === order.id ? 'Marking...' : 'Mark Delivered'}
-              </IonButton>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* Completed */}
-      {selectedTab === 'completed' && (
-        <div className="px-4 pb-4">
-          {completedOrders.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-5xl mb-4 opacity-60">🏁</div>
-              <p className="m-0 mb-1 text-base font-bold text-[var(--ion-text-color)]">No completed deliveries</p>
-              <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">Your delivery history will appear here</p>
-            </div>
-          ) : (
-            completedOrders.map(order => renderOrderCard(
-              order,
-              <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--ion-background-color)]">
-                <span className="text-xs text-[var(--ion-text-color-secondary)]">
-                  Delivered at {order.completedAt ? new Date(order.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
-                </span>
-                <span className="text-sm font-bold text-[var(--ion-color-primary)]">
-                  <IonIcon icon={cashOutline} className="mr-1 align-middle" />
-                  ₱{order.total?.toFixed(2)}
-                </span>
+            filteredAvailable.map(order => (
+              <div key={order.id} onClick={() => setDetailsOrder(order)} className="cursor-pointer">
+                <OrderCard
+                  order={order}
+                  badge={{ label: STATUS_CONFIG[order.status]?.label || order.status, color: STATUS_CONFIG[order.status]?.color || '#9CA3AF' }}
+                  actions={
+                    <div className="flex gap-2">
+                      <RiderActionButton variant="decline" className="flex-1" onClick={(e) => handleDecline(e, order.id)}>
+                        Decline
+                      </RiderActionButton>
+                      <RiderActionButton variant="accept" className="flex-[2]" loading={claimingId === order.id} onClick={() => handleAccept(order)}>
+                        Accept
+                      </RiderActionButton>
+                    </div>
+                  }
+                />
               </div>
             ))
           )}
         </div>
       )}
+
+      {selectedTab === 'active' && (
+        <div className="pb-4 space-y-4">
+          {activeOrders.length === 0 ? (
+            <EmptyState
+              icon="bicycle-outline"
+              title="No active deliveries"
+              subtitle="Accept an available order to start delivering"
+            />
+          ) : (
+            activeOrders.map(order => (
+              <div key={order.id} onClick={() => history.push(`/rider/delivery/${order.id}`, { order })} className="cursor-pointer">
+                <OrderCard
+                  order={order}
+                  badge={{ label: STATUS_CONFIG[order.status]?.label || order.status, color: STATUS_CONFIG[order.status]?.color || '#9CA3AF' }}
+                  actions={
+                    <div className="flex gap-2">
+                      <RiderActionButton variant="primary" className="flex-1" onClick={(e) => { e.stopPropagation(); history.push(`/rider/delivery/${order.id}`, { order }); }}>
+                        Open Delivery
+                      </RiderActionButton>
+                      <RiderActionButton variant="accept" className="flex-1" loading={deliveringId === order.id} onClick={(e) => { e.stopPropagation(); handleDelivered(order); }}>
+                        {deliveringId === order.id ? 'Marking...' : 'Mark Delivered'}
+                      </RiderActionButton>
+                    </div>
+                  }
+                />
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {selectedTab === 'completed' && (
+        <div className="pb-4 space-y-4">
+          {completedOrders.length === 0 ? (
+            <EmptyState
+              icon="flag-outline"
+              title="No completed deliveries"
+              subtitle="Your delivery history will appear here"
+            />
+          ) : (
+            completedOrders.map(order => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                badge={{ label: STATUS_CONFIG[order.status]?.label || order.status, color: STATUS_CONFIG[order.status]?.color || '#9CA3AF' }}
+                actions={
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)]">
+                    <span className="text-xs text-[var(--ion-text-color-secondary)]">
+                      Delivered at {order.completedAt ? new Date(order.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                    </span>
+                    <span className="text-sm font-bold text-[var(--ion-color-primary)]">
+                      <IonIcon icon={cashOutline} className="mr-1 align-middle" />
+                      ₱{order.total?.toFixed(2)}
+                    </span>
+                  </div>
+                }
+              />
+            ))
+          )}
+        </div>
+      )}
+
+      <IonModal isOpen={!!detailsOrder} onDidDismiss={() => setDetailsOrder(null)}>
+        <IonHeader className="ion-no-border">
+          <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
+            <IonButtons slot="start">
+              <IonButton onClick={() => setDetailsOrder(null)}>
+                <IonIcon icon={closeOutline} />
+              </IonButton>
+            </IonButtons>
+            <IonTitle>Order Details</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent style={{ '--background': 'var(--ion-background-color)' }}>
+          {detailsOrder && (
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-4 pb-3 border-b border-[var(--ion-border-color)]">
+                <div>
+                  <h2 className="m-0 text-lg font-bold text-[var(--ion-text-color)]">
+                    <IonIcon icon={storefrontOutline} className="align-middle mr-1.5" />
+                    {detailsOrder.stallName || 'Stall'}
+                  </h2>
+                  <p className="m-0 mt-1 text-xs text-[var(--ion-text-color-secondary)]">
+                    {detailsOrder.items.length} item(s) · ₱{detailsOrder.total.toFixed(2)}
+                  </p>
+                </div>
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">#{detailsOrder.id.slice(-5)}</span>
+              </div>
+
+              {detailsOrder.customerName && (
+                <div className="mb-4 pb-3 border-b border-[var(--ion-border-color)]">
+                  <p className="m-0 mb-2 text-xs font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">
+                    <IonIcon icon={personOutline} className="align-middle mr-1" />
+                    Customer
+                  </p>
+                  <p className="m-0 text-sm font-semibold text-[var(--ion-text-color)]">{detailsOrder.customerName}</p>
+                  {detailsOrder.customerPhone && (
+                    <p className="m-0 mt-1 text-xs text-[var(--ion-text-color-secondary)]">
+                      <IonIcon icon={callOutline} className="align-middle mr-1" />
+                      {detailsOrder.customerPhone}
+                    </p>
+                  )}
+                  {detailsOrder.deliveryAddress && (
+                    <p className="m-0 mt-1 text-xs text-[var(--ion-text-color-secondary)]">
+                      <IonIcon icon={locationOutline} className="align-middle mr-1" />
+                      {detailsOrder.deliveryAddress}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="mb-4">
+                <p className="m-0 mb-2 text-xs font-bold text-[var(--ion-text-color-secondary)] uppercase tracking-[0.3px]">Items</p>
+                {detailsOrder.items.map((item, i) => (
+                  <div key={i} className="p-3 bg-[var(--ion-card-background)] rounded-xl mb-2 border border-[var(--ion-border-color)]">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-sm font-semibold text-[var(--ion-text-color)] flex-1">{item.name}</span>
+                      <span className="text-sm font-semibold text-[var(--ion-text-color-secondary)] mx-3">x{item.quantity}</span>
+                      <span className="text-sm font-bold text-[var(--ion-text-color)]">₱{(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                    {item.selectedOptions?.map(opt => (
+                      <p key={opt.optionId} className="mt-0.5 ml-3 text-xs text-[var(--ion-text-color-secondary)]">{opt.choiceName}</p>
+                    ))}
+                    {item.selectedAddOns?.map(addon => (
+                      <p key={addon.addOnId} className="mt-0.5 ml-3 text-xs text-[var(--ion-text-color-secondary)]">+ {addon.name}</p>
+                    ))}
+                    {item.specialInstructions && (
+                      <p className="mt-1.5 text-xs italic text-[var(--ion-text-color-secondary)] border-t border-dashed border-[var(--ion-border-color)] pt-1.5">
+                        📝 {item.specialInstructions}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <RiderActionButton
+                variant="accept"
+                expand="block"
+                loading={claimingId === detailsOrder.id}
+                onClick={(e) => { setDetailsOrder(null); handleAccept(detailsOrder); }}
+              >
+                Accept Order
+              </RiderActionButton>
+            </div>
+          )}
+        </IonContent>
+      </IonModal>
 
       <IonToast
         isOpen={showToast}

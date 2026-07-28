@@ -19,57 +19,57 @@
 }
 
 :root {
-  --tw-card-background: #FFFFFF;
-  --tw-card-border: #E5E7EB;
-  --tw-background-color: #F8FAFC;
-  --tw-text-color: #0F172A;
-  --tw-text-secondary: #64748B;
-  --tw-border-color: #E5E7EB;
-  --tw-primary: #FF5A1F;
-  --tw-primary-hover: #FF7A3D;
-  --tw-success: #22C55E;
-  --tw-warning: #FACC15;
-  --tw-danger: #EF4444;
-  --tw-light: #F1F5F9;
-  --tw-dark: #0F172A;
+  --tw-card-background: var(--ion-card-background);
+  --tw-card-border: var(--ion-border-color);
+  --tw-background-color: var(--ion-background-color);
+  --tw-text-color: var(--ion-text-color);
+  --tw-text-secondary: var(--ion-text-color-secondary);
+  --tw-border-color: var(--ion-border-color);
+  --tw-primary: var(--ion-color-primary);
+  --tw-primary-hover: var(--ion-color-primary-tint);
+  --tw-success: var(--ion-color-success);
+  --tw-warning: var(--ion-color-warning);
+  --tw-danger: var(--ion-color-danger);
+  --tw-light: var(--ion-color-light);
+  --tw-dark: var(--ion-color-dark);
 }
 
 .dark {
-  --tw-card-background: #1E293B;
-  --tw-card-border: #334155;
-  --tw-background-color: #0B0F19;
-  --tw-text-color: #F1F5F9;
-  --tw-text-secondary: #94A3B8;
-  --tw-border-color: #334155;
-  --tw-primary: #FF7A3D;
-  --tw-primary-hover: #FF9A5D;
-  --tw-success: #22C55E;
-  --tw-warning: #FACC15;
-  --tw-danger: #EF4444;
-  --tw-light: #1E293B;
-  --tw-dark: #F1F5F9;
+  --tw-card-background: var(--ion-card-background);
+  --tw-card-border: var(--ion-border-color);
+  --tw-background-color: var(--ion-background-color);
+  --tw-text-color: var(--ion-text-color);
+  --tw-text-secondary: var(--ion-text-color-secondary);
+  --tw-border-color: var(--ion-border-color);
+  --tw-primary: var(--ion-color-primary);
+  --tw-primary-hover: var(--ion-color-primary-tint);
+  --tw-success: var(--ion-color-success);
+  --tw-warning: var(--ion-color-warning);
+  --tw-danger: var(--ion-color-danger);
+  --tw-light: var(--ion-color-light);
+  --tw-dark: var(--ion-color-dark);
 }
 
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--tw-text-color);
-  background-color: var(--tw-background-color);
+  color: var(--ion-text-color);
+  background-color: var(--ion-background-color);
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl bg-[var(--tw-card-background)] border border-[var(--tw-card-border)] p-4 md:p-6;
+    @apply rounded-2xl bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] p-4 md:p-6;
   }
 
   .card-interactive {
-    @apply rounded-2xl bg-[var(--tw-card-background)] border border-[var(--tw-card-border)] p-4 md:p-6
+    @apply rounded-2xl bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] p-4 md:p-6
            transition-all duration-300 hover:shadow-md cursor-pointer;
   }
 
   .button-primary {
-    @apply rounded-xl bg-[var(--tw-primary)] text-white font-semibold px-4
+    @apply rounded-xl bg-[var(--ion-color-primary)] text-white font-semibold px-4
            transition-all duration-200 hover:opacity-90 active:scale-95 min-h-[44px];
   }
 
@@ -78,9 +78,9 @@ body {
   }
 
   .stall-card {
-    @apply rounded-2xl bg-[var(--tw-card-background)] border border-[var(--tw-card-border)] overflow-hidden transition-all duration-300;
+    @apply rounded-2xl bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] overflow-hidden transition-all duration-300;
     &:hover {
-      @apply shadow-md border-[var(--tw-primary)];
+      @apply shadow-md border-[var(--ion-color-primary)];
     }
   }
 
@@ -89,14 +89,14 @@ body {
   }
 
   .nav-tabs {
-    @apply flex gap-2 p-4 bg-[var(--tw-card-background)] rounded-b-xl overflow-x-auto;
+    @apply flex gap-2 p-4 bg-[var(--ion-card-background)] rounded-b-xl overflow-x-auto;
   }
 
   .form-input {
-    @apply w-full h-11 px-3 text-sm border border-[var(--tw-border-color)]
-           rounded-lg bg-[var(--tw-background-color)] text-[var(--tw-text-color)];
+    @apply w-full h-11 px-3 text-sm border border-[var(--ion-border-color)]
+           rounded-lg bg-[var(--ion-background-color)] text-[var(--ion-text-color)];
     &:focus {
-      @apply outline-none ring-2 ring-[var(--tw-primary)] ring-offset-2;
+      @apply outline-none ring-2 ring-[var(--ion-color-primary)] ring-offset-2;
     }
   }
 
@@ -111,7 +111,7 @@ body {
 }
 
 .skeleton-loader {
-  background: linear-gradient(90deg, var(--tw-light) 25%, var(--tw-primary) 50%, var(--tw-light) 75%);
+  background: linear-gradient(90deg, var(--ion-color-light) 25%, var(--ion-color-primary) 50%, var(--ion-color-light) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 8px;
@@ -147,10 +147,14 @@ ion-button {
   --padding-start: 0;
   --padding-end: 0;
   --highlight-height: 0;
-  border: 1px solid var(--tw-border-color);
+  border: 1px solid var(--ion-border-color);
   border-radius: 8px;
   --background-hover: transparent;
   font-size: 13px;
+}
+
+.menu-item-modal {
+  --backdrop-opacity: 0.6 !important;
 }
 
 .product-editor-modal {
@@ -166,7 +170,7 @@ ion-button {
 }
 
 .product-editor-page {
-  --background: var(--tw-background-color);
+  --background: var(--ion-background-color);
 }
 
 .product-editor-page ion-content {

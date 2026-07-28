@@ -13,6 +13,7 @@ import {
   IonInput,
   IonTextarea,
   IonToggle,
+  IonAlert,
   isPlatform,
 } from '@ionic/react';
 import {
@@ -35,6 +36,7 @@ interface ProductEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updated: MenuItem) => void;
+  onDelete?: () => void;
 }
 
 const emptyOption = (): MenuItemOption => ({
@@ -73,6 +75,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   const [options, setOptions] = useState<MenuItemOption[]>(item.options || []);
   const [addOns, setAddOns] = useState<MenuItemAddOn[]>(item.addOns || []);
   const [isMobile, setIsMobile] = useState(isPlatform('mobile') || window.innerWidth < 640);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -124,7 +127,10 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     setAddOns(prev => prev.map(a => a.id === addOnId ? { ...a, [field]: value } : a));
   };
 
+  const isValid = name.trim() && price > 0;
+
   const handleSave = () => {
+    if (!isValid) return;
     onSave({
       ...item,
       name,
@@ -140,6 +146,13 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     onClose();
   };
 
+  const handleDelete = () => setShowDeleteAlert(true);
+
+  const confirmDelete = () => {
+    onDelete?.();
+    onClose();
+  };
+
   const hasChanges = name !== item.name
     || description !== (item.description || '')
     || price !== item.price
@@ -149,10 +162,10 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     || image !== (item.image || '');
 
   const SectionCard: React.FC<{ title: string; icon: string; children: React.ReactNode }> = ({ title, icon, children }) => (
-    <div className="mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-[var(--tw-border-color)] bg-[var(--tw-card-background)] overflow-hidden">
-      <div className="flex items-center gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[var(--tw-border-color)] bg-[var(--tw-background-color)]/50">
-        <IonIcon icon={icon} className="text-[#8B5CF6] text-sm sm:text-base shrink-0" />
-        <span className="font-semibold text-xs sm:text-sm text-[var(--tw-text-color)]">{title}</span>
+    <div className="mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)] overflow-hidden">
+      <div className="flex items-center gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[var(--ion-border-color)] bg-[var(--ion-background-color)]/50">
+        <IonIcon icon={icon} className="text-[var(--ion-color-primary)] text-sm sm:text-base shrink-0" />
+        <span className="font-semibold text-xs sm:text-sm text-[var(--ion-text-color)]">{title}</span>
       </div>
       <div className="p-3 sm:p-5">
         {children}
@@ -187,14 +200,14 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             </div>
           ) : (
             <div
-              className="relative w-full aspect-[3/1] sm:aspect-[4/1] flex flex-col items-center justify-center cursor-pointer hover:bg-[var(--tw-border-color)]/30 transition-colors border-b border-[var(--tw-border-color)]"
+              className="relative w-full aspect-[3/1] sm:aspect-[4/1] flex flex-col items-center justify-center cursor-pointer hover:bg-[var(--ion-border-color)]/30 transition-colors border-b border-[var(--ion-border-color)]"
               onClick={() => fileInputRef.current?.click()}
-              style={{ background: 'var(--tw-background-color)' }}
+              style={{ background: 'var(--ion-background-color)' }}
             >
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-[#8B5CF6]/10 flex items-center justify-center mb-1.5 sm:mb-2">
-                <IonIcon icon={imageOutline} className="text-[#8B5CF6] text-xl sm:text-2xl" />
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-[var(--ion-color-primary)]/10 flex items-center justify-center mb-1.5 sm:mb-2">
+                <IonIcon icon={imageOutline} className="text-[var(--ion-color-primary)] text-xl sm:text-2xl" />
               </div>
-              <span className="text-xs sm:text-sm font-medium text-[var(--tw-text-secondary)]">Tap to add product photo</span>
+              <span className="text-xs sm:text-sm font-medium text-[var(--ion-text-color-secondary)]">Tap to add product photo</span>
             </div>
           )}
           <input
@@ -205,12 +218,13 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             onChange={handleImageUpload}
           />
         </div>
+        <p className="text-[10px] text-[var(--ion-text-color-secondary)] opacity-60 px-3 sm:px-5 -mt-1 mb-1">Recommended: 600×600px square — shown in menu cards</p>
 
         <div className="p-3 sm:p-5 space-y-3 sm:space-y-4 pb-20 sm:pb-6">
           <SectionCard title="Details" icon={documentTextOutline}>
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[var(--tw-text-secondary)] mb-1.5">Product Name</label>
+                <label className="block text-xs font-medium text-[var(--ion-text-color-secondary)] mb-1.5">Product Name</label>
                 <IonItem className="ion-item-clean">
                   <IonInput
                     value={name}
@@ -221,7 +235,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 </IonItem>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[var(--tw-text-secondary)] mb-1.5">Description</label>
+                <label className="block text-xs font-medium text-[var(--ion-text-color-secondary)] mb-1.5">Description</label>
                 <IonItem className="ion-item-clean">
                   <IonTextarea
                     value={description}
@@ -238,7 +252,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           <SectionCard title="Pricing & Category" icon={cashOutline}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-xs font-medium text-[var(--tw-text-secondary)] mb-1.5">Price (₱)</label>
+                <label className="block text-xs font-medium text-[var(--ion-text-color-secondary)] mb-1.5">Price (₱)</label>
                 <IonItem className="ion-item-clean">
                   <IonInput
                     type="number"
@@ -250,7 +264,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 </IonItem>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[var(--tw-text-secondary)] mb-1.5">Category</label>
+                <label className="block text-xs font-medium text-[var(--ion-text-color-secondary)] mb-1.5">Category</label>
                 <IonItem className="ion-item-clean">
                   <IonInput
                     value={category}
@@ -265,33 +279,33 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
           <SectionCard title="Status" icon={checkmarkCircle}>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
-              <div className="flex items-center justify-between sm:justify-start sm:gap-3 flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-[var(--tw-border-color)] bg-[var(--tw-background-color)]/50">
+              <div className="flex items-center justify-between sm:justify-start sm:gap-3 flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)]/50">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${available ? 'bg-green-500' : 'bg-gray-400'}`} />
-                  <span className="text-sm font-medium text-[var(--tw-text-color)]">Available</span>
+                  <span className="text-sm font-medium text-[var(--ion-text-color)]">Available</span>
                 </div>
                 <IonToggle
                   checked={available}
                   onIonChange={e => setAvailable(e.detail.checked)}
                   style={{
-                    '--background': 'var(--tw-border-color)',
-                    '--background-checked': '#22C55E',
+                    '--background': 'var(--ion-border-color)',
+                    '--background-checked': 'var(--ion-color-success)',
                     '--handle-background': '#fff',
                     '--handle-background-checked': '#fff',
                   } as React.CSSProperties & Record<string, string>}
                 />
               </div>
-              <div className="flex items-center justify-between sm:justify-start sm:gap-3 flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-[var(--tw-border-color)] bg-[var(--tw-background-color)]/50">
+              <div className="flex items-center justify-between sm:justify-start sm:gap-3 flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)]/50">
                 <div className="flex items-center gap-2">
                   <IonIcon icon={starOutline} className={`text-sm ${popular ? 'text-yellow-500' : 'text-gray-400'}`} />
-                  <span className="text-sm font-medium text-[var(--tw-text-color)]">Popular</span>
+                  <span className="text-sm font-medium text-[var(--ion-text-color)]">Popular</span>
                 </div>
                 <IonToggle
                   checked={popular}
                   onIonChange={e => setPopular(e.detail.checked)}
                   style={{
-                    '--background': 'var(--tw-border-color)',
-                    '--background-checked': '#F59E0B',
+                    '--background': 'var(--ion-border-color)',
+                    '--background-checked': 'var(--ion-color-warning)',
                     '--handle-background': '#fff',
                     '--handle-background-checked': '#fff',
                   } as React.CSSProperties & Record<string, string>}
@@ -300,20 +314,20 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             </div>
           </SectionCard>
 
-          <div className="mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-[var(--tw-border-color)] bg-[var(--tw-card-background)] overflow-hidden">
-            <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[var(--tw-border-color)] bg-[var(--tw-background-color)]/50">
+          <div className="mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)] overflow-hidden">
+            <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[var(--ion-border-color)] bg-[var(--ion-background-color)]/50">
               <div className="flex items-center gap-2">
-                <IonIcon icon={listOutline} className="text-[#8B5CF6] text-sm sm:text-base shrink-0" />
-                <span className="font-semibold text-xs sm:text-sm text-[var(--tw-text-color)]">Options</span>
+                <IonIcon icon={listOutline} className="text-[var(--ion-color-primary)] text-sm sm:text-base shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm text-[var(--ion-text-color)]">Options</span>
                 {options.length > 0 && (
-                  <span className="text-[10px] sm:text-xs bg-[#8B5CF6]/10 text-[#8B5CF6] px-2 py-0.5 rounded-full font-medium">{options.length}</span>
+                  <span className="text-[10px] sm:text-xs bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)] px-2 py-0.5 rounded-full font-medium">{options.length}</span>
                 )}
               </div>
               <IonButton
                 fill="clear"
                 size="small"
                 onClick={addOption}
-                style={{ '--color': '#8B5CF6', fontSize: '12px' }}
+                style={{ '--color': 'var(--ion-color-primary)', fontSize: '12px' }}
               >
                 <IonIcon icon={addCircleOutline} slot="start" />
                 Add Group
@@ -322,37 +336,37 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
               {options.length === 0 ? (
                 <div className="text-center py-6 sm:py-8">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--tw-background-color)] flex items-center justify-center mx-auto mb-2">
-                    <IonIcon icon={addOutline} className="text-[var(--tw-text-secondary)] text-lg sm:text-xl" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--ion-background-color)] flex items-center justify-center mx-auto mb-2">
+                    <IonIcon icon={addOutline} className="text-[var(--ion-text-color-secondary)] text-lg sm:text-xl" />
                   </div>
-                  <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)]">No option groups yet</p>
-                  <p className="text-[10px] sm:text-xs text-[var(--tw-text-secondary)] mt-1">Add choices like size, drink, or toppings</p>
+                  <p className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">No option groups yet</p>
+                  <p className="text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)] mt-1">Add choices like size, drink, or toppings</p>
                 </div>
               ) : (
                 options.map((option, oi) => (
                   <div
                     key={option.id}
-                    className="rounded-lg sm:rounded-xl border border-[var(--tw-border-color)] overflow-hidden bg-[var(--tw-background-color)]/30"
+                    className="rounded-lg sm:rounded-xl border border-[var(--ion-border-color)] overflow-hidden bg-[var(--ion-background-color)]/30"
                   >
-                    <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-[#8B5CF6]/5 border-b border-[var(--tw-border-color)]">
+                    <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-[var(--ion-color-primary)]/5 border-b border-[var(--ion-border-color)]">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#8B5CF6] text-white text-[10px] sm:text-xs font-bold flex items-center justify-center shrink-0">
+                        <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[var(--ion-color-primary)] text-white text-[10px] sm:text-xs font-bold flex items-center justify-center shrink-0">
                           {oi + 1}
                         </span>
-                        <span className="text-xs sm:text-sm font-semibold text-[var(--tw-text-color)] truncate max-w-[120px] sm:max-w-[200px]">
+                        <span className="text-xs sm:text-sm font-semibold text-[var(--ion-text-color)] truncate max-w-[120px] sm:max-w-[200px]">
                           {option.name || `Option ${oi + 1}`}
                         </span>
                         {option.required ? (
                           <span className="text-[10px] sm:text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 sm:px-2 py-0.5 rounded-full font-medium">Required</span>
                         ) : (
-                          <span className="text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 text-[var(--tw-text-secondary)] px-1.5 sm:px-2 py-0.5 rounded-full font-medium">Optional</span>
+                          <span className="text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 text-[var(--ion-text-color-secondary)] px-1.5 sm:px-2 py-0.5 rounded-full font-medium">Optional</span>
                         )}
                       </div>
                       <IonButton
                         fill="clear"
                         size="small"
                         onClick={() => removeOption(option.id)}
-                        style={{ '--color': '#EF4444', minHeight: '28px', height: '28px' }}
+                        style={{ '--color': 'var(--ion-color-danger)', minHeight: '28px', height: '28px' }}
                       >
                         <IonIcon icon={trashOutline} className="text-sm" />
                       </IonButton>
@@ -360,21 +374,21 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
                     <div className="p-3 sm:p-4 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--tw-border-color)] bg-[var(--tw-card-background)]">
-                          <IonLabel className="text-xs font-medium text-[var(--tw-text-secondary)] shrink-0">Required</IonLabel>
+                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-card-background)]">
+                          <IonLabel className="text-xs font-medium text-[var(--ion-text-color-secondary)] shrink-0">Required</IonLabel>
                           <IonToggle
                             checked={option.required}
                             onIonChange={e => updateOption(option.id, 'required', e.detail.checked)}
                             style={{
-                              '--background': 'var(--tw-border-color)',
-                              '--background-checked': '#EF4444',
+                              '--background': 'var(--ion-border-color)',
+                              '--background-checked': 'var(--ion-color-danger)',
                               '--handle-background': '#fff',
                               '--handle-background-checked': '#fff',
                   } as React.CSSProperties & Record<string, string>}
                 />
               </div>
-                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--tw-border-color)] bg-[var(--tw-card-background)]">
-                          <IonLabel className="text-xs font-medium text-[var(--tw-text-secondary)] shrink-0">Max picks</IonLabel>
+                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-card-background)]">
+                          <IonLabel className="text-xs font-medium text-[var(--ion-text-color-secondary)] shrink-0">Max picks</IonLabel>
                           <IonItem className="ion-item-clean flex-1">
                             <IonInput
                               type="number"
@@ -387,7 +401,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium text-[var(--tw-text-secondary)] mb-1.5">Option Name</label>
+                        <label className="block text-xs font-medium text-[var(--ion-text-color-secondary)] mb-1.5">Option Name</label>
                         <IonItem className="ion-item-clean">
                           <IonInput
                             value={option.name}
@@ -400,27 +414,27 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-medium text-[var(--tw-text-secondary)]">Choices</span>
+                          <span className="text-xs font-medium text-[var(--ion-text-color-secondary)]">Choices</span>
                           <IonButton
                             fill="clear"
                             size="small"
                             onClick={() => addChoice(option.id)}
-                            style={{ '--color': '#8B5CF6', fontSize: '11px', minHeight: '26px', height: '26px' }}
+                            style={{ '--color': 'var(--ion-color-primary)', fontSize: '11px', minHeight: '26px', height: '26px' }}
                           >
                             <IonIcon icon={addOutline} slot="start" className="text-xs" />
                             Add
                           </IonButton>
                         </div>
                         {option.choices.length === 0 ? (
-                          <p className="text-[11px] sm:text-xs text-[var(--tw-text-secondary)] text-center py-3 italic">No choices yet — tap "Add" to create one</p>
+                          <p className="text-[11px] sm:text-xs text-[var(--ion-text-color-secondary)] text-center py-3 italic">No choices yet — tap "Add" to create one</p>
                         ) : (
                           <div className="space-y-1.5">
                             {option.choices.map((choice, ci) => (
                               <div
                                 key={choice.id}
-                                className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg border border-[var(--tw-border-color)] ${ci % 2 === 0 ? 'bg-[var(--tw-background-color)]/30' : ''}`}
+                                className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg border border-[var(--ion-border-color)] ${ci % 2 === 0 ? 'bg-[var(--ion-background-color)]/30' : ''}`}
                               >
-                                <span className="text-[10px] sm:text-xs font-bold text-[var(--tw-text-secondary)] w-4 sm:w-5 text-center shrink-0">{ci + 1}.</span>
+                                <span className="text-[10px] sm:text-xs font-bold text-[var(--ion-text-color-secondary)] w-4 sm:w-5 text-center shrink-0">{ci + 1}.</span>
                                 <IonItem className="ion-item-clean flex-1 min-w-0">
                                   <IonInput
                                     value={choice.name}
@@ -429,7 +443,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                                     className="text-xs sm:text-sm"
                                   />
                                 </IonItem>
-                                <span className="text-[10px] sm:text-xs text-[var(--tw-text-secondary)] shrink-0">+₱</span>
+                                <span className="text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)] shrink-0">+₱</span>
                                 <IonItem className="ion-item-clean w-16 sm:w-20 shrink-0">
                                   <IonInput
                                     type="number"
@@ -443,7 +457,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                                   fill="clear"
                                   size="small"
                                   onClick={() => removeChoice(option.id, choice.id)}
-                                  style={{ '--color': '#EF4444', minHeight: '24px', height: '24px', width: '24px' }}
+                                  style={{ '--color': 'var(--ion-color-danger)', minHeight: '24px', height: '24px', width: '24px' }}
                                 >
                                   <IonIcon icon={trashOutline} className="text-xs" />
                                 </IonButton>
@@ -459,11 +473,11 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             </div>
           </div>
 
-          <div className="mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-[var(--tw-border-color)] bg-[var(--tw-card-background)] overflow-hidden">
-            <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[var(--tw-border-color)] bg-[var(--tw-background-color)]/50">
+          <div className="mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)] overflow-hidden">
+            <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[var(--ion-border-color)] bg-[var(--ion-background-color)]/50">
               <div className="flex items-center gap-2">
                 <IonIcon icon={addCircleOutline} className="text-emerald-500 text-sm sm:text-base shrink-0" />
-                <span className="font-semibold text-xs sm:text-sm text-[var(--tw-text-color)]">Add-ons</span>
+                <span className="font-semibold text-xs sm:text-sm text-[var(--ion-text-color)]">Add-ons</span>
                 {addOns.length > 0 && (
                   <span className="text-[10px] sm:text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">{addOns.length}</span>
                 )}
@@ -472,7 +486,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 fill="clear"
                 size="small"
                 onClick={addAddOn}
-                style={{ '--color': '#10B981', fontSize: '12px' }}
+                style={{ '--color': 'var(--ion-color-success)', fontSize: '12px' }}
               >
                 <IonIcon icon={addCircleOutline} slot="start" />
                 Add Add-on
@@ -481,20 +495,20 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             <div className="p-3 sm:p-5">
               {addOns.length === 0 ? (
                 <div className="text-center py-6 sm:py-8">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--tw-background-color)] flex items-center justify-center mx-auto mb-2">
-                    <IonIcon icon={addOutline} className="text-[var(--tw-text-secondary)] text-lg sm:text-xl" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--ion-background-color)] flex items-center justify-center mx-auto mb-2">
+                    <IonIcon icon={addOutline} className="text-[var(--ion-text-color-secondary)] text-lg sm:text-xl" />
                   </div>
-                  <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)]">No add-ons yet</p>
-                  <p className="text-[10px] sm:text-xs text-[var(--tw-text-secondary)] mt-1">Add extras like extra cheese, sauce, or toppings</p>
+                  <p className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">No add-ons yet</p>
+                  <p className="text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)] mt-1">Add extras like extra cheese, sauce, or toppings</p>
                 </div>
               ) : (
                 <div className="space-y-1.5">
                   {addOns.map((addOn, ai) => (
                     <div
                       key={addOn.id}
-                      className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg border border-[var(--tw-border-color)] ${ai % 2 === 0 ? 'bg-[var(--tw-background-color)]/30' : ''}`}
+                      className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg border border-[var(--ion-border-color)] ${ai % 2 === 0 ? 'bg-[var(--ion-background-color)]/30' : ''}`}
                     >
-                      <span className="text-[10px] sm:text-xs font-bold text-[var(--tw-text-secondary)] w-4 sm:w-5 text-center shrink-0">{ai + 1}.</span>
+                      <span className="text-[10px] sm:text-xs font-bold text-[var(--ion-text-color-secondary)] w-4 sm:w-5 text-center shrink-0">{ai + 1}.</span>
                       <IonItem className="ion-item-clean flex-1 min-w-0">
                         <IonInput
                           value={addOn.name}
@@ -503,7 +517,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                           className="text-xs sm:text-sm"
                         />
                       </IonItem>
-                      <span className="text-[10px] sm:text-xs text-[var(--tw-text-secondary)] shrink-0">₱</span>
+                      <span className="text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)] shrink-0">₱</span>
                       <IonItem className="ion-item-clean w-16 sm:w-20 shrink-0">
                         <IonInput
                           type="number"
@@ -517,7 +531,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                         fill="clear"
                         size="small"
                         onClick={() => removeAddOn(addOn.id)}
-                        style={{ '--color': '#EF4444', minHeight: '24px', height: '24px', width: '24px' }}
+                        style={{ '--color': 'var(--ion-color-danger)', minHeight: '24px', height: '24px', width: '24px' }}
                       >
                         <IonIcon icon={trashOutline} className="text-xs" />
                       </IonButton>
@@ -529,50 +543,88 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           </div>
 
           {!isMobile && (
-            <div className="flex justify-end gap-3 pt-2">
-              <IonButton
-                fill="outline"
-                onClick={onClose}
-                style={{
-                  '--border-color': 'var(--tw-border-color)',
-                  '--color': 'var(--tw-text-secondary)',
-                  '--border-radius': '10px',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  minHeight: '42px',
-                }}
-              >
-                Cancel
-              </IonButton>
-              <IonButton
-                onClick={handleSave}
-                disabled={!hasChanges && !!item.name}
-                style={{
-                  '--background': 'linear-gradient(135deg, #8B5CF6, #A78BFA)',
-                  '--background-hover': 'linear-gradient(135deg, #7C3AED, #8B5CF6)',
-                  '--border-radius': '10px',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  minHeight: '42px',
-                }}
-              >
-                <IonIcon icon={checkmarkCircle} slot="start" className="text-sm" />
-                Save Product
-              </IonButton>
+            <div className="flex justify-between gap-3 pt-2">
+              <div className="flex gap-2">
+                {item.name && onDelete && (
+                  <IonButton
+                    fill="outline"
+                    onClick={handleDelete}
+                    style={{
+                      '--border-color': 'var(--ion-color-danger)',
+                      '--color': 'var(--ion-color-danger)',
+                      '--border-radius': '10px',
+                      fontWeight: 600,
+                      fontSize: '13px',
+                      minHeight: '42px',
+                    }}
+                  >
+                    <IonIcon icon={trashOutline} slot="start" className="text-sm" />
+                    Delete
+                  </IonButton>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <IonButton
+                  fill="outline"
+                  onClick={onClose}
+                  style={{
+                    '--border-color': 'var(--ion-border-color)',
+                    '--color': 'var(--ion-text-color-secondary)',
+                    '--border-radius': '10px',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    minHeight: '42px',
+                  }}
+                >
+                  Cancel
+                </IonButton>
+                <IonButton
+                  onClick={handleSave}
+                  disabled={!isValid || (!hasChanges && !!item.name)}
+                  style={{
+                    '--background': 'var(--ion-color-primary)',
+                    '--border-radius': '10px',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    minHeight: '42px',
+                  }}
+                >
+                  <IonIcon icon={checkmarkCircle} slot="start" className="text-sm" />
+                  {item.name ? 'Save Product' : 'Create Product'}
+                </IonButton>
+              </div>
             </div>
           )}
         </div>
       </div>
 
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 p-3 bg-[var(--tw-card-background)] border-t border-[var(--tw-border-color)] z-50">
+        <div className="fixed bottom-0 left-0 right-0 p-3 bg-[var(--ion-card-background)] border-t border-[var(--ion-border-color)] z-50 flex gap-2">
+          {item.name && onDelete && (
+            <IonButton
+              fill="outline"
+              onClick={handleDelete}
+              className="min-h-[48px] shrink-0"
+              style={{
+                '--border-color': 'var(--ion-color-danger)',
+                '--color': 'var(--ion-color-danger)',
+                '--border-radius': '12px',
+                fontWeight: 600,
+                fontSize: '14px',
+                margin: 0,
+                minWidth: '56px',
+              }}
+            >
+              <IonIcon icon={trashOutline} />
+            </IonButton>
+          )}
           <IonButton
             expand="block"
             onClick={handleSave}
-            disabled={!hasChanges && !!item.name}
+            disabled={!isValid || (!hasChanges && !!item.name)}
             className="min-h-[48px]"
             style={{
-              '--background': 'linear-gradient(135deg, #8B5CF6, #A78BFA)',
+              '--background': 'var(--ion-color-primary)',
               '--border-radius': '12px',
               fontWeight: 700,
               fontSize: '14px',
@@ -591,23 +643,34 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     return (
       <IonPage className="product-editor-page">
         <IonHeader className="ion-no-border">
-          <IonToolbar style={{ '--background': 'var(--tw-card-background)', '--border-width': 0 }}>
+          <IonToolbar style={{ '--background': 'var(--ion-card-background)', '--border-width': 0 }}>
             <IonButtons slot="start">
-              <IonButton onClick={onClose} style={{ '--color': 'var(--tw-text-secondary)' }}>
+              <IonButton onClick={onClose} style={{ '--color': 'var(--ion-text-color-secondary)' }}>
                 <IonIcon icon={closeOutline} className="text-lg" />
               </IonButton>
             </IonButtons>
             <div className="flex items-center justify-center h-full">
-              <span className="font-semibold text-sm text-[var(--tw-text-color)]">{item.name || 'New Product'}</span>
+              <span className="font-semibold text-sm text-[var(--ion-text-color)]">{item.name || 'New Product'}</span>
             </div>
             <IonButtons slot="end">
               <div className="w-10" />
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent style={{ '--background': 'var(--tw-background-color)' }} className="product-editor-content">
+        <IonContent style={{ '--background': 'var(--ion-background-color)' }} className="product-editor-content">
           {content}
         </IonContent>
+
+        <IonAlert
+          isOpen={showDeleteAlert}
+          onDidDismiss={() => setShowDeleteAlert(false)}
+          header="Delete Product"
+          message="Delete this product? This cannot be undone."
+          buttons={[
+            { text: 'Cancel', role: 'cancel', handler: () => setShowDeleteAlert(false) },
+            { text: 'Delete', role: 'destructive', handler: confirmDelete },
+          ]}
+        />
       </IonPage>
     );
   }
@@ -626,7 +689,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     >
       <IonHeader className="ion-no-border">
         <IonToolbar style={{
-          '--background': 'linear-gradient(135deg, #8B5CF6, #A78BFA)',
+          '--background': 'var(--ion-color-primary)',
           '--border-width': 0,
           minHeight: '52px',
         }}>
@@ -641,7 +704,7 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           <IonButtons slot="end">
             <IonButton
               onClick={handleSave}
-              disabled={!hasChanges && !!item.name}
+              disabled={!isValid || (!hasChanges && !!item.name)}
               style={{
                 '--background': 'rgba(255,255,255,0.2)',
                 '--color': '#fff',
@@ -659,9 +722,20 @@ const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         </IonToolbar>
       </IonHeader>
 
-      <IonContent style={{ '--background': 'var(--tw-background-color)' }} className="product-editor-content">
+      <IonContent style={{ '--background': 'var(--ion-background-color)' }} className="product-editor-content">
         {content}
       </IonContent>
+
+      <IonAlert
+        isOpen={showDeleteAlert}
+        onDidDismiss={() => setShowDeleteAlert(false)}
+        header="Delete Product"
+        message="Delete this product? This cannot be undone."
+        buttons={[
+          { text: 'Cancel', role: 'cancel', handler: () => setShowDeleteAlert(false) },
+          { text: 'Delete', role: 'destructive', handler: confirmDelete },
+        ]}
+      />
     </IonModal>
   );
 };

@@ -20,9 +20,9 @@ const Landing: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 max-w-lg mx-auto w-full text-center">
         {/* Logo */}
         <img
-          src={isDarkMode ? '/Logo/E-hatid-dark-mode.png' : '/Logo/E-hatid-light-mode.png'}
+          src={isDarkMode ? '/Logo/Logo-dark-mode.png' : '/Logo/Logo-light-mode.png'}
           alt="E-Hatid"
-          className="h-16 sm:h-20 object-contain mb-6"
+          className="h-16 sm:h-24 object-contain mb-6"
         />
 
         <p className="text-base sm:text-lg text-[var(--ion-text-color-secondary)] mb-8 max-w-sm">
@@ -73,19 +73,19 @@ const Landing: React.FC = () => {
         {/* Role icons row */}
         <div className="flex items-center gap-6 mt-12 text-[var(--ion-text-color-secondary)]">
           <div className="flex flex-col items-center gap-1.5">
-            <div className="w-10 h-10 rounded-full bg-[var(--tw-light)] dark:bg-[#1E293B] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--ion-color-light)] dark:bg-[#1E293B] flex items-center justify-center">
               <IonIcon icon={restaurantOutline} className="text-lg" />
             </div>
             <span className="text-xs">Eat</span>
           </div>
           <div className="flex flex-col items-center gap-1.5">
-            <div className="w-10 h-10 rounded-full bg-[var(--tw-light)] dark:bg-[#1E293B] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--ion-color-light)] dark:bg-[#1E293B] flex items-center justify-center">
               <IonIcon icon={storefrontOutline} className="text-lg" />
             </div>
             <span className="text-xs">Sell</span>
           </div>
           <div className="flex flex-col items-center gap-1.5">
-            <div className="w-10 h-10 rounded-full bg-[var(--tw-light)] dark:bg-[#1E293B] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--ion-color-light)] dark:bg-[#1E293B] flex items-center justify-center">
               <IonIcon icon={bicycleOutline} className="text-lg" />
             </div>
             <span className="text-xs">Deliver</span>

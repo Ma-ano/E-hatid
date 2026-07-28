@@ -10,6 +10,7 @@ ion-content,
 ion-page {
   background-color: var(--ion-background-color) !important;
   color: var(--ion-text-color) !important;
+  overflow-x: hidden;
 }
 
 /* ==================== LINK STYLING (Tailwind utility with Ionic theming) ==================== */
@@ -35,6 +36,36 @@ ion-input:focus {
 }
 
 /* ==================== ANIMATIONS ==================== */
+@keyframes pulse-bike {
+  0%, 100% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes dot-bounce {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes progress-sweep {
+  0% { width: 0%; margin-left: 0; }
+  50% { width: 60%; margin-left: 20%; }
+  100% { width: 0%; margin-left: 100%; }
+}
+
+.delivery-bike-icon {
+  animation: pulse-bike 1.5s ease-in-out infinite;
+}
+
+.loading-dots {
+  animation: dot-bounce 1.5s ease-in-out infinite;
+  letter-spacing: 2px;
+}
+
+.delivery-progress-bar {
+  animation: progress-sweep 2s ease-in-out infinite;
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(100%);

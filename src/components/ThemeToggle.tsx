@@ -13,7 +13,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   return (
     <button
       onClick={toggleTheme}
-      className={`w-9 h-9 flex items-center justify-center rounded-lg text-[var(--ion-text-color-secondary)] hover:bg-[var(--tw-border-color)]/30 transition-colors ${className}`}
+      className={`w-9 h-9 flex items-center justify-center rounded-lg text-[var(--ion-text-color-secondary)] hover:bg-[var(--ion-border-color)]/30 transition-colors ${className}`}
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       <IonIcon

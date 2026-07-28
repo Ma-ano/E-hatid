@@ -3,7 +3,6 @@ import { Route, Redirect } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { roleHomePaths } from '../config/routesByRole';
 import { getRoleRedirect } from '../services/roleGuard';
-import FullScreenLoader from './FullScreenLoader';
 import { isVerifiedOrAdmin } from '../utils/isVerifiedOrAdmin';
 
 interface ProtectedRouteProps {
@@ -21,11 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requiredRole,
 }) => {
-  const { user, authLoading, activeRole, roles } = useAuth();
-
-  if (authLoading) {
-    return <FullScreenLoader />;
-  }
+  const { user, activeRole, roles } = useAuth();
 
   const homePath = activeRole ? (roleHomePaths[activeRole] || '/') : '/select-role';
 
@@ -75,7 +70,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           : !roles.includes(requiredRole as any) || (roles.length > 1 && activeRole !== requiredRole)
       ) ? (
         <Redirect to={homePath} />
-      ) : !requireAuth && user ? (
+      ) : !requireAuth && user && !(requiredRole && (
+        Array.isArray(requiredRole)
+          ? requiredRole.some(r => roles.includes(r as any))
+          : roles.includes(requiredRole as any)
+      )) ? (
         <Redirect to={homePath} />
       ) : (
         children

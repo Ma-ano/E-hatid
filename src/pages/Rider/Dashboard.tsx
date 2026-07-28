@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-  IonButton,
   IonIcon,
-  IonToggle,
 } from '@ionic/react';
-import { cashOutline, checkmarkCircleOutline, navigateOutline, storefrontOutline, personOutline } from 'ionicons/icons';
+import { cashOutline, checkmarkCircleOutline, navigateOutline, bicycleOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -12,6 +10,13 @@ import { db } from '../../firebaseConfig';
 import { useAuth } from '../../context/AuthContext';
 import { subscribeAvailableOrders, subscribeRiderOrders } from '../../services/orderService';
 import type { Order } from '../../types';
+import OrderCard from '../../components/Rider/OrderCard';
+import StatusToggle from '../../components/Rider/StatusToggle';
+import StatCard from '../../components/Rider/StatCard';
+import RiderActionButton from '../../components/Rider/RiderActionButton';
+import RiderPageHeader from '../../components/Rider/RiderPageHeader';
+import EmptyState from '../../components/Rider/EmptyState';
+import { useDeclinedOrders } from '../../hooks/useDeclinedOrders';
 
 const RiderDashboard: React.FC = () => {
   const history = useHistory();
@@ -19,6 +24,53 @@ const RiderDashboard: React.FC = () => {
   const [isAvailable, setIsAvailable] = useState(false);
   const [availableOrders, setAvailableOrders] = useState<Order[]>([]);
   const [riderOrders, setRiderOrders] = useState<Order[]>([]);
+  const [riderCoords, setRiderCoords] = useState<{lat: number; lng: number} | null>(null);
+
+  const { declineOrder, filterDeclined } = useDeclinedOrders(user?.id);
+
+  useEffect(() => {
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      pos => setRiderCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  const processedOrders = useMemo(() => {
+    let sorted = [...availableOrders];
+    if (riderCoords) {
+      sorted = sorted
+        .map(o => ({
+          order: o,
+          distance: (o.stallLatitude && o.stallLongitude)
+            ? haversineKm(riderCoords.lat, riderCoords.lng, o.stallLatitude, o.stallLongitude)
+            : Infinity,
+        }))
+        .sort((a, b) => {
+          if (a.distance === Infinity && b.distance === Infinity) return 0;
+          if (a.distance === Infinity) return 1;
+          if (b.distance === Infinity) return -1;
+          return a.distance - b.distance;
+        })
+        .map(x => x.order);
+    } else {
+      sorted = [...availableOrders].sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+    return filterDeclined(sorted);
+  }, [availableOrders, riderCoords, filterDeclined]);
 
   useEffect(() => {
     if (!user) return;
@@ -65,6 +117,7 @@ const RiderDashboard: React.FC = () => {
     return () => unsub();
   }, [user]);
 
+  const activeDelivery = riderOrders.find(o => o.status === 'delivering');
   const todayDelivered = riderOrders.filter(o => {
     if (o.status !== 'delivered') return false;
     const d = new Date(o.completedAt || o.createdAt);
@@ -74,135 +127,114 @@ const RiderDashboard: React.FC = () => {
 
   const todayEarnings = todayDelivered.reduce((sum, o) => sum + (o.total || 0), 0);
 
+  const handleDecline = (e: React.MouseEvent, orderId: string) => {
+    e.stopPropagation();
+    declineOrder(orderId);
+  };
+
   return (
     <>
-      <div className="max-w-4xl mx-auto">
-        <div className="px-4 pt-5 pb-2">
-          <h2 className="m-0 text-[28px] font-bold text-[var(--ion-text-color)]">Dashboard</h2>
+      <div className="pb-2">
+        <RiderPageHeader title="Dashboard" subtitle="Manage your deliveries" />
+      </div>
+
+      <div className="pb-3 space-y-4">
+        <StatusToggle
+          checked={isAvailable}
+          onChange={toggleAvailability}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <StatCard
+            icon={cashOutline}
+            label="Today's Earnings"
+            value={`₱${todayEarnings.toFixed(2)}`}
+            gradientFrom="#FF5A1F"
+            gradientTo="#FF7A3D"
+          />
+          <StatCard
+            icon={checkmarkCircleOutline}
+            label="Completed Today"
+            value={String(todayDelivered.length)}
+            gradientFrom="#10B981"
+            gradientTo="#34D399"
+          />
         </div>
+      </div>
 
-        {/* Status Toggle */}
-        <div className="px-4 pb-3">
-          <div className="bg-[var(--ion-card-background)] rounded-xl border border-[var(--ion-border-color)] p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="m-0 text-sm font-bold text-[var(--ion-text-color)]">
-                  {isAvailable ? 'Online' : 'Offline'}
-                </h3>
-                <p className="m-0 mt-1 text-xs text-[var(--ion-text-color-secondary)]">
-                  {isAvailable ? 'Ready to accept orders' : 'Tap to go online'}
-                </p>
-              </div>
-              <IonToggle
-                checked={isAvailable}
-                onIonChange={(e) => toggleAvailability(e.detail.checked)}
-                style={{ '--background-checked': 'var(--ion-color-primary)' }}
-              />
-            </div>
-          </div>
+      {/* Active Delivery Summary */}
+      {activeDelivery && (
+        <div className="pb-3">
+          <h3 className="m-0 mb-2 text-xs font-bold uppercase tracking-wide text-[var(--ion-text-color-secondary)]">
+            Active Delivery
+          </h3>
+          <OrderCard
+            order={activeDelivery}
+            actions={
+              <RiderActionButton variant="primary" expand="block" onClick={() => history.push(`/rider/delivery/${activeDelivery.id}`, { order: activeDelivery })}>
+                Continue Delivery
+              </RiderActionButton>
+            }
+          />
         </div>
+      )}
 
-        {/* Quick Stats */}
-        <div className="px-4 pb-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gradient-to-br from-[#FF5A1F] to-[#FF7A3D] rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                  <IonIcon icon={cashOutline} className="text-xl text-white" />
-                </div>
-                <div className="min-w-0">
-                  <p className="m-0 text-xs text-white/80">Today's Earnings</p>
-                  <h4 className="m-0 mt-1 text-base font-bold text-white truncate">₱{todayEarnings.toFixed(2)}</h4>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                  <IonIcon icon={checkmarkCircleOutline} className="text-xl text-white" />
-                </div>
-                <div className="min-w-0">
-                  <p className="m-0 text-xs text-white/80">Completed Today</p>
-                  <h4 className="m-0 mt-1 text-base font-bold text-white truncate">{todayDelivered.length}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Available Orders */}
-        {isAvailable && (
-          <>
-            <div className="px-4 pb-2">
-              <h2 className="m-0 text-base font-bold text-[var(--ion-text-color)]">
-                Available Orders
-                {availableOrders.length > 0 && (
-                  <span className="ml-2 text-xs font-bold text-white bg-[#FF5A1F] px-2 py-0.5 rounded-full align-middle">
-                    {availableOrders.length}
-                  </span>
-                )}
-              </h2>
-            </div>
-
-            <div className="px-4 pb-4 space-y-3">
-              {availableOrders.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">No orders available right now</p>
-                </div>
-              ) : (
-                availableOrders.slice(0, 5).map(order => (
-                  <div key={order.id} className="bg-[var(--ion-card-background)] rounded-xl border border-[var(--ion-border-color)] overflow-hidden">
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="min-w-0 flex-1 mr-2">
-                          <h3 className="m-0 mb-1 text-sm font-bold text-[var(--ion-text-color)] truncate">
-                            <IonIcon icon={storefrontOutline} className="mr-1 align-middle" />
-                            {order.stallName || 'Stall'}
-                          </h3>
-                          <p className="m-0 text-xs text-[var(--ion-text-color-secondary)]">
-                            <IonIcon icon={personOutline} className="mr-1 align-middle" />
-                            {order.customerName || 'Customer'}
-                          </p>
-                        </div>
-                        <span className="shrink-0 text-sm font-bold text-[var(--ion-color-primary)]">
-                          ₱{order.total?.toFixed(2)}
-                        </span>
-                      </div>
-
-                      {order.deliveryAddress && (
-                        <div className="flex items-center gap-2 mb-3 text-xs text-[var(--ion-text-color-secondary)]">
-                          <IonIcon icon={navigateOutline} className="text-sm" />
-                          <span className="truncate">{order.deliveryAddress}</span>
-                        </div>
-                      )}
-
-                      <IonButton
-                        expand="block"
-                        className="min-h-[44px]"
-                        style={{ '--background': '#10B981', margin: 0 }}
-                        onClick={() => history.push('/rider/orders')}
-                      >
-                        View & Accept
-                      </IonButton>
-                    </div>
-                  </div>
-                ))
+      {/* Available Orders */}
+      {isAvailable && (
+        <>
+          <div className="pb-2">
+            <div className="flex items-center gap-2">
+              <h2 className="m-0 text-sm font-bold text-[var(--ion-text-color)]">Available Orders</h2>
+              {filterDeclined(availableOrders).length > 0 && (
+                <span className="text-xs font-bold text-white bg-[var(--ion-color-primary)] px-2 py-0.5 rounded-full leading-none">
+                  {filterDeclined(availableOrders).length}
+                </span>
               )}
             </div>
-          </>
-        )}
-
-        {!isAvailable && (
-          <div className="flex flex-col items-center justify-center py-16 px-5 text-center">
-            <div className="text-5xl mb-4">🔴</div>
-            <p className="text-base font-bold text-[var(--ion-text-color)] m-0 mb-2">You're currently offline</p>
-            <p className="text-sm text-[var(--ion-text-color-secondary)] m-0 mb-5">
-              Toggle above to go online and start accepting orders
-            </p>
           </div>
-        )}
-      </div>
+
+          <div className="pb-4 space-y-4">
+            {processedOrders.length === 0 ? (
+              <EmptyState
+                icon="cube-outline"
+                title="No orders available right now"
+                subtitle="Waiting for vendors to mark orders as ready"
+              />
+            ) : (
+              processedOrders.map(order => {
+                const dist = riderCoords && order.stallLatitude && order.stallLongitude
+                  ? haversineKm(riderCoords.lat, riderCoords.lng, order.stallLatitude, order.stallLongitude)
+                  : null;
+                return (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    distanceKm={dist}
+                    actions={
+                      <div className="flex gap-2">
+                        <RiderActionButton variant="decline" className="flex-1" onClick={(e) => handleDecline(e, order.id)}>
+                          Decline
+                        </RiderActionButton>
+                        <RiderActionButton variant="primary" className="flex-1" onClick={() => history.push('/rider/orders')}>
+                          View Order
+                        </RiderActionButton>
+                      </div>
+                    }
+                  />
+                );
+              })
+            )}
+          </div>
+        </>
+      )}
+
+      {!isAvailable && (
+        <EmptyState
+          icon={bicycleOutline}
+          title="You're currently offline"
+          subtitle="Toggle above to go online and start accepting orders"
+        />
+      )}
     </>
   );
 };

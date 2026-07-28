@@ -7,10 +7,10 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<string, string> = {
-  success: 'bg-[var(--tw-success)]/10 text-[var(--tw-success)] border-[var(--tw-success)]/20',
-  warning: 'bg-[var(--tw-warning)]/10 text-[var(--tw-warning)] border-[var(--tw-warning)]/20',
-  error: 'bg-[var(--tw-danger)]/10 text-[var(--tw-danger)] border-[var(--tw-danger)]/20',
-  info: 'bg-[var(--tw-primary)]/10 text-[var(--tw-primary)] border-[var(--tw-primary)]/20',
+  success: 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)] border-[var(--ion-color-success)]/20',
+  warning: 'bg-[var(--ion-color-warning)]/10 text-[var(--ion-color-warning)] border-[var(--ion-color-warning)]/20',
+  error: 'bg-[var(--ion-color-danger)]/10 text-[var(--ion-color-danger)] border-[var(--ion-color-danger)]/20',
+  info: 'bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)] border-[var(--ion-color-primary)]/20',
 };
 
 const Badge: React.FC<BadgeProps> = ({ children, variant = 'info', className = '' }) => (

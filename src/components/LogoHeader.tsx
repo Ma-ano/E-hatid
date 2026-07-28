@@ -15,9 +15,9 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({ onClick }) => {
       onClick={onClick}
     >
       <img
-        src={isDarkMode ? '/Logo/E-hatid-dark-mode.png' : '/Logo/E-hatid-light-mode.png'}
+        src={isDarkMode ? '/Logo/Logo-dark-mode.png' : '/Logo/Logo-light-mode.png'}
         alt="E-Hatid"
-        className="h-10 sm:h-12 object-contain"
+        className="h-10 sm:h-14 object-contain"
       />
     </div>
   );

@@ -75,7 +75,7 @@ const CustomerHome: React.FC = () => {
   return (
     <>
 
-      <div className="pb-2 sm:pb-3">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex-1 md:pt-8">
         {/* Header Section */}
         <div className="pt-2 sm:pt-3 pb-2">
           <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--ion-text-color)] m-0 truncate">
@@ -107,12 +107,12 @@ const CustomerHome: React.FC = () => {
 
         {/* Categories */}
         <div className="py-1 sm:py-2 overflow-x-auto no-scrollbar">
-          <div className="flex gap-2 bg-light-200 dark:bg-dark-card p-1 rounded-full w-max min-w-full">
+          <div className="flex gap-3 bg-[var(--ion-card-background)] p-1 rounded-full w-max min-w-full">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className="relative min-w-[90px] px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors rounded-full"
+                className="relative min-w-[100px] px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-colors rounded-full"
               >
                 {selectedCategory === cat && (
                   <motion.div
@@ -139,7 +139,7 @@ const CustomerHome: React.FC = () => {
           </div>
 
           {initialLoading ? (
-            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
               {Array.from({ length: 6 }).map((_, i) => (
                 <StallCardSkeleton key={i} />
               ))}
@@ -153,7 +153,7 @@ const CustomerHome: React.FC = () => {
               <p className="text-sm text-[var(--ion-text-color-secondary)] m-0">Try a different search or category</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
               {filteredStalls.map((stall) => (
                 <div key={stall.id} className="rounded-2xl overflow-hidden bg-[var(--ion-card-background)] border border-[var(--ion-border-color)] shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer" onClick={() => history.push(`/stall/${stall.id}/menu`)}>
                   <div className="relative aspect-[4/3] overflow-hidden" data-initial={stall.name.charAt(0)}>

@@ -60,7 +60,7 @@ export const getReviewStats = async (stallId: string) => {
     const sum = reviews.reduce((s, r) => s + r.rating, 0);
     const dist = [0, 0, 0, 0, 0];
     reviews.forEach(r => { if (r.rating >= 1 && r.rating <= 5) dist[5 - r.rating]++; });
-    return { average: Math.round((sum / total) * 10) / 10, total, distribution: dist.reverse() };
+    return { average: Math.round((sum / total) * 10) / 10, total, distribution: dist };
   } catch (err) {
     console.error('Error computing review stats:', err);
     return { average: 0, total: 0, distribution: [0, 0, 0, 0, 0] };

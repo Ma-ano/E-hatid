@@ -17,8 +17,8 @@ interface AdminPageShellProps {
 const AdminPageShell: React.FC<AdminPageShellProps> = ({
   title, subtitle, search, loading, skeleton, children
 }) => (
-  <div className="page-container" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
-    <div style={{ padding: '0 16px', marginBottom: '16px' }}>
+  <div className="page-container py-6">
+    <div className="px-4 mb-4">
       <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
         {title}
       </h1>

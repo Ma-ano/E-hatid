@@ -74,7 +74,7 @@ const ReviewPage: React.FC = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
         <IonIcon icon={checkmarkCircle} className="text-5xl text-[#10B981] mb-4" />
         <h2 className="m-0 mb-2 text-xl font-bold text-[var(--ion-text-color)]">Thank you for your review!</h2>
-        <p className="m-0 mb-6 text-sm text-[var(--ion-text-color-secondary)]">Your feedback helps us improve</p>
+        <p className="m-0 mb-4 text-sm text-[var(--ion-text-color-secondary)]">Your feedback helps us improve</p>
         <IonButton style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px' }} onClick={() => history.push('/customer/orders')}>
           Back to Orders
         </IonButton>
@@ -83,12 +83,12 @@ const ReviewPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex-1 md:pt-8">
       <div className="page-container flex-1 pt-6 pb-10">
-        <h2 className="m-0 mb-6 text-2xl font-bold text-[var(--ion-text-color)] text-center">Leave a Review</h2>
+        <h2 className="m-0 mb-4 text-2xl font-bold text-[var(--ion-text-color)] text-center">Leave a Review</h2>
 
         {/* Order Summary */}
-        <div className="max-w-[360px] mx-auto mb-6 bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+        <div className="max-w-[360px] mx-auto mb-4 bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
           <div className="flex items-center gap-2 mb-2">
             <IonIcon icon={storefrontOutline} className="text-[var(--ion-color-primary)]" />
             <span className="font-semibold text-sm text-[var(--ion-text-color)]">{order.stallName || 'Stall'}</span>
@@ -99,7 +99,7 @@ const ReviewPage: React.FC = () => {
         </div>
 
         {/* Rate Vendor */}
-        <div className="max-w-[360px] mx-auto mb-6 bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+        <div className="max-w-[360px] mx-auto mb-4 bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
           <div className="flex items-center gap-2 mb-3">
             <IonIcon icon={storefrontOutline} className="text-[#8B5CF6]" />
             <p className="m-0 text-sm font-bold text-[var(--ion-text-color)]">Rate the Vendor</p>
@@ -130,7 +130,7 @@ const ReviewPage: React.FC = () => {
 
         {/* Rate Rider */}
         {order.riderId && (
-          <div className="max-w-[360px] mx-auto mb-6 bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
+          <div className="max-w-[360px] mx-auto mb-4 bg-[var(--ion-card-background)] rounded-2xl p-4 border border-[var(--ion-border-color)]">
             <div className="flex items-center gap-2 mb-3">
               <IonIcon icon={personOutline} className="text-[#10B981]" />
               <p className="m-0 text-sm font-bold text-[var(--ion-text-color)]">Rate the Rider</p>

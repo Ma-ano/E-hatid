@@ -24,8 +24,8 @@ const AdminRiders: React.FC = () => {
       title="Manage Riders"
       search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Search riders by name or email...' }}
     >
-      <div style={{ padding: '0 16px' }}>
-        <IonSegment value={filterStatus} onIonChange={e => setFilterStatus(e.detail.value as string)} style={{ marginBottom: '16px' }}>
+      <div className="px-4">
+        <IonSegment value={filterStatus} onIonChange={e => setFilterStatus(e.detail.value as string)} className="mb-4">
           <IonSegmentButton value="all"><IonLabel>All</IonLabel></IonSegmentButton>
           <IonSegmentButton value="online"><IonLabel>Online</IonLabel></IonSegmentButton>
           <IonSegmentButton value="offline"><IonLabel>Offline</IonLabel></IonSegmentButton>
@@ -33,16 +33,16 @@ const AdminRiders: React.FC = () => {
         </IonSegment>
       </div>
 
-      <div style={{ padding: '0 16px 16px' }}>
+      <div className="px-4 pb-4">
         {filteredRiders.length === 0 ? (
           <IonCard style={{ margin: 0, background: 'var(--ion-card-background)', textAlign: 'center', padding: '40px 20px' }}>
             <p style={{ color: 'var(--ion-text-color-secondary)' }}>No riders found</p>
           </IonCard>
         ) : (
           filteredRiders.map(rider => (
-            <IonCard key={rider.id} style={{ margin: '0 0 12px', background: 'var(--ion-card-background)' }}>
+            <IonCard key={rider.id} className="mb-4" style={{ margin: 0, background: 'var(--ion-card-background)' }}>
               <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                   <div style={{ flex: 1 }}>
                     <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>{rider.name}</h3>
                     <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>{rider.email}</p>
@@ -50,7 +50,7 @@ const AdminRiders: React.FC = () => {
                   <IonBadge style={{ '--background': getStatusColor(rider.status), color: 'white' }}>{rider.status}</IonBadge>
                 </div>
 
-                <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>
+                <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
                   {[
                     ['Phone', rider.phone], ['Vehicle', rider.vehicle], ['Plate', rider.licensePlate],
                     ['Deliveries', rider.totalDeliveries], ['Rating', `${rider.rating} ⭐`],
@@ -62,7 +62,7 @@ const AdminRiders: React.FC = () => {
                   ))}
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '16px' }}>
                   <IonButton fill="outline" size="small"
                     style={{ '--border-color': rider.isVerified ? '#EF4444' : '#10B981', '--color': rider.isVerified ? '#EF4444' : '#10B981', flex: 1 }}
                     onClick={() => toggleVerification(rider.id)}>

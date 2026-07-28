@@ -101,13 +101,18 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({
   };
 
   const content = (
-    <div className="overflow-hidden">
+    <div>
       <div className="relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden">
         <div
           className="w-full h-full bg-center bg-cover"
           style={{ backgroundImage: `url(${item.image})` }}
         >
           <div className="absolute inset-0 bg-black/40" />
+          {!item.available && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <span className="text-white font-bold text-lg sm:text-xl bg-red-500 px-4 py-2 rounded-full">Currently Unavailable</span>
+            </div>
+          )}
           <h2 className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white font-semibold text-lg sm:text-xl md:text-2xl drop-shadow-lg">
             {item.name}
           </h2>
@@ -218,12 +223,12 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({
           expand="block"
           size="large"
           className="min-h-[48px]"
-          style={{ '--border-radius': '8px', fontSize: '14px', fontWeight: 600 }}
-          disabled={!allRequiredFilled}
+          style={{ '--border-radius': '8px', fontSize: '14px', fontWeight: 600, '--background': item.available ? 'var(--ion-color-primary)' : '#9CA3AF' }}
+          disabled={!allRequiredFilled || !item.available}
           onClick={handleAddToCart}
         >
           <IonIcon icon={cartOutline} slot="start" className="mr-2" />
-          Add to Cart • ₱{totalPrice.toFixed(2)}
+          {item.available ? `Add to Cart • ₱${totalPrice.toFixed(2)}` : 'Currently Unavailable'}
         </IonButton>
       </div>
     </div>
@@ -256,10 +261,10 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({
       style={{ '--max-width': 'min(560px, 95vw)', '--max-height': '90vh', '--border-radius': '16px' } as any}
     >
       <IonHeader className="ion-no-border">
-        <IonToolbar style={{ '--background': 'transparent' }}>
+        <IonToolbar style={{ '--background': 'var(--ion-card-background)' }}>
           <IonButtons slot="end">
-            <IonButton onClick={onClose}>
-              <IonIcon icon={closeOutline} />
+            <IonButton onClick={onClose} className="min-h-[44px] min-w-[44px]">
+              <IonIcon icon={closeOutline} className="text-xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>

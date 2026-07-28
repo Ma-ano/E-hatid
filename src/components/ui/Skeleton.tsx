@@ -15,7 +15,7 @@ const Skeleton: React.FC<SkeletonProps> = ({ className = '', variant = 'text', w
 );
 
 const StallCardSkeleton: React.FC = () => (
-  <div className="rounded-2xl overflow-hidden bg-[var(--tw-card-background)] border border-[var(--tw-card-border)]">
+  <div className="rounded-2xl overflow-hidden bg-[var(--ion-card-background)] border border-[var(--ion-border-color)]">
     <div className="aspect-[4/3] skeleton-loader" />
     <div className="p-4 space-y-3">
       <div className="h-4 w-3/4 skeleton-loader rounded-lg" />

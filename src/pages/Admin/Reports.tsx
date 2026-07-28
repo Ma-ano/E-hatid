@@ -57,22 +57,22 @@ const AdminReports: React.FC = () => {
         title="Manage Reports"
         search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Search reports...' }}
       >
-        <div style={{ padding: '0 16px' }}>
-          <IonSegment value={filterStatus} onIonChange={e => setFilterStatus(e.detail.value as string)} scrollable style={{ marginBottom: '8px' }}>
+        <div className="px-4">
+          <IonSegment value={filterStatus} onIonChange={e => setFilterStatus(e.detail.value as string)} scrollable className="mb-4">
             <IonSegmentButton value="all"><IonLabel>All</IonLabel></IonSegmentButton>
             <IonSegmentButton value="open"><IonLabel>Open</IonLabel></IonSegmentButton>
             <IonSegmentButton value="under_review"><IonLabel>Review</IonLabel></IonSegmentButton>
             <IonSegmentButton value="resolved"><IonLabel>Resolved</IonLabel></IonSegmentButton>
             <IonSegmentButton value="rejected"><IonLabel>Rejected</IonLabel></IonSegmentButton>
           </IonSegment>
-          <IonSegment value={filterPriority} onIonChange={e => setFilterPriority(e.detail.value as string)} style={{ marginBottom: '16px' }}>
+          <IonSegment value={filterPriority} onIonChange={e => setFilterPriority(e.detail.value as string)} className="mb-4">
             <IonSegmentButton value="all"><IonLabel>All Priority</IonLabel></IonSegmentButton>
             <IonSegmentButton value="high"><IonLabel>🔥 High</IonLabel></IonSegmentButton>
             <IonSegmentButton value="medium"><IonLabel>⚡ Medium</IonLabel></IonSegmentButton>
             <IonSegmentButton value="low"><IonLabel>💤 Low</IonLabel></IonSegmentButton>
           </IonSegment>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
             <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
               <IonCardContent style={{ padding: '16px' }}>
                 <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Total Reports</p>
@@ -88,16 +88,16 @@ const AdminReports: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ padding: '0 16px 16px' }}>
+        <div className="px-4 pb-4">
           {filteredReports.length === 0 ? (
             <IonCard style={{ margin: 0, background: 'var(--ion-card-background)', textAlign: 'center', padding: '40px 20px' }}>
               <p style={{ color: 'var(--ion-text-color-secondary)' }}>No reports found</p>
             </IonCard>
           ) : (
             filteredReports.map(report => (
-              <IonCard key={report.id} className="cursor-pointer hover:shadow-lg transition-shadow duration-200" style={{ margin: '0 0 12px', background: 'var(--ion-card-background)' }} onClick={() => openDetails(report)}>
+              <IonCard key={report.id} className="cursor-pointer hover:shadow-lg transition-shadow duration-200 mb-4" style={{ margin: 0, background: 'var(--ion-card-background)' }} onClick={() => openDetails(report)}>
                 <IonCardContent style={{ padding: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <IonIcon icon={warningOutline} style={{ color: getPriorityColor(report.priority || 'low'), fontSize: '16px' }} />
@@ -144,7 +144,7 @@ const AdminReports: React.FC = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{ display: 'grid', gap: '16px', marginBottom: '16px' }}>
                     <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px' }}>
                       <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Description</p>
                       <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color)' }}>{selectedReport.description}</p>
@@ -174,7 +174,7 @@ const AdminReports: React.FC = () => {
 
                   <div style={{ padding: '16px', background: 'var(--ion-background-color)', borderRadius: '12px' }}>
                     <h4 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 700, color: 'var(--ion-text-color)' }}>Update Status</h4>
-                    <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0, marginBottom: '12px' }}>
+                    <IonItem style={{ '--background': 'transparent', '--padding-start': 0, '--inner-padding-end': 0, marginBottom: '16px' }}>
                       <IonSelect value={newStatus} onIonChange={e => setNewStatus(e.detail.value)} interface="popover" style={{ width: '100%' }}>
                         <IonSelectOption value="open">Open</IonSelectOption>
                         <IonSelectOption value="under_review">Under Review</IonSelectOption>
@@ -188,7 +188,7 @@ const AdminReports: React.FC = () => {
                       onIonChange={e => setResolution(e.detail.value!)}
                       placeholder="Add resolution notes..."
                       rows={3}
-                      style={{ marginBottom: '12px' }}
+                      className="mb-4"
                     />
                     <IonButton expand="block" onClick={saveResolution}>
                       <IonIcon slot="start" icon={shieldCheckmarkOutline} />

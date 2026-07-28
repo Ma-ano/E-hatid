@@ -1,269 +1,148 @@
-// src/pages/Rider/Earnings.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  IonCard,
-  IonCardContent,
-  IonBadge,
   IonIcon,
   IonSegment,
   IonSegmentButton,
   IonLabel,
   IonButton,
 } from '@ionic/react';
-import { cashOutline, trendingUpOutline, downloadOutline, calendarOutline } from 'ionicons/icons';
-import { useHistory } from 'react-router-dom';
+import { cashOutline, trendingUpOutline, downloadOutline } from 'ionicons/icons';
 
 import { useAuth } from '../../context/AuthContext';
+import { useRiderEarnings } from '../../hooks/useRiderEarnings';
+import RiderPageHeader from '../../components/Rider/RiderPageHeader';
+import EmptyState from '../../components/Rider/EmptyState';
 
 const RiderEarnings: React.FC = () => {
-  const history = useHistory();
-  const { logout } = useAuth();
-  const [selectedPeriod, setSelectedPeriod] = useState('today');
+  const { user } = useAuth();
+  const [selectedPeriod, setSelectedPeriod] = React.useState('today');
+  const earnings = useRiderEarnings(user?.id);
 
-  const earnings = { total: 0, trips: 0, average: 0 };
-  const weeklyEarnings: { day: string; amount: number; trips: number }[] = [];
-  const maxEarning = 1;
+  const periodTotal = selectedPeriod === 'today' ? earnings.todayTotal
+    : selectedPeriod === 'week' ? earnings.weekTotal
+    : earnings.monthTotal;
+
+  const periodTrips = selectedPeriod === 'today' ? earnings.todayTrips
+    : selectedPeriod === 'week' ? earnings.weekTrips
+    : earnings.monthTrips;
+
+  const avgPerTrip = periodTrips > 0 ? periodTotal / periodTrips : 0;
+  const maxEarning = Math.max(...earnings.weeklyBreakdown.map(d => d.amount), 1);
 
   return (
     <>
+      <div className="pb-2">
+        <RiderPageHeader title="Earnings" subtitle="Track your delivery income" />
+      </div>
 
-        {/* Rider Navigation */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px',
-          padding: '16px',
-          overflowX: 'auto',
-          background: 'var(--ion-card-background)',
-          borderBottomLeftRadius: '12px',
-          borderBottomRightRadius: '12px'
-        }}>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              border: '1px solid var(--ion-color-primary)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/dashboard')}
-          >
-            🏠 Home
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/orders')}
-          >
-            📦 Orders
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'var(--ion-color-primary)',
-              '--color': '#FFFFFF',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-          >
-            💰 Earnings
-          </IonButton>
-          <IonButton
-            expand="block"
-            style={{
-              '--background': 'transparent',
-              '--color': 'var(--ion-text-color)',
-              height: '40px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              flex: '1',
-              minWidth: '80px'
-            }}
-            onClick={() => history.push('/rider/profile')}
-          >
-            👤 Profile
-          </IonButton>
+      {/* Period Selection */}
+      <div className="pb-3">
+        <IonSegment
+          value={selectedPeriod}
+          onIonChange={e => setSelectedPeriod(e.detail.value as string)}
+          style={{ '--background': 'var(--ion-border-color)' }}
+        >
+          <IonSegmentButton value="today" style={{ '--color-checked': '#FFFFFF', '--border-radius': '12px', '--indicator-color': 'var(--ion-color-primary)' }}>
+            <IonLabel className="text-xs">Today</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="week" style={{ '--color-checked': '#FFFFFF', '--border-radius': '12px', '--indicator-color': 'var(--ion-color-primary)' }}>
+            <IonLabel className="text-xs">Week</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="month" style={{ '--color-checked': '#FFFFFF', '--border-radius': '12px', '--indicator-color': 'var(--ion-color-primary)' }}>
+            <IonLabel className="text-xs">Month</IonLabel>
+          </IonSegmentButton>
+        </IonSegment>
+      </div>
+
+      {/* Total Earnings Hero */}
+      <div className="pb-3">
+        <div className="rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg, #FF5A1F, #FF7A3D)' }}>
+          <p className="m-0 mb-2 text-sm text-white/90">Total Earnings</p>
+          <h2 className="m-0 text-4xl font-bold text-white">₱{periodTotal.toFixed(2)}</h2>
+          <p className="m-0 mt-3 text-xs text-white/80">
+            {periodTrips} trips · Avg: ₱{avgPerTrip.toFixed(2)}
+          </p>
         </div>
+      </div>
 
-        {/* Quick Access Menu */}
-        <div style={{
-          padding: '0 16px 16px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '10px'
-        }}>
-          <div 
-            onClick={() => history.push('/activities')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>📋</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Activity</p>
-          </div>
-          <div 
-            onClick={() => history.push('/messages')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>💬</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Messages</p>
-          </div>
-        </div>
-
-        {/* Period Selection */}
-        <div style={{ padding: '16px' }}>
-          <IonSegment 
-            value={selectedPeriod} 
-            onIonChange={e => setSelectedPeriod(e.detail.value as string)}
-            style={{ '--background': 'transparent' }}
-          >
-            <IonSegmentButton value="today" style={{ '--color-checked': '#FFFFFF', '--border-radius': '8px' }}>
-              <IonLabel style={{ fontSize: '12px' }}>Today</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="week" style={{ '--color-checked': '#FFFFFF', '--border-radius': '8px' }}>
-              <IonLabel style={{ fontSize: '12px' }}>Week</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="month" style={{ '--color-checked': '#FFFFFF', '--border-radius': '8px' }}>
-              <IonLabel style={{ fontSize: '12px' }}>Month</IonLabel>
-            </IonSegmentButton>
-          </IonSegment>
-        </div>
-
-        {/* Total Earnings Card */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)' }}>
-            <IonCardContent style={{ padding: '24px' }}>
-              <div style={{ textAlign: 'center', color: 'white' }}>
-                <p style={{ margin: '0 0 8px', fontSize: '14px', opacity: 0.9 }}>Total Earnings</p>
-                <h2 style={{ margin: 0, fontSize: '36px', fontWeight: 700 }}>₱{earnings.total.toFixed(2)}</h2>
-                <p style={{ margin: '12px 0 0', fontSize: '12px', opacity: 0.8 }}>
-                  {earnings.trips} trips • Avg: ₱{earnings.average.toFixed(2)}
-                </p>
+      {/* Stats Grid */}
+      <div className="pb-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)] p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(99, 102, 241, 0.1)' }}>
+                <IonIcon icon={cashOutline} className="text-xl" style={{ color: 'var(--ion-color-primary)' }} />
               </div>
-            </IonCardContent>
-          </IonCard>
-        </div>
+              <div>
+                <p className="m-0 text-xs text-[var(--ion-text-color-secondary)]">Trips</p>
+                <h4 className="m-0 mt-1 font-bold text-[var(--ion-text-color)]">{periodTrips}</h4>
+              </div>
+            </div>
+          </div>
 
-        {/* Stats Grid */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    background: 'rgba(99, 102, 241, 0.1)', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <IonIcon icon={cashOutline} style={{ fontSize: '20px', color: 'var(--ion-color-primary)' }} />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Trips</p>
-                    <h4 style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 700 }}>{earnings.trips}</h4>
-                  </div>
-                </div>
-              </IonCardContent>
-            </IonCard>
-
-            <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    background: 'rgba(16, 185, 129, 0.1)', 
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <IonIcon icon={trendingUpOutline} style={{ fontSize: '20px', color: '#10B981' }} />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Average</p>
-                    <h4 style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 700 }}>₱{earnings.average.toFixed(2)}</h4>
-                  </div>
-                </div>
-              </IonCardContent>
-            </IonCard>
+          <div className="rounded-xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)] p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+                <IonIcon icon={trendingUpOutline} className="text-xl" style={{ color: '#10B981' }} />
+              </div>
+              <div>
+                <p className="m-0 text-xs text-[var(--ion-text-color-secondary)]">Average</p>
+                <h4 className="m-0 mt-1 font-bold text-[var(--ion-text-color)]">₱{avgPerTrip.toFixed(2)}</h4>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Weekly Chart */}
-        {selectedPeriod !== 'month' && (
-          <div style={{ padding: '0 16px 16px' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-              Weekly Breakdown
-            </h3>
-            <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-              <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '150px', gap: '8px' }}>
-                  {weeklyEarnings.map((day, index) => (
-                    <div key={index} style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                      <div 
-                        style={{
-                          height: `${(day.amount / maxEarning) * 100}%`,
-                          background: 'linear-gradient(180deg, #FF5A1F 0%, #FF7A3D 100%)',
-                          borderRadius: '8px 8px 0 0',
-                          marginBottom: '8px',
-                          minHeight: '20px'
-                        }}
-                      />
-                      <p style={{ margin: 0, fontSize: '11px', color: 'var(--ion-text-color-secondary)' }}>{day.day}</p>
-                      <p style={{ margin: '2px 0 0', fontSize: '10px', color: 'var(--ion-text-color-secondary)' }}>₱{day.amount}</p>
-                    </div>
-                  ))}
-                </div>
-              </IonCardContent>
-            </IonCard>
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <IonButton 
-            expand="block" 
-            fill="outline"
-            style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)', margin: 0 }}
-          >
-            <IonIcon slot="start" icon={downloadOutline} />
-            Download Statement
-          </IonButton>
+      {/* Weekly Chart */}
+      {selectedPeriod !== 'month' && (
+        <div className="pb-3">
+          <h3 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide text-[var(--ion-text-color-secondary)]">
+            Weekly Breakdown
+          </h3>
+          {earnings.weeklyBreakdown.length === 0 || earnings.weekTotal === 0 ? (
+            <EmptyState
+              icon={cashOutline}
+              title="No earnings yet"
+              subtitle="Complete deliveries to see your weekly breakdown"
+            />
+          ) : (
+            <div className="rounded-xl border border-[var(--ion-border-color)] bg-[var(--ion-card-background)] p-4">
+              <div className="flex items-end justify-around h-[150px] gap-2">
+                {earnings.weeklyBreakdown.map((day, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center justify-end text-center">
+                    <div
+                      className="w-full rounded-t-lg transition-all"
+                      style={{
+                        height: `${Math.max((day.amount / maxEarning) * 100, 4)}%`,
+                        background: 'linear-gradient(180deg, #FF5A1F, #FF7A3D)',
+                        minHeight: 20,
+                      }}
+                    />
+                    <p className="m-0 mt-2 text-[11px] text-[var(--ion-text-color-secondary)]">{day.day}</p>
+                    <p className="m-0 mt-0.5 text-[10px] text-[var(--ion-text-color-secondary)]">₱{day.amount.toFixed(0)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+      )}
+
+      {/* Download Statement */}
+      <div className="pb-4">
+        <IonButton
+          expand="block"
+          fill="outline"
+          disabled
+          style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)', margin: 0 }}
+          title="Coming soon"
+        >
+          <IonIcon slot="start" icon={downloadOutline} />
+          Download Statement
+        </IonButton>
+        <p className="m-0 mt-1 text-center text-[10px] text-[var(--ion-text-color-secondary)]">Coming soon</p>
+      </div>
     </>
   );
 };

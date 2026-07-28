@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonButton,
   IonIcon,
-  IonItem,
-  IonLabel,
+  IonSpinner,
 } from '@ionic/react';
 import {
-  locationOutline, bicycleOutline, cashOutline,
+  locationOutline, bicycleOutline, cashOutline, storefrontOutline,
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import { db } from '../../firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
 
 import CartItem from '../../components/Cart/CartItem';
 
@@ -18,7 +15,9 @@ import { useCart } from '../../context/CartContext';
 import { useOrders } from '../../context/OrderContext';
 import { useAuth } from '../../context/AuthContext';
 import { fetchStallById } from '../../services/stallService';
-import type { Order } from '../../types';
+import { createOrder } from '../../services/orderService';
+import { getDeliveryFeeInfo } from '../../services/deliveryService';
+import type { Order, Stall } from '../../types';
 
 const UserCart: React.FC = () => {
   const history = useHistory();
@@ -26,16 +25,67 @@ const UserCart: React.FC = () => {
   const { addOrder } = useOrders();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [unavailableItems, setUnavailableItems] = useState<string[]>([]);
+  const [feeLoading, setFeeLoading] = useState(true);
+  const [deliveryFee, setDeliveryFee] = useState(0);
+  const [serviceFee] = useState(1.49);
+  const [rawDistance, setRawDistance] = useState<number | null>(null);
+  const [chargedDistance, setChargedDistance] = useState<number>(0);
+  const [stall, setStall] = useState<Stall | null>(null);
 
-  const deliveryFee = 2.99;
-  const serviceFee = 1.49;
+  useEffect(() => {
+    const calcFee = async () => {
+      if (items.length === 0) return;
+      setFeeLoading(true);
+      let fetched: Stall | null = null;
+      try {
+        const stallId = items[0]?.stallId || '';
+        fetched = stallId ? await fetchStallById(stallId) : null;
+        setStall(fetched);
+        const custLocation = sessionStorage.getItem('selectedLocation');
+        const sessionCoords = custLocation ? JSON.parse(custLocation) : null;
+        const custLat = sessionCoords?.lat ?? user?.latitude;
+        const custLng = sessionCoords?.lng ?? user?.longitude;
+        const info = await getDeliveryFeeInfo(
+          fetched?.latitude, fetched?.longitude,
+          custLat, custLng
+        );
+        setDeliveryFee(info.fare);
+        setRawDistance(info.distance_km);
+        setChargedDistance(info.final_km);
+      } catch { }
+      setFeeLoading(false);
+      if (fetched?.menu) {
+        const badItems = items.filter(cartItem => {
+          const menuItem = fetched.menu!.find(m => m.id === cartItem.menuItemId);
+          return !menuItem || menuItem.available === false;
+        });
+        setUnavailableItems(badItems.map(i => i.id));
+      }
+    };
+    calcFee();
+  }, [items]);
+
   const finalTotal = total + deliveryFee + serviceFee;
 
   const handlePayment = async () => {
     setLoading(true);
+    setOrderError(null);
     try {
       const stallId = items[0]?.stallId || '';
       const stall = stallId ? await fetchStallById(stallId) : null;
+      if (!stall) throw new Error('Stall not found');
+      if (stall.active === false) throw new Error('This stall is no longer accepting orders');
+      if (stall.menu) {
+        const badItems = items.filter(cartItem => {
+          const menuItem = stall.menu!.find(m => m.id === cartItem.menuItemId);
+          return !menuItem || menuItem.available === false;
+        });
+        if (badItems.length > 0) {
+          throw new Error(`Some items in your cart are no longer available: ${badItems.map(i => i.name).join(', ')}. Please remove them and try again.`);
+        }
+      }
       const orderData: Omit<Order, 'id'> = {
         userId: user?.id || '',
         stallId,
@@ -54,16 +104,25 @@ const UserCart: React.FC = () => {
           specialInstructions: item.specialInstructions,
         })),
         total: finalTotal,
+        deliveryFee,
+        distance: chargedDistance || undefined,
         status: 'pending',
         createdAt: new Date(),
         deliveryAddress: user?.address || 'Current Location',
+        customerLatitude: user?.latitude ?? undefined,
+        customerLongitude: user?.longitude ?? undefined,
+        stallLatitude: stall?.latitude ?? undefined,
+        stallLongitude: stall?.longitude ?? undefined,
       };
-      const docRef = await addDoc(collection(db, 'orders'), orderData);
-      const order: Order = { id: docRef.id, ...orderData };
-      addOrder(order);
-      clearCart();
-      history.push('/customer/order-tracking', { order });
+      const order = await createOrder(orderData);
+      if (order) {
+        addOrder(order);
+        clearCart();
+        history.push('/customer/order-tracking', { order });
+      }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to place order';
+      setOrderError(msg);
       console.error('Failed to place order:', err);
     } finally {
       setLoading(false);
@@ -74,16 +133,15 @@ const UserCart: React.FC = () => {
     <>
 
 
-        <div className="flex flex-col min-h-full">
-        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pb-10 sm:pb-16">
-          <div className="py-4 sm:py-5 md:py-6">
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-4 sm:px-6 pb-10 sm:pb-16 pt-4 sm:pt-6 md:pt-8">
+          <div className="pb-4 sm:pb-5">
             <h2 className="m-0 text-2xl xs:text-3xl sm:text-4xl font-bold text-[var(--ion-text-color)]">
               Your Cart
             </h2>
           </div>
 
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center flex-1 px-6 text-center">
+            <div className="flex flex-col items-center justify-center flex-1 px-6 text-center min-h-[65vh]">
               <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 rounded-full bg-[var(--ion-card-background)] border-2 border-[var(--ion-border-color)] flex items-center justify-center mb-6">
                 <IonIcon icon={bicycleOutline} className="text-4xl sm:text-5xl text-[var(--ion-color-primary)]" />
               </div>
@@ -110,14 +168,46 @@ const UserCart: React.FC = () => {
                 <IonButton fill="clear" className="shrink-0 min-h-[44px] text-sm" style={{ '--color': 'var(--ion-color-primary)' }} onClick={() => history.push('/customer/location')}>Change</IonButton>
               </div>
 
+              {stall && (
+                <div className="bg-[var(--ion-card-background)] mb-4 p-4 md:p-6 rounded-2xl border border-[var(--ion-border-color)]">
+                  <div className="flex items-center gap-3">
+                    {stall.logo && (
+                      <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-gray-100">
+                        <img src={stall.logo} alt={stall.name} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="m-0 mb-0.5 font-semibold text-sm sm:text-base text-[var(--ion-text-color)] truncate">{stall.name}</p>
+                      {stall.address && (
+                        <p className="m-0 text-xs text-[var(--ion-text-color-secondary)] truncate">
+                          <IonIcon icon={locationOutline} className="align-middle mr-1" />
+                          {stall.address}
+                        </p>
+                      )}
+                      {rawDistance != null && (
+                        <p className="m-0 mt-0.5 text-xs text-[var(--ion-color-primary)]">Distance: {rawDistance} km</p>
+                      )}
+                    </div>
+                    <IonIcon icon={storefrontOutline} className="text-xl sm:text-2xl text-[var(--ion-text-color-secondary)]/40" />
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-3 sm:space-y-4">
                 {items.map(item => (
-                  <CartItem
-                    key={item.id}
-                    item={item}
-                    onUpdateQuantity={(qty) => updateQuantity(item.id, qty)}
-                    onRemove={() => removeFromCart(item.id)}
-                  />
+                  <div key={item.id}>
+                    {unavailableItems.includes(item.id) && (
+                      <div className="mb-1 text-xs font-semibold text-red-500 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                        This item is no longer available
+                      </div>
+                    )}
+                    <CartItem
+                      item={item}
+                      onUpdateQuantity={(qty) => updateQuantity(item.id, qty)}
+                      onRemove={() => removeFromCart(item.id)}
+                    />
+                  </div>
                 ))}
               </div>
 
@@ -128,8 +218,11 @@ const UserCart: React.FC = () => {
                   <span>₱{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
-                  <span>Delivery Fee</span>
-                  <span>₱{deliveryFee.toFixed(2)}</span>
+                  <span className="flex flex-col">
+                    <span>Delivery Fee</span>
+                    {rawDistance != null && <span className="text-[10px] text-[var(--ion-text-color-secondary)]">{rawDistance} km → {chargedDistance} km charged</span>}
+                  </span>
+                  <span>{feeLoading ? <IonSpinner className="inline-block" style={{ width: 14, height: 14 }} /> : `₱${deliveryFee.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
                   <span>Service Fee</span>
@@ -152,6 +245,11 @@ const UserCart: React.FC = () => {
                 </p>
               </div>
 
+              {orderError && (
+                <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400 text-center">
+                  {orderError}
+                </div>
+              )}
               {items.length > 0 && (
                 <div className="mt-6 space-y-3">
                   {user?.emailVerified !== true && (
@@ -162,7 +260,7 @@ const UserCart: React.FC = () => {
                       <IonButton
                         size="small"
                         fill="outline"
-                        className="mt-2 min-h-[36px]"
+                        className="mt-2 min-h-[36px] w-full sm:w-auto"
                         style={{ '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)' }}
                         onClick={() => history.push('/verify-otp')}
                       >
@@ -188,7 +286,6 @@ const UserCart: React.FC = () => {
             </>
           )}
         </div>
-      </div>
     </>
   );
 };

@@ -13,13 +13,29 @@ import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebaseConfig';
 import { Order } from '../../types';
 
-const statusConfig: Record<string, { label: string; color: string }> = {
-  pending: { label: 'Pending', color: '#F59E0B' },
-  accepted: { label: 'Accepted', color: 'var(--ion-color-primary)' },
-  preparing: { label: 'Preparing', color: '#FF5A1F' },
-  ready: { label: 'Ready', color: '#10B981' },
-  delivered: { label: 'Delivered', color: '#6B7280' },
-  cancelled: { label: 'Cancelled', color: '#EF4444' },
+const STATUS_BADGE: Record<string, { color: string; label: string }> = {
+  pending: { color: '#F59E0B', label: 'Pending' },
+  accepted: { color: '#3B82F6', label: 'Accepted' },
+  preparing: { color: '#FF5A1F', label: 'Preparing' },
+  ready: { color: '#10B981', label: 'Ready' },
+  delivering: { color: '#8B5CF6', label: 'Delivering' },
+  delivered: { color: '#6B7280', label: 'Delivered' },
+  cancelled: { color: '#EF4444', label: 'Cancelled' },
+};
+
+const badgestyle = (status: string): React.CSSProperties => {
+  const c = STATUS_BADGE[status]?.color || '#9CA3AF';
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '3px 10px',
+    borderRadius: 9999,
+    fontSize: 11,
+    fontWeight: 600,
+    backgroundColor: c + '1A',
+    color: c,
+    border: '1px solid ' + c + '30',
+  };
 };
 
 const UserOrders: React.FC = () => {
@@ -53,12 +69,17 @@ const UserOrders: React.FC = () => {
         seen.add(o.id);
       }
     }
-    result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    result.sort((a, b) => {
+      const aActive = a.status !== 'delivered' && a.status !== 'cancelled';
+      const bActive = b.status !== 'delivered' && b.status !== 'cancelled';
+      if (aActive !== bActive) return aActive ? -1 : 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
     return result;
   }, [firestoreOrders, localOrders]);
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex-1 md:pt-8">
       <div className="page-container flex-1 flex flex-col pb-10">
         <div className="pt-5 pb-4">
           <h2 className="m-0 text-[28px] font-bold text-[var(--ion-text-color)]">
@@ -88,23 +109,17 @@ const UserOrders: React.FC = () => {
         ) : (
           <div>
             {mergedOrders.map(order => {
-              const status = statusConfig[order.status] || { label: order.status, color: '#6B7280' };
               return (
                 <div
                   key={order.id}
                   onClick={() => history.push('/customer/order-tracking', { order })}
-                  className="bg-[var(--ion-card-background)] p-4 rounded-xl border border-[var(--ion-border-color)] mb-3 cursor-pointer transition-transform duration-200"
+                  className="bg-[var(--ion-card-background)] p-4 rounded-xl border border-[var(--ion-border-color)] mb-4 cursor-pointer transition-transform duration-200"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-sm text-[var(--ion-text-color)]">
                       {order.id}
                     </span>
-                    <span style={{
-                      fontSize: '12px', fontWeight: 600, padding: '4px 10px',
-                      borderRadius: '20px', background: `${status.color}20`, color: status.color,
-                    }}>
-                      {status.label}
-                    </span>
+                    <span style={badgestyle(order.status)}>{STATUS_BADGE[order.status]?.label || order.status}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div>

@@ -6,13 +6,14 @@ import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { fetchOrdersByVendor, getEarningsStats } from '../../services/orderService';
 import { Order } from '../../types';
+import PageHeader from '../../components/ui/PageHeader';
 
 const VendorEarnings: React.FC = () => {
   const history = useHistory();
   const { logout, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [financeCards, setFinanceCards] = useState([
-    { icon: trendingUpOutline, label: 'Total Revenue', value: '₱0', change: '', color: '#8B5CF6' },
+    { icon: trendingUpOutline, label: 'Total Revenue', value: '₱0', change: '', color: 'var(--ion-color-primary)' },
     { icon: cashOutline, label: 'This Month', value: '₱0', change: '', color: '#10B981' },
     { icon: cardOutline, label: 'Pending Payout', value: '₱0', change: '', color: '#F59E0B' },
     { icon: walletOutline, label: 'Available Balance', value: '₱0', change: '', color: 'var(--ion-color-primary)' },
@@ -25,7 +26,7 @@ const VendorEarnings: React.FC = () => {
       try {
         const stats = await getEarningsStats(user.id);
         setFinanceCards([
-          { icon: trendingUpOutline, label: 'Total Revenue', value: `₱${stats.totalRevenue.toLocaleString()}`, change: '', color: '#8B5CF6' },
+          { icon: trendingUpOutline, label: 'Total Revenue', value: `₱${stats.totalRevenue.toLocaleString()}`, change: '', color: 'var(--ion-color-primary)' },
           { icon: cashOutline, label: 'This Month', value: `₱${stats.thisMonthRevenue.toLocaleString()}`, change: '', color: '#10B981' },
           { icon: cardOutline, label: 'Pending Payout', value: `₱${stats.pendingPayout.toLocaleString()}`, change: '', color: '#F59E0B' },
           { icon: walletOutline, label: 'Available Balance', value: `₱${stats.pendingPayout.toLocaleString()}`, change: '', color: 'var(--ion-color-primary)' },
@@ -45,10 +46,7 @@ const VendorEarnings: React.FC = () => {
     <>
 
         <div className="p-4">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[var(--tw-text-color)]">Earnings</h1>
-            <p className="text-sm text-[var(--tw-text-secondary)] mt-1">Track your revenue and payouts</p>
-          </div>
+          <PageHeader title="Earnings" subtitle="Track your revenue and payouts" />
 
           {loading ? (
             <div className="text-center p-12"><IonSpinner name="crescent" /></div>
@@ -63,8 +61,8 @@ const VendorEarnings: React.FC = () => {
                           <IonIcon icon={card.icon} className="text-2xl" style={{ color: card.color }} />
                         </div>
                         <div>
-                          <p className="m-0 mb-1 text-xs font-medium text-[var(--tw-text-secondary)]">{card.label}</p>
-                          <h3 className="m-0 text-xl font-bold text-[var(--tw-text-color)]">{card.value}</h3>
+                          <p className="m-0 mb-1 text-xs font-medium text-[var(--ion-text-color-secondary)]">{card.label}</p>
+                          <h3 className="m-0 text-xl font-bold text-[var(--ion-text-color)]">{card.value}</h3>
                         </div>
                       </div>
                     </IonCardContent>
@@ -72,23 +70,23 @@ const VendorEarnings: React.FC = () => {
                 ))}
               </div>
 
-              <div className="mt-8">
-                <h3 className="m-0 mb-4 text-lg font-bold text-[var(--tw-text-color)]">Transaction History</h3>
+              <div className="mt-4">
+                <h3 className="m-0 mb-4 text-lg font-bold text-[var(--ion-text-color)]">Transaction History</h3>
                 {transactions.length === 0 ? (
-                  <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">No transactions yet</p></IonCardContent></IonCard>
+                  <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--ion-text-color-secondary)] m-0">No transactions yet</p></IonCardContent></IonCard>
                 ) : (
                   <IonCard className="rounded-xl shadow">
-                    <div className="grid grid-cols-4 gap-4 p-4 bg-[var(--tw-light)] font-semibold text-sm text-[var(--tw-text-secondary)]">
+                    <div className="grid grid-cols-4 gap-4 p-4 bg-[var(--ion-color-light)] font-semibold text-sm text-[var(--ion-text-color-secondary)]">
                       <span>Order</span>
                       <span>Customer</span>
                       <span>Amount</span>
                       <span>Status</span>
                     </div>
                     {transactions.map((txn, i) => (
-                      <div key={i} className="grid grid-cols-4 gap-4 p-4 text-sm text-[var(--tw-text-color)] border-t border-[var(--tw-border-color)]">
-                        <span className="font-semibold text-[#8B5CF6]">#{txn.id.slice(-5)}</span>
+                      <div key={i} className="grid grid-cols-4 gap-4 p-4 text-sm text-[var(--ion-text-color)] border-t border-[var(--ion-border-color)]">
+                        <span className="font-semibold text-[var(--ion-color-primary)]">#{txn.id.slice(-5)}</span>
                         <span>{txn.customerName || 'Unknown'}</span>
-                        <span className="font-semibold">₱{txn.total}</span>
+                        <span className="font-semibold">₱{txn.total.toFixed(2)}</span>
                         <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full w-fit ${
                           txn.status === 'delivered' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
                           'bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)]'

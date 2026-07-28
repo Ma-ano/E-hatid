@@ -61,8 +61,8 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <AdminPageShell title="Admin Dashboard" subtitle="Welcome back, Administrator">
-      <div style={{ padding: '0 16px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div className="px-4 pb-4">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {statCards.map((card, i) => (
             <AdminStatCard key={i} {...card} />
           ))}
@@ -70,10 +70,10 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {user?.isMasterAdmin && (
-        <div style={{ padding: '0 16px 16px' }}>
+        <div className="px-4 pb-4">
           <IonCard style={{ margin: 0, background: 'var(--ion-card-background)', border: '1px solid #EF444440' }}>
             <IonCardContent style={{ padding: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
                 <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#EF444420', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <IonIcon icon={shieldCheckmarkOutline} style={{ fontSize: '20px', color: '#EF4444' }} />
                 </div>
@@ -93,13 +93,13 @@ const AdminDashboard: React.FC = () => {
       )}
 
       {pendingUsers.length > 0 && (
-        <div style={{ padding: '0 16px 16px' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
+        <div className="px-4 pb-4">
+          <h3 className="mb-4" style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
             Pending Approvals ({pendingUsers.length})
           </h3>
           <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
             <IonCardContent style={{ padding: '12px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {pendingUsers.map(u => {
                   const pendingRoles = Object.entries(u.roleStatus || {}).filter(([, s]) => s === 'pending').map(([r]) => r);
                   return (
@@ -133,15 +133,16 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      <div style={{ padding: '0 16px 16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      <div className="px-4 pb-4">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>Quick Actions</h3>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <button onClick={() => history.push('/admin/users')} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--ion-border-color)', background: 'var(--ion-card-background)', color: 'var(--ion-text-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>Manage Users</button>
           <button onClick={() => history.push('/admin/orders')} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--ion-border-color)', background: 'var(--ion-card-background)', color: 'var(--ion-text-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>View Orders</button>
           <button onClick={() => history.push('/admin/reports')} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--ion-border-color)', background: 'var(--ion-card-background)', color: 'var(--ion-text-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>View Reports</button>
           <button onClick={() => history.push('/admin/users')} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--ion-border-color)', background: 'var(--ion-card-background)', color: 'var(--ion-text-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>Manage Riders</button>
+          <button onClick={() => history.push('/admin/delivery-config')} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--ion-border-color)', background: 'var(--ion-card-background)', color: 'var(--ion-text-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>Delivery Config</button>
         </div>
       </div>
     </AdminPageShell>

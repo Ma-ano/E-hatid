@@ -85,10 +85,14 @@ const LocationPicker: React.FC = () => {
   const history = useHistory();
   const { user, updateUserProfile } = useAuth();
   const { itemCount } = useCart();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(user?.address || '');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Suggestion | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(
+    user?.latitude != null && user?.longitude != null
+      ? { lat: user.latitude, lng: user.longitude }
+      : null
+  );
   const [fetching, setFetching] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const geocodeRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -164,7 +168,11 @@ const LocationPicker: React.FC = () => {
     sessionStorage.setItem('selectedLocation', JSON.stringify(selectedLocation));
     sessionStorage.setItem('locationName', selectedAddress.display);
     if (user) {
-      await updateUserProfile({ address: selectedAddress.display }).catch(() => {});
+      await updateUserProfile({
+        address: selectedAddress.display,
+        latitude: selectedLocation.lat,
+        longitude: selectedLocation.lng,
+      }).catch(() => {});
     }
     history.goBack();
   };
@@ -173,7 +181,7 @@ const LocationPicker: React.FC = () => {
     <>
 
 
-        <div className="flex flex-col min-h-full">
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex-1 md:pt-8">
         <div className="flex-1 max-w-2xl mx-auto w-full px-3 sm:px-4 md:px-6 pt-4 sm:pt-6 pb-6 sm:pb-8">
           {/* Map */}
           <div className="w-full h-[35vh] sm:h-[40vh] md:h-[45vh] rounded-2xl overflow-hidden mb-4 border border-[var(--ion-border-color)]">
@@ -232,7 +240,7 @@ const LocationPicker: React.FC = () => {
 
           {/* Selected Address Display */}
           {selectedAddress && (
-            <div className="bg-[var(--ion-card-background)] p-4 md:p-6 rounded-2xl border border-[var(--ion-border-color)] mb-6">
+            <div className="bg-[var(--ion-card-background)] p-4 md:p-6 rounded-2xl border border-[var(--ion-border-color)] mb-4">
               <div className="flex gap-3">
                 <IonIcon icon={locationOutline} className="text-[var(--ion-color-primary)] text-lg shrink-0 mt-0.5" />
                 <div className="min-w-0">

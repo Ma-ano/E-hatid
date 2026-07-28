@@ -7,9 +7,10 @@ import {
   appsOutline, apps,
   fastFoodOutline, fastFood,
   starOutline, star,
-  settingsOutline, settings,
+
   peopleOutline, people,
   barChartOutline, barChart,
+  bicycleOutline,
 } from 'ionicons/icons';
 
 export interface NavItem {
@@ -39,13 +40,14 @@ export const navItemsByRole: Record<string, NavItem[]> = {
     { label: 'Orders', path: '/vendor/orders', icon: documentTextOutline, activeIcon: documentText },
     { label: 'Earnings', path: '/vendor/earnings', icon: cashOutline, activeIcon: cash },
     { label: 'Reviews', path: '/vendor/reviews', icon: starOutline, activeIcon: star },
-    { label: 'Profile', path: '/vendor/settings', icon: settingsOutline, activeIcon: settings },
+    { label: 'Profile', path: '/vendor/profile', icon: personOutline, activeIcon: person },
   ],
   admin: [
     { label: 'Home', path: '/admin/dashboard', icon: appsOutline, activeIcon: apps },
     { label: 'Users', path: '/admin/users', icon: peopleOutline, activeIcon: people },
     { label: 'Orders', path: '/admin/orders', icon: documentTextOutline, activeIcon: documentText },
     { label: 'Reports', path: '/admin/reports', icon: barChartOutline, activeIcon: barChart },
+    { label: 'Delivery', path: '/admin/delivery-config', icon: bicycleOutline, activeIcon: bicycleOutline },
   ],
 };
 

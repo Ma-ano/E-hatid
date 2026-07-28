@@ -4,11 +4,27 @@ import {
   IonButton,
   IonIcon,
 } from '@ionic/react';
-import { personOutline, mailOutline, callOutline, locationOutline, logOutOutline, cameraOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
+import { personOutline, mailOutline, callOutline, locationOutline, logOutOutline, cameraOutline, checkmarkCircleOutline, closeCircleOutline, swapHorizontalOutline, checkmarkCircle, time, closeCircle, searchOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+
+function MapFixer() {
+  const map = useMap();
+  useEffect(() => { setTimeout(() => map.invalidateSize(), 100); }, [map]);
+  return null;
+}
+
+const profileMarkerIcon = L.divIcon({
+  className: '',
+  html: '<div style="background:var(--ion-color-primary);width:24px;height:24px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
+});
 
 const COUNTRY_CODES = [
   { code: '+63', label: 'PH +63' },
@@ -47,7 +63,7 @@ const formatPhone = (digits: string, code: string) => {
 };
 
 const UserProfile: React.FC = () => {
-  const { user, updateUserProfile, logout } = useAuth();
+  const { user, updateUserProfile, logout, roles, activeRole, setActiveRole, refreshUser } = useAuth();
   const { itemCount } = useCart();
   const history = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,13 +84,12 @@ const UserProfile: React.FC = () => {
   const [phoneError, setPhoneError] = useState(
     currentNumber && currentNumber.length < 7 ? 'Phone must be at least 7 digits' : currentNumber === '' ? 'Phone is required' : ''
   );
-  const [address, setAddress] = useState(user?.address || '');
+  const [address] = useState(user?.address || '');
   const [age, setAge] = useState(user?.age?.toString() || '');
 
   useEffect(() => {
     setName(user?.name || '');
     setEmail(user?.email || '');
-    setAddress(user?.address || '');
     setAge(user?.age?.toString() || '');
     setEmailError(user?.email && !isValidEmail(user.email) ? 'Invalid email address' : '');
     const phone = user?.phone || '+63';
@@ -86,6 +101,10 @@ const UserProfile: React.FC = () => {
       digits && digits.length < 7 ? 'Phone must be at least 7 digits' : digits === '' ? 'Phone is required' : ''
     );
   }, [user]);
+
+  useEffect(() => {
+    refreshUser();
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -102,7 +121,6 @@ const UserProfile: React.FC = () => {
       name,
       email,
       phone: `${countryCode}${phoneNumber.replace(/\s/g, '')}`,
-      address,
       age: age ? Number(age) : undefined,
     });
     history.push('/customer/home');
@@ -111,9 +129,9 @@ const UserProfile: React.FC = () => {
   return (
     <>
 
-        <div className="page-container max-w-3xl mx-auto pt-6 pb-6">
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex-1 md:pt-8">
           {/* Avatar */}
-          <div className="text-center mb-8 pt-4">
+          <div className="text-center mb-4 pt-4">
             <div
               onClick={() => fileInputRef.current?.click()}
               className="w-[88px] h-[88px] rounded-full mx-auto mb-4 cursor-pointer relative overflow-hidden bg-[var(--ion-color-primary)] flex items-center justify-center"
@@ -143,7 +161,7 @@ const UserProfile: React.FC = () => {
           </div>
 
           {/* Contact Info */}
-          <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-6 border border-[var(--ion-border-color)]">
+          <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-4 border border-[var(--ion-border-color)]">
             <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">
               Contact Information
             </h3>
@@ -181,10 +199,49 @@ const UserProfile: React.FC = () => {
                 <IonIcon icon={locationOutline} className="mr-2 text-[var(--ion-color-primary)]" />
                 <span className="text-xs text-[var(--ion-text-color-secondary)]">Delivery Address</span>
               </div>
-              <input type="text" value={address} onChange={e => setAddress(e.target.value)}
-                placeholder="Enter your delivery address"
-                className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
-              />
+              <p className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm m-0">
+                {user?.address || 'No address set'}
+              </p>
+            </div>
+
+            {/* Delivery Location */}
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <IonIcon icon={locationOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+                <span className="text-xs text-[var(--ion-text-color-secondary)]">Delivery Location</span>
+              </div>
+              {user?.latitude != null && user?.longitude != null && (
+                <p className="text-xs text-[var(--ion-color-primary)] mb-2">📍 {user.latitude.toFixed(6)}, {user.longitude.toFixed(6)}</p>
+              )}
+              <div className="w-full h-[200px] rounded-lg overflow-hidden border border-[var(--ion-border-color)]" style={{ position: 'relative', isolation: 'isolate' }}>
+                <MapContainer
+                  center={[user?.latitude || 14.5995, user?.longitude || 120.9842]}
+                  zoom={15}
+                  style={{ width: '100%', height: '100%' }}
+                  zoomControl={false}
+                  dragging={false}
+                  scrollWheelZoom={false}
+                  touchZoom={false}
+                  doubleClickZoom={false}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  {user?.latitude != null && user?.longitude != null && (
+                    <Marker position={[user.latitude, user.longitude]} icon={profileMarkerIcon} />
+                  )}
+                  <MapFixer />
+                </MapContainer>
+              </div>
+              <IonButton
+                expand="block"
+                className="mt-3 h-12 text-base font-semibold"
+                style={{ '--border-radius': '8px' }}
+                onClick={() => history.push('/customer/location')}
+              >
+                Edit Address
+              </IonButton>
             </div>
 
             {/* Age */}
@@ -231,6 +288,46 @@ const UserProfile: React.FC = () => {
           >
             Save Changes
           </IonButton>
+
+          {/* Switch Role */}
+          <div className="md:hidden w-full mb-4">
+            {roles.length > 1 && (
+              <div className="bg-[var(--ion-card-background)] rounded-xl p-4 border border-[var(--ion-border-color)]">
+                <div className="flex items-center gap-2 mb-2">
+                  <IonIcon icon={swapHorizontalOutline} className="text-[var(--ion-color-primary)] text-base" />
+                  <h3 className="text-sm font-semibold text-[var(--ion-text-color)] m-0 uppercase opacity-70">Switch Role</h3>
+                </div>
+                <div className="space-y-2">
+                  {roles.map(role => {
+                    const st = role === 'customer' ? (user?.emailVerified ? 'approved' : 'pending') : (user?.roleStatus?.[role] || 'pending');
+                    const disabled = st === 'pending' || st === 'rejected';
+                    const active = role === activeRole;
+                    const stIcon = st === 'approved' ? checkmarkCircle : st === 'rejected' ? closeCircle : time;
+                    const stColor = st === 'approved' ? '#10B981' : st === 'rejected' ? '#EF4444' : '#F59E0B';
+                    return (
+                      <button
+                        key={role}
+                        disabled={disabled}
+                        onClick={() => { setActiveRole(role); }}
+                        className={`w-full flex items-center gap-3 px-5 py-3.5 rounded-lg transition-colors text-sm ${
+                          active ? 'bg-[var(--ion-color-primary)]/10' : 'hover:bg-[var(--ion-border-color)]/30'
+                        } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        <span className="flex-1 text-left font-medium capitalize text-[var(--ion-text-color)]">{role}</span>
+                        <div className="flex items-center gap-2">
+                          {active && (
+                            <span className="text-[10px] font-semibold text-white bg-[var(--ion-color-primary)] px-2 py-0.5 rounded-full">Active</span>
+                          )}
+                          <IonIcon icon={stIcon} style={{ fontSize: '14px', color: stColor }} />
+                          <span className="text-xs capitalize text-[var(--ion-text-color-secondary)]">{st}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Sign Out */}
           <IonButton expand="block" color="danger" className="md:hidden h-12 text-base font-semibold" onClick={() => { logout(); history.push('/guest/home'); }}

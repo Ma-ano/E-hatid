@@ -26,17 +26,17 @@ const AppFooter: React.FC = () => {
   const { isDarkMode } = useTheme();
 
   return (
-    <footer className="bg-[var(--tw-card-background)] border-t border-[var(--tw-border-color)] py-8 sm:py-12 mt-auto">
+    <footer className="hidden md:block bg-[var(--ion-card-background)] border-t border-[var(--ion-border-color)] py-8 sm:py-12 mt-auto">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 mb-8 sm:mb-10">
           {/* Brand */}
           <div className="space-y-3 sm:space-y-4">
             <img
-              src={isDarkMode ? '/Logo/E-hatid-dark-mode.png' : '/Logo/E-hatid-light-mode.png'}
+              src={isDarkMode ? '/Logo/Logo-dark-mode.png' : '/Logo/Logo-light-mode.png'}
               alt="E-Hatid"
               className="h-8 sm:h-9 object-contain"
             />
-            <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)] leading-relaxed max-w-xs">
+            <p className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)] leading-relaxed max-w-xs">
               Your favorite food, delivered fast. Order from the best local restaurants and stalls near you.
             </p>
             <div className="flex gap-2 pt-1">
@@ -47,7 +47,7 @@ const AppFooter: React.FC = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-9 h-9 rounded-lg bg-[var(--tw-light)] hover:bg-[var(--ion-color-primary)]/10 hover:text-[var(--ion-color-primary)] transition-colors flex items-center justify-center text-[var(--tw-text-secondary)]"
+                  className="w-9 h-9 rounded-lg bg-[var(--ion-color-light)] hover:bg-[var(--ion-color-primary)]/10 hover:text-[var(--ion-color-primary)] transition-colors flex items-center justify-center text-[var(--ion-text-color-secondary)]"
                 >
                   <IonIcon icon={social.icon} className="text-lg" />
                 </a>
@@ -57,13 +57,13 @@ const AppFooter: React.FC = () => {
 
           {/* Quick Links */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-sm sm:text-base font-bold text-[var(--tw-text-color)]">Quick Links</h3>
+            <h3 className="text-sm sm:text-base font-bold text-[var(--ion-text-color)]">Quick Links</h3>
             <ul className="space-y-2 sm:space-y-2.5">
               {quickLinks.map(link => (
                 <li key={link.label}>
                   <button
                     onClick={() => history.push(link.path)}
-                    className="text-xs sm:text-sm text-[var(--tw-text-secondary)] hover:text-[var(--ion-color-primary)] transition-colors min-h-[36px] text-left"
+                    className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)] hover:text-[var(--ion-color-primary)] transition-colors min-h-[36px] text-left"
                   >
                     {link.label}
                   </button>
@@ -74,13 +74,13 @@ const AppFooter: React.FC = () => {
 
           {/* Support */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-sm sm:text-base font-bold text-[var(--tw-text-color)]">Support</h3>
+            <h3 className="text-sm sm:text-base font-bold text-[var(--ion-text-color)]">Support</h3>
             <ul className="space-y-2 sm:space-y-2.5">
               {supportLinks.map(link => (
                 <li key={link.label}>
                   <button
                     onClick={() => history.push(link.path)}
-                    className="text-xs sm:text-sm text-[var(--tw-text-secondary)] hover:text-[var(--ion-color-primary)] transition-colors min-h-[36px] text-left"
+                    className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)] hover:text-[var(--ion-color-primary)] transition-colors min-h-[36px] text-left"
                   >
                     {link.label}
                   </button>
@@ -90,8 +90,8 @@ const AppFooter: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-[var(--tw-border-color)] pt-5 sm:pt-6">
-          <span className="text-[10px] sm:text-xs text-[var(--tw-text-secondary)] block text-center">
+        <div className="border-t border-[var(--ion-border-color)] pt-5 sm:pt-6">
+          <span className="text-[10px] sm:text-xs text-[var(--ion-text-color-secondary)] block text-center">
             &copy; {new Date().getFullYear()} E-Hatid. All rights reserved.
           </span>
         </div>

@@ -1,8 +1,10 @@
 import React, { Suspense, lazy } from 'react';
-import { IonApp, IonRouterOutlet, IonSpinner, IonPage, IonContent, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, IonPage, IonContent, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { AppLayout, RoleLayout } from './layouts';
+import { useAuth } from './context/AuthContext';
+import DeliveryLoader from './components/DeliveryLoader';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -34,10 +36,13 @@ const RiderDashboard = lazy(() => import('./pages/Rider/Dashboard'));
 const RiderOrders = lazy(() => import('./pages/Rider/Orders'));
 const RiderEarnings = lazy(() => import('./pages/Rider/Earnings'));
 const RiderProfile = lazy(() => import('./pages/Rider/Profile'));
+const RiderDelivery = lazy(() => import('./pages/Rider/Delivery'));
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
 const AdminUsers = lazy(() => import('./pages/Admin/Users'));
 const AdminOrders = lazy(() => import('./pages/Admin/Orders'));
 const AdminReports = lazy(() => import('./pages/Admin/Reports'));
+const AdminDeliveryConfig = lazy(() => import('./pages/Admin/DeliveryConfig'));
+
 const VendorApply = lazy(() => import('./pages/apply/ApplyVendor'));
 const RiderApply = lazy(() => import('./pages/apply/ApplyRider'));
 const VendorDashboard = lazy(() => import('./pages/Vendor/VendorDashboard'));
@@ -45,9 +50,9 @@ const VendorProducts = lazy(() => import('./pages/Vendor/VendorProducts'));
 const VendorOrders = lazy(() => import('./pages/Vendor/VendorOrders'));
 const VendorEarnings = lazy(() => import('./pages/Vendor/VendorEarnings'));
 const VendorReviews = lazy(() => import('./pages/Vendor/VendorReviews'));
-const VendorSettings = lazy(() => import('./pages/Vendor/VendorSettings'));
+const VendorProfile = lazy(() => import('./pages/Vendor/VendorProfile'));
+const VendorLocationPicker = lazy(() => import('./pages/Vendor/VendorLocationPicker'));
 const ActivityLog = lazy(() => import('./pages/Activities/ActivityLog'));
-const Messages = lazy(() => import('./pages/Messages/Messages'));
 const ReportIncident = lazy(() => import('./pages/Reports/ReportIncident'));
 const RoleSelection = lazy(() => import('./pages/Auth/RoleSelection'));
 const EmailVerification = lazy(() => import('./pages/Auth/EmailVerification'));
@@ -62,26 +67,18 @@ setupIonicReact({
   animated: false,
 });
 
-const PageLoader: React.FC = () => (
-  <IonPage>
-    <IonContent className="ion-content-center">
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--ion-color-primary)]/10 flex items-center justify-center">
-          <IonSpinner name="crescent" className="text-[var(--ion-color-primary)]" />
-        </div>
-      </div>
-    </IonContent>
-  </IonPage>
-);
-
 const L: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AppLayout><RoleLayout>{children}</RoleLayout></AppLayout>
 );
 
-const App: React.FC = () => (
+const App: React.FC = () => {
+  const { authLoading } = useAuth();
+  if (authLoading) return <DeliveryLoader />;
+
+  return (
   <IonApp>
     <IonReactRouter>
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<DeliveryLoader />}>
         <IonRouterOutlet>
           {/* Landing - standalone, no layout wrapper */}
           <Route exact path="/">
@@ -103,10 +100,10 @@ const App: React.FC = () => (
             <L><GuestLocationPicker /></L>
           </ProtectedRoute>
 
-          {/* Stall Detail (public) */}
-          <Route exact path="/stall/:id/menu">
+          {/* Stall Detail (guest + customer only) */}
+          <ProtectedRoute exact path="/stall/:id/menu" requireAuth={false} requiredRole="customer">
             <L><StallDetail /></L>
-          </Route>
+          </ProtectedRoute>
 
           {/* Customer Routes */}
           <ProtectedRoute exact path="/customer/home" requiredRole="customer">
@@ -175,6 +172,9 @@ const App: React.FC = () => (
           <ProtectedRoute exact path="/rider/profile" requiredRole="rider">
             <L><RiderProfile /></L>
           </ProtectedRoute>
+          <ProtectedRoute exact path="/rider/delivery/:id" requiredRole="rider">
+            <L><RiderDelivery /></L>
+          </ProtectedRoute>
 
           {/* Admin Routes */}
           <ProtectedRoute exact path="/admin/dashboard" requiredRole="admin">
@@ -189,7 +189,9 @@ const App: React.FC = () => (
           <ProtectedRoute exact path="/admin/reports" requiredRole="admin">
             <L><AdminReports /></L>
           </ProtectedRoute>
-
+          <ProtectedRoute exact path="/admin/delivery-config" requiredRole="admin">
+            <L><AdminDeliveryConfig /></L>
+          </ProtectedRoute>
           {/* Vendor Routes */}
           <ProtectedRoute exact path="/vendor/dashboard" requiredRole="vendor">
             <L><VendorDashboard /></L>
@@ -206,16 +208,16 @@ const App: React.FC = () => (
           <ProtectedRoute exact path="/vendor/reviews" requiredRole="vendor">
             <L><VendorReviews /></L>
           </ProtectedRoute>
-          <ProtectedRoute exact path="/vendor/settings" requiredRole="vendor">
-            <L><VendorSettings /></L>
+          <ProtectedRoute exact path="/vendor/profile" requiredRole="vendor">
+            <L><VendorProfile /></L>
+          </ProtectedRoute>
+          <ProtectedRoute exact path="/vendor/location" requiredRole="vendor">
+            <L><VendorLocationPicker /></L>
           </ProtectedRoute>
 
-          {/* Activity & Messages Routes */}
+          {/* Activity Routes */}
           <ProtectedRoute exact path="/activities" requireAuth={true}>
             <L><ActivityLog /></L>
-          </ProtectedRoute>
-          <ProtectedRoute exact path="/messages" requireAuth={true}>
-            <L><Messages /></L>
           </ProtectedRoute>
 
           {/* Report Routes */}
@@ -230,6 +232,7 @@ const App: React.FC = () => (
       <StorageConsent />
     </IonReactRouter>
   </IonApp>
-);
+  );
+};
 
 export default App;

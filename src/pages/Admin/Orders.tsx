@@ -31,8 +31,8 @@ const AdminOrders: React.FC = () => {
       title="Manage Orders"
       search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Search by stall, customer, or order ID...' }}
     >
-      <div style={{ padding: '0 16px' }}>
-        <IonSegment value={filterStatus} onIonChange={e => setFilterStatus(e.detail.value as string)} scrollable style={{ marginBottom: '16px' }}>
+      <div className="px-4">
+        <IonSegment value={filterStatus} onIonChange={e => setFilterStatus(e.detail.value as string)} scrollable className="mb-4">
           <IonSegmentButton value="all"><IonLabel>All</IonLabel></IonSegmentButton>
           {statusList.map(s => (
             <IonSegmentButton key={s} value={s}><IonLabel>{s.charAt(0).toUpperCase() + s.slice(1)}</IonLabel></IonSegmentButton>
@@ -40,8 +40,8 @@ const AdminOrders: React.FC = () => {
         </IonSegment>
       </div>
 
-      <div style={{ padding: '0 16px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+      <div className="px-4 pb-4">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
             <IonCardContent style={{ padding: '16px' }}>
               <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Total Orders</p>
@@ -62,9 +62,9 @@ const AdminOrders: React.FC = () => {
           </IonCard>
         ) : (
           filteredOrders.map(order => (
-            <IonCard key={order.id} style={{ margin: '0 0 12px', background: 'var(--ion-card-background)' }}>
+            <IonCard key={order.id} style={{ margin: '0 0 16px', background: 'var(--ion-card-background)' }}>
               <IonCardContent style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                   <div>
                     <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>{order.stallName}</h3>
                     <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>by {order.customerName}</p>
@@ -72,7 +72,7 @@ const AdminOrders: React.FC = () => {
                   <IonBadge style={{ '--background': getStatusColor(order.status), color: 'white' }}>{order.status}</IonBadge>
                 </div>
 
-                <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>
+                <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <span style={{ color: 'var(--ion-text-color-secondary)' }}>Order ID:</span>
                     <span style={{ color: 'var(--ion-text-color)', fontWeight: 600 }}>#{order.id}</span>

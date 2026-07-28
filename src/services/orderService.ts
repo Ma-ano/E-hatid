@@ -1,5 +1,5 @@
 import { db } from '../firebaseConfig';
-import { collection, getDocs, query, where, doc, updateDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, updateDoc, addDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import { Order } from '../types';
 
 function convertTimestamps<T>(data: any): T {
@@ -10,6 +10,16 @@ function convertTimestamps<T>(data: any): T {
   }
   return data as T;
 }
+
+export const createOrder = async (orderData: Omit<Order, 'id'>): Promise<Order | null> => {
+  try {
+    const docRef = await addDoc(collection(db, 'orders'), orderData);
+    return { id: docRef.id, ...orderData };
+  } catch (err) {
+    console.error('Error creating order:', err);
+    return null;
+  }
+};
 
 export const updateOrderStatus = async (orderId: string, data: Partial<Order>): Promise<void> => {
   try {
@@ -101,6 +111,26 @@ export const subscribeRiderOrders = (riderId: string, callback: (orders: Order[]
     callback(orders);
   }, (err) => {
     console.error('subscribeRiderOrders error:', err);
+    if (onError) onError(err);
+    else callback([]);
+  });
+};
+
+export const subscribeCustomerOrders = (userId: string, callback: (orders: Order[]) => void, onError?: (err: Error) => void): Unsubscribe => {
+  const q = query(collection(db, 'orders'), where('userId', '==', userId));
+  return onSnapshot(q, (snapshot) => {
+    const orders = snapshot.docs.map(d => {
+      const data = convertTimestamps<Order>(d.data());
+      return { ...data, id: d.id };
+    });
+    orders.sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+    callback(orders);
+  }, (err) => {
+    console.error('subscribeCustomerOrders error:', err);
     if (onError) onError(err);
     else callback([]);
   });

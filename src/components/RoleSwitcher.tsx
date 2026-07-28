@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { IonIcon } from '@ionic/react';
 import { swapHorizontalOutline, checkmarkCircle, time, closeCircle } from 'ionicons/icons';
 import { useAuth } from '../context/AuthContext';
+import { roleHomePaths } from '../config/routesByRole';
 
 const statusIcon: Record<string, string> = {
   approved: checkmarkCircle as any,
@@ -25,7 +26,7 @@ const RoleSwitcher: React.FC = () => {
     try {
       await setActiveRole(role);
       setOpen(false);
-      window.location.reload();
+      window.location.href = roleHomePaths[role] || '/';
     } catch {
       // blocked
     }
@@ -35,7 +36,7 @@ const RoleSwitcher: React.FC = () => {
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors min-h-[36px] text-[var(--ion-text-color-secondary)] hover:bg-[var(--tw-border-color)]/30"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors min-h-[36px] text-[var(--ion-text-color-secondary)] hover:bg-[var(--ion-border-color)]/30"
       >
         <IonIcon icon={swapHorizontalOutline} className="text-sm shrink-0" />
         <span className="hidden sm:inline capitalize">{activeRole}</span>

@@ -1,45 +1,75 @@
-// src/pages/Rider/Profile.tsx
 import React, { useState, useEffect } from 'react';
 import {
-  IonCard,
-  IonCardContent,
   IonButton,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonToggle,
   IonSpinner,
   IonToast,
 } from '@ionic/react';
-import { personOutline, callOutline, mailOutline, carOutline, starOutline, saveOutline, logOutOutline } from 'ionicons/icons';
+import {
+  personOutline,
+  callOutline,
+  mailOutline,
+  carOutline,
+  starOutline,
+  logOutOutline,
+  swapHorizontalOutline,
+  checkmarkCircle,
+  time,
+  closeCircle,
+  bicycleOutline,
+  locationOutline,
+  cashOutline,
+} from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import { getRoleProfile, updateRoleProfile, updateUserDocument } from '../../services/userService';
+import { subscribeRiderOrders } from '../../services/orderService';
+import type { Order } from '../../types';
+
+const initialProfile = {
+  name: '',
+  email: '',
+  phone: '',
+  vehicle: '',
+  licensePlate: '',
+  licenseNumber: '',
+  rating: 0,
+  totalDeliveries: 0,
+  bankAccount: '',
+  bankName: '',
+};
 
 const RiderProfile: React.FC = () => {
   const history = useHistory();
-  const { user, logout } = useAuth();
+  const { user, logout, roles, activeRole, setActiveRole } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+  const [profile, setProfile] = useState(initialProfile);
 
-  const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    vehicle: '',
-    licensePlate: '',
-    licenseNumber: '',
-    rating: 0,
-    totalDeliveries: 0,
-    bankAccount: '',
-    bankName: '',
-  });
+  useEffect(() => {
+    if (!user) return;
+    const unsub = subscribeRiderOrders(user.id, orders => {
+      const active = orders.find(o => o.status === 'accepted' || o.status === 'delivering');
+      setActiveOrder(active || null);
+    });
+    return () => unsub();
+  }, [user]);
+
+  const getProgressPercent = (status: string): number => {
+    switch (status) {
+      case 'accepted': return 10;
+      case 'preparing': return 15;
+      case 'ready': return 30;
+      case 'delivering': return 65;
+      case 'delivered': return 100;
+      default: return 0;
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -61,7 +91,6 @@ const RiderProfile: React.FC = () => {
           bankAccount: user.bankAccount || profileData?.bankAccount || '',
           bankName: user.bankName || profileData?.bankName || '',
         });
-        console.log('Rider profile loaded from Firestore');
       } catch (err) {
         console.error('Error loading rider profile:', err);
       } finally {
@@ -98,10 +127,8 @@ const RiderProfile: React.FC = () => {
         bankAccount: profile.bankAccount,
         bankName: profile.bankName,
       });
-      console.log('Rider profile saved to Firestore');
       setToastMessage('Profile saved successfully');
       setShowToast(true);
-      setIsEditing(false);
     } catch (err) {
       console.error('Error saving rider profile:', err);
       setToastMessage('Failed to save profile');
@@ -116,6 +143,17 @@ const RiderProfile: React.FC = () => {
     history.push('/login');
   };
 
+  const verificationStatus = user?.roleStatus?.rider || 'pending';
+  const verificationConfig = {
+    approved: { icon: checkmarkCircle, color: '#10B981', label: 'Approved' },
+    pending: { icon: time, color: '#F59E0B', label: 'Pending' },
+    rejected: { icon: closeCircle, color: '#EF4444', label: 'Rejected' },
+  };
+  const vConfig = verificationConfig[verificationStatus as keyof typeof verificationConfig] || verificationConfig.pending;
+
+  const totalRating = profile.rating || 0;
+  const totalDeliveries = profile.totalDeliveries || 0;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -125,251 +163,243 @@ const RiderProfile: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <>
+      {/* Avatar */}
+      <div className="text-center mb-6 pt-4">
+        <div className="w-[88px] h-[88px] rounded-full mx-auto mb-4 overflow-hidden bg-[var(--ion-color-primary)] flex items-center justify-center">
+          <span className="text-[36px] font-bold text-white">
+            {profile.name ? profile.name.charAt(0).toUpperCase() : '?'}
+          </span>
+        </div>
+        <h1 className="text-2xl font-bold text-[var(--ion-text-color)] m-0 mb-1">{profile.name}</h1>
+        <div className="flex items-center justify-center gap-1 mb-1">
+          <IonIcon icon={starOutline} className="text-sm text-[#F59E0B]" />
+          <span className="text-sm text-[var(--ion-text-color-secondary)]">{totalRating.toFixed(1)} &middot; {totalDeliveries} deliveries</span>
+        </div>
+        <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${vConfig.color}20`, color: vConfig.color }}>
+          <IonIcon icon={vConfig.icon} className="text-sm" />
+          {vConfig.label}
+        </div>
+      </div>
 
-        {/* Quick Access Menu */}
-        <div style={{
-          padding: '0 16px 16px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '10px'
-        }}>
-          <div 
-            onClick={() => history.push('/activities')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>📋</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Activity</p>
+      {/* Contact Information */}
+      <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-4 border border-[var(--ion-border-color)]">
+        <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">Contact Information</h3>
+
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <IonIcon icon={personOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">Full Name</span>
           </div>
-          <div 
-            onClick={() => history.push('/messages')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: 'white'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>💬</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Messages</p>
-          </div>
-          <div 
-            onClick={() => history.push('/report')}
-            style={{
-              padding: '12px',
-              background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              color: '#1F2937'
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>⚠️</div>
-            <p style={{ margin: 0, fontSize: '10px', fontWeight: 600 }}>Report</p>
-          </div>
+          <input type="text" value={profile.name} onChange={e => handleInputChange('name', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
         </div>
 
-        {/* Profile Header */}
-        <div style={{ padding: '24px 16px', textAlign: 'center', background: 'linear-gradient(135deg, #FF5A1F 0%, #FF7A3D 100%)' }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            background: 'rgba(255, 255, 255, 0.3)',
-            borderRadius: '50%',
-            margin: '0 auto 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '3px solid rgba(255, 255, 255, 0.5)'
-          }}>
-            <IonIcon icon={personOutline} style={{ fontSize: '40px', color: 'white' }} />
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <IonIcon icon={mailOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">Email</span>
           </div>
-          <h2 style={{ margin: '0 0 8px', color: 'white', fontWeight: 700 }}>{profile.name}</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', alignItems: 'center', marginTop: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', background: 'rgba(255,255,255,0.2)', borderRadius: '20px' }}>
-              <span style={{ fontSize: '16px', color: '#FCD34D' }}>★</span>
-              <span style={{ color: 'white', fontWeight: 600, fontSize: '13px' }}>{profile.rating}</span>
+          <input type="email" value={profile.email} onChange={e => handleInputChange('email', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center mb-2">
+            <IonIcon icon={callOutline} className="mr-2 text-[var(--ion-color-primary)]" />
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">Phone</span>
+          </div>
+          <input type="tel" value={profile.phone} onChange={e => handleInputChange('phone', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Vehicle Information */}
+      <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-4 border border-[var(--ion-border-color)]">
+        <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">
+          <IonIcon icon={carOutline} className="mr-1.5 align-middle" />
+          Vehicle Information
+        </h3>
+
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">Vehicle Type</span>
+          </div>
+          <input type="text" value={profile.vehicle} onChange={e => handleInputChange('vehicle', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">License Plate</span>
+          </div>
+          <input type="text" value={profile.licensePlate} onChange={e => handleInputChange('licensePlate', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center mb-2">
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">License Number</span>
+          </div>
+          <input type="text" value={profile.licenseNumber} onChange={e => handleInputChange('licenseNumber', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Banking Information */}
+      <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-4 border border-[var(--ion-border-color)]">
+        <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">
+          <IonIcon icon={cashOutline} className="mr-1.5 align-middle" />
+          Banking Information
+        </h3>
+
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">Bank Name</span>
+          </div>
+          <input type="text" value={profile.bankName} onChange={e => handleInputChange('bankName', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center mb-2">
+            <span className="text-xs text-[var(--ion-text-color-secondary)]">Account Number</span>
+          </div>
+          <input type="text" value={profile.bankAccount} onChange={e => handleInputChange('bankAccount', e.target.value)}
+            className="w-full p-[10px] rounded-lg border border-[var(--ion-border-color)] bg-[var(--ion-background-color)] text-[var(--ion-text-color)] text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Delivery Status */}
+      <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-4 border border-[var(--ion-border-color)]">
+        <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">
+          <IonIcon icon={bicycleOutline} className="mr-1.5 align-middle" />
+          Delivery Status
+        </h3>
+        {activeOrder ? (
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm font-semibold text-[var(--ion-text-color)]">
+                Order #{activeOrder.id.slice(-6)}
+              </span>
+              <span
+                className="text-xs font-bold px-2.5 py-1 rounded-full capitalize"
+                style={{
+                  background: activeOrder.status === 'delivering' ? '#10B98120' : '#FF5A1F20',
+                  color: activeOrder.status === 'delivering' ? '#10B981' : '#FF5A1F',
+                }}
+              >
+                {activeOrder.status}
+              </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', background: 'rgba(255,255,255,0.2)', borderRadius: '20px' }}>
-              <span style={{ color: 'white', fontSize: '13px' }}>🚚</span>
-              <span style={{ color: 'white', fontWeight: 600, fontSize: '13px' }}>{profile.totalDeliveries} Deliveries</span>
+            <div className="mb-3">
+              <p className="m-0 mb-1.5 text-xs text-[var(--ion-text-color-secondary)]">Delivery Progress</p>
+              <div className="w-full h-2.5 rounded-full overflow-hidden bg-[var(--ion-border-color)]">
+                <div
+                  className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-[#FF5A1F] to-[#10B981]"
+                  style={{ width: `${getProgressPercent(activeOrder.status)}%` }}
+                />
+              </div>
+              <p className="m-0 mt-1 text-xs font-bold text-[var(--ion-color-primary)] text-right">
+                {getProgressPercent(activeOrder.status)}% complete
+              </p>
             </div>
+            {activeOrder.estimatedDeliveryTime && (
+              <div className="flex items-center gap-1.5 p-2 rounded-lg bg-[var(--ion-background-color)] text-xs text-[var(--ion-text-color-secondary)]">
+                <IonIcon icon={locationOutline} className="text-sm text-[var(--ion-color-primary)]" />
+                <span>ETA: {activeOrder.estimatedDeliveryTime}</span>
+              </div>
+            )}
+            {activeOrder.deliveryAddress && (
+              <p className="m-0 mt-2 text-xs text-[var(--ion-text-color-secondary)]">
+                Delivering to: {activeOrder.deliveryAddress}
+              </p>
+            )}
           </div>
-        </div>
-
-        {/* Personal Information */}
-        <div style={{ padding: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-              Personal Information
-            </h3>
-            <IonButton 
-              fill="clear" 
-              size="small"
-              onClick={() => setIsEditing(!isEditing)}
-              style={{ '--color': 'var(--ion-color-primary)', margin: 0 }}
-            >
-              {isEditing ? 'Done' : 'Edit'}
-            </IonButton>
+        ) : (
+          <div className="text-center py-4">
+            <IonIcon icon={bicycleOutline} className="text-3xl mb-2" style={{ color: 'var(--ion-border-color)' }} />
+            <p className="m-0 text-xs text-[var(--ion-text-color-secondary)]">No active delivery</p>
           </div>
+        )}
+      </div>
 
-          <IonCard style={{ margin: '0 0 12px', background: 'var(--ion-card-background)' }}>
-            <IonCardContent style={{ padding: '16px' }}>
-              {isEditing ? (
-                <>
-                  <IonItem lines="none" style={{ '--background': 'transparent', marginBottom: '12px' } as any}>
-                    <IonIcon icon={personOutline} slot="start" style={{ color: 'var(--ion-color-primary)' }} />
-                    <IonInput 
-                      placeholder="Full Name"
-                      value={profile.name}
-                      onIonChange={(e) => handleInputChange('name', e.detail.value!)}
-                      style={{ '--padding-start': '12px' }}
-                    />
-                  </IonItem>
-                  <IonItem lines="none" style={{ '--background': 'transparent', marginBottom: '12px' } as any}>
-                    <IonIcon icon={mailOutline} slot="start" style={{ color: 'var(--ion-color-primary)' }} />
-                    <IonInput 
-                      placeholder="Email"
-                      value={profile.email}
-                      onIonChange={(e) => handleInputChange('email', e.detail.value!)}
-                      style={{ '--padding-start': '12px' }}
-                    />
-                  </IonItem>
-                  <IonItem lines="none" style={{ '--background': 'transparent' } as any}>
-                    <IonIcon icon={callOutline} slot="start" style={{ color: 'var(--ion-color-primary)' }} />
-                    <IonInput 
-                      placeholder="Phone"
-                      value={profile.phone}
-                      onIonChange={(e) => handleInputChange('phone', e.detail.value!)}
-                      style={{ '--padding-start': '12px' }}
-                    />
-                  </IonItem>
-                </>
-              ) : (
-                <>
-                  <div style={{ margin: '0 0 12px' }}>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Full Name</p>
-                    <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.name}</p>
-                  </div>
-                  <div style={{ margin: '0 0 12px' }}>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Email</p>
-                    <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.email}</p>
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Phone</p>
-                    <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.phone}</p>
-                  </div>
-                </>
-              )}
-            </IonCardContent>
-          </IonCard>
-        </div>
-
-        {/* Vehicle Information */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-            Vehicle Information
-          </h3>
-
-          <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-            <IonCardContent style={{ padding: '16px' }}>
-              <div style={{ margin: '0 0 12px' }}>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Vehicle</p>
-                <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.vehicle}</p>
-              </div>
-              <div style={{ margin: '0 0 12px' }}>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>License Plate</p>
-                <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.licensePlate}</p>
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>License Number</p>
-                <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.licenseNumber}</p>
-              </div>
-            </IonCardContent>
-          </IonCard>
-        </div>
-
-        {/* Banking Information */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-            Banking Information
-          </h3>
-
-          <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-            <IonCardContent style={{ padding: '16px' }}>
-              <div style={{ margin: '0 0 12px' }}>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Bank Name</p>
-                <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.bankName}</p>
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>Account Number</p>
-                <p style={{ margin: '4px 0 0', color: 'var(--ion-text-color)', fontWeight: 600 }}>{profile.bankAccount}</p>
-              </div>
-            </IonCardContent>
-          </IonCard>
-        </div>
-
-        {/* Notifications */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: '16px', fontWeight: 700, color: 'var(--ion-text-color)' }}>
-            Preferences
-          </h3>
-
-          <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
-            <IonItem lines="none" style={{ '--background': 'transparent' } as any}>
-              <IonLabel>Enable Notifications</IonLabel>
-              <IonToggle 
-                checked={notificationsEnabled} 
-                onIonChange={(e) => setNotificationsEnabled(e.detail.checked)}
-                slot="end"
-                style={{ '--background-checked': 'var(--ion-color-primary)' }}
-              />
-            </IonItem>
-          </IonCard>
-        </div>
-
-        {/* Action Buttons */}
-        <div style={{ padding: '0 16px 16px' }}>
-          {isEditing && (
-            <IonButton 
-              expand="block" 
-              disabled={saving}
-              onClick={handleSave}
-              style={{ '--background': 'var(--ion-color-primary)', margin: '0 0 12px' }}
-            >
-              <IonIcon slot="start" icon={saveOutline} />
-              {saving ? 'Saving...' : 'Save Changes'}
-            </IonButton>
-          )}
-          <IonButton 
-            expand="block" 
-            fill="outline"
-            className="md:hidden"
-            style={{ '--border-color': '#EF4444', '--color': '#EF4444', margin: 0 }}
-            onClick={handleLogout}
+      {/* Preferences */}
+      <div className="bg-[var(--ion-card-background)] rounded-xl p-4 mb-4 border border-[var(--ion-border-color)]">
+        <h3 className="text-sm font-semibold text-[var(--ion-text-color)] mb-4 uppercase opacity-70">Preferences</h3>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-[var(--ion-text-color)]">Enable Notifications</span>
+          <div
+            onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+            className={`relative w-11 h-6 rounded-full cursor-pointer transition-colors duration-200 ${notificationsEnabled ? 'bg-[var(--ion-color-primary)]' : 'bg-[var(--ion-border-color)]'}`}
           >
-            <IonIcon slot="start" icon={logOutOutline} />
-            Logout
-          </IonButton>
+            <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${notificationsEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+          </div>
         </div>
-        <IonToast
-          isOpen={showToast}
-          message={toastMessage}
-          duration={3000}
-          onDidDismiss={() => setShowToast(false)}
-          position="bottom"
-          color={toastMessage.includes('Failed') ? 'danger' : 'success'}
-        />
-    </div>
+      </div>
+
+      {/* Save Button */}
+      <IonButton expand="block" disabled={saving} onClick={handleSave}
+        className="h-12 text-base font-semibold mb-3"
+        style={{ '--background': 'var(--ion-color-primary)', '--border-radius': '8px' }}
+      >
+        {saving ? 'Saving...' : 'Save Changes'}
+      </IonButton>
+
+      {/* Switch Role */}
+      {roles.length > 1 && (
+        <div className="md:hidden bg-[var(--ion-card-background)] rounded-xl p-4 border border-[var(--ion-border-color)] mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <IonIcon icon={swapHorizontalOutline} className="text-[var(--ion-color-primary)] text-base" />
+            <h3 className="text-sm font-semibold text-[var(--ion-text-color)] m-0 uppercase opacity-70">Switch Role</h3>
+          </div>
+          <div className="space-y-2">
+            {roles.map(role => {
+              const st = role === 'customer' ? (user?.emailVerified ? 'approved' : 'pending') : (user?.roleStatus?.[role] || 'pending');
+              const disabled = st === 'pending' || st === 'rejected';
+              const active = role === activeRole;
+              const stIcon = st === 'approved' ? checkmarkCircle : st === 'rejected' ? closeCircle : time;
+              const stColor = st === 'approved' ? '#10B981' : st === 'rejected' ? '#EF4444' : '#F59E0B';
+              return (
+                <button key={role} disabled={disabled} onClick={() => setActiveRole(role)}
+                  className={`w-full flex items-center gap-3 px-5 py-3.5 rounded-lg transition-colors text-sm ${
+                    active ? 'bg-[var(--ion-color-primary)]/10' : 'hover:bg-[var(--ion-border-color)]/30'
+                  } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  <span className="flex-1 text-left font-medium capitalize text-[var(--ion-text-color)]">{role}</span>
+                  <div className="flex items-center gap-2">
+                    {active && <span className="text-[10px] font-semibold text-white bg-[var(--ion-color-primary)] px-2 py-0.5 rounded-full">Active</span>}
+                    <IonIcon icon={stIcon} style={{ fontSize: '14px', color: stColor }} />
+                    <span className="text-xs capitalize text-[var(--ion-text-color-secondary)]">{st}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Sign Out */}
+      <IonButton expand="block" color="danger" className="md:hidden h-12 text-base font-semibold mb-6"
+        onClick={handleLogout}
+        style={{ '--border-radius': '8px' }}
+      >
+        <IonIcon icon={logOutOutline} slot="start" />
+        Sign Out
+      </IonButton>
+
+      <IonToast isOpen={showToast} message={toastMessage} duration={3000} onDidDismiss={() => setShowToast(false)} position="bottom"
+        color={toastMessage.includes('Failed') ? 'danger' : 'success'}
+      />
+    </>
   );
 };
 

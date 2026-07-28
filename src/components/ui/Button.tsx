@@ -13,13 +13,13 @@ interface ButtonProps {
 
 const variantStyles: Record<string, string> = {
   primary:
-    'bg-[var(--tw-primary)] text-white hover:bg-[var(--tw-primary-hover)] active:bg-[var(--tw-primary)]',
+    'bg-[var(--ion-color-primary)] text-white hover:bg-[var(--ion-color-primary-tint)] active:bg-[var(--ion-color-primary)]',
   secondary:
-    'bg-[var(--tw-light)] text-[var(--tw-text-color)] hover:bg-[var(--tw-border-color)] active:bg-[var(--tw-light)]',
+    'bg-[var(--ion-color-light)] text-[var(--ion-text-color)] hover:bg-[var(--ion-border-color)] active:bg-[var(--ion-color-light)]',
   ghost:
-    'bg-transparent text-[var(--tw-primary)] hover:bg-[var(--tw-primary)]/10 active:bg-transparent',
+    'bg-transparent text-[var(--ion-color-primary)] hover:bg-[var(--ion-color-primary)]/10 active:bg-transparent',
   danger:
-    'bg-[var(--tw-danger)] text-white hover:opacity-90 active:opacity-100',
+    'bg-[var(--ion-color-danger)] text-white hover:opacity-90 active:opacity-100',
 };
 
 const sizeStyles: Record<string, string> = {

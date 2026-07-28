@@ -1,26 +1,56 @@
 // src/pages/Guest/Cart.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonButton,
   IonIcon,
   IonItem,
   IonLabel,
   IonModal,
+  IonSpinner,
 } from '@ionic/react';
 import { locationOutline, bicycleOutline, cardOutline, logInOutline, personAddOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import CartItem from '../../components/Cart/CartItem';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { fetchStallById } from '../../services/stallService';
+import { getDeliveryFeeInfo } from '../../services/deliveryService';
 
 const GuestCart: React.FC = () => {
   const history = useHistory();
   const { items, updateQuantity, removeFromCart, total, itemCount } = useCart();
-  const { isGuest, logout } = useAuth();
+  const { user, isGuest, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [feeLoading, setFeeLoading] = useState(false);
+  const [deliveryFee, setDeliveryFee] = useState(2.99);
+  const [serviceFee] = useState(1.49);
+  const [rawDistance, setRawDistance] = useState<number | null>(null);
+  const [chargedDistance, setChargedDistance] = useState<number>(0);
 
-  const deliveryFee = 2.99;
-  const serviceFee = 1.49;
+  useEffect(() => {
+    const calcFee = async () => {
+      if (items.length === 0) return;
+      setFeeLoading(true);
+      try {
+        const stallId = items[0]?.stallId || '';
+        const stall = stallId ? await fetchStallById(stallId) : null;
+        const custLocation = sessionStorage.getItem('selectedLocation');
+        const sessionCoords = custLocation ? JSON.parse(custLocation) : null;
+        const custLat = sessionCoords?.lat ?? user?.latitude;
+        const custLng = sessionCoords?.lng ?? user?.longitude;
+        const info = await getDeliveryFeeInfo(
+          stall?.latitude, stall?.longitude,
+          custLat, custLng
+        );
+        setDeliveryFee(info.fare);
+        setRawDistance(info.distance_km);
+        setChargedDistance(info.final_km);
+      } catch { }
+      setFeeLoading(false);
+    };
+    calcFee();
+  }, [items]);
+
   const finalTotal = total + deliveryFee + serviceFee;
 
   const handleCheckout = () => {
@@ -92,8 +122,8 @@ const GuestCart: React.FC = () => {
                   <span>₱{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
-                  <span>Delivery Fee</span>
-                  <span>₱{deliveryFee.toFixed(2)}</span>
+                  <span>Delivery Fee {rawDistance != null && <span className="text-[10px] text-[var(--ion-text-color-secondary)]">({rawDistance} km → {chargedDistance} km charged)</span>}</span>
+                  <span>{feeLoading ? <IonSpinner className="inline-block" style={{ width: 14, height: 14 }} /> : `₱${deliveryFee.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 text-xs sm:text-sm text-[var(--ion-text-color)]">
                   <span>Service Fee</span>

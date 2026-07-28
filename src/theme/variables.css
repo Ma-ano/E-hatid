@@ -47,6 +47,9 @@
   --ion-toolbar-background: #1E293B;
 
   --ion-border-color: #334155;
+
+  --ion-color-light: #1E293B;
+  --ion-color-dark: #F1F5F9;
 }
 
 ion-select-option {

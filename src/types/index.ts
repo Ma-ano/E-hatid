@@ -26,6 +26,8 @@ export interface User {
   bankName?: string;
   otpCode?: string;
   otpExpiresAt?: any;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Rider extends User {
@@ -116,6 +118,8 @@ export interface Stall {
   menu?: MenuItem[];
   active?: boolean;
   address?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface MenuItemOption {
@@ -189,16 +193,29 @@ export interface Order {
   vendorId?: string;
   items: OrderItem[];
   total: number;
+  deliveryFee?: number;
+  distance?: number;
   status: 'pending' | 'accepted' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled' | 'rejected' | 'completed' | 'ready_for_pickup';
   createdAt: string | Date;
   deliveryAddress?: string;
   riderId?: string;
   estimatedDeliveryTime?: string;
+  customerLatitude?: number;
+  customerLongitude?: number;
+  stallLatitude?: number;
+  stallLongitude?: number;
   cancelledReason?: string;
   acceptedAt?: string | Date;
   readyAt?: string | Date;
   pickedUpAt?: string | Date;
   completedAt?: string | Date;
+}
+
+export interface RiderLocation {
+  lat: number;
+  lng: number;
+  updatedAt: any;
+  riderId: string;
 }
 
 export interface OrderItem {

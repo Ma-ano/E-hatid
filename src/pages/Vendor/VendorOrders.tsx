@@ -1,17 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import {
-  IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonBadge, IonSpinner,
+  IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonSpinner,
   IonModal, IonHeader, IonToolbar, IonButtons, IonTitle, IonTextarea, IonToast,
 } from '@ionic/react';
-import { checkmarkOutline, closeOutline, personOutline, callOutline, timeOutline, documentTextOutline, locationOutline } from 'ionicons/icons';
+import { checkmarkOutline, closeOutline, personOutline, callOutline, timeOutline, locationOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import { updateOrderStatus, subscribeVendorOrders } from '../../services/orderService';
 import { useOrders } from '../../context/OrderContext';
 import { Order } from '../../types';
+import PageHeader from '../../components/ui/PageHeader';
 
-type FilterTab = 'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
+const STATUS_BADGE: Record<string, { color: string; label: string }> = {
+  pending: { color: '#F59E0B', label: 'Pending' },
+  accepted: { color: '#3B82F6', label: 'Accepted' },
+  preparing: { color: '#FF5A1F', label: 'Preparing' },
+  ready: { color: '#10B981', label: 'Ready' },
+  delivering: { color: '#8B5CF6', label: 'Delivering' },
+  delivered: { color: '#10B981', label: 'Delivered' },
+  cancelled: { color: '#EF4444', label: 'Cancelled' },
+};
+
+const badgestyle = (status: string): React.CSSProperties => {
+  const c = STATUS_BADGE[status]?.color || '#9CA3AF';
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '3px 10px',
+    borderRadius: 9999,
+    fontSize: 11,
+    fontWeight: 600,
+    backgroundColor: c + '1A',
+    color: c,
+    border: '1px solid ' + c + '30',
+  };
+};
+
+type FilterTab = 'all' | 'pending' | 'active' | 'completed' | 'cancelled';
 
 const TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -87,7 +113,7 @@ const VendorOrders: React.FC = () => {
   const filteredOrders = orders.filter(o => {
     if (filter === 'all') return true;
     if (filter === 'pending') return o.status === 'pending';
-    if (filter === 'in_progress') return ['accepted', 'preparing', 'ready'].includes(o.status);
+    if (filter === 'active') return ['accepted', 'preparing', 'ready', 'delivering'].includes(o.status);
     if (filter === 'completed') return o.status === 'delivered';
     if (filter === 'cancelled') return o.status === 'cancelled';
     return true;
@@ -111,20 +137,17 @@ const VendorOrders: React.FC = () => {
     <>
 
         <div className="p-4">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[var(--tw-text-color)]">Orders</h1>
-            <p className="text-sm text-[var(--tw-text-secondary)] mt-1">View and manage incoming orders</p>
-          </div>
+          <PageHeader title="Orders" subtitle="View and manage incoming orders" />
 
-          <div className="flex gap-3 mb-6 overflow-x-auto">
-            {(['all', 'pending', 'in_progress', 'completed', 'cancelled'] as FilterTab[]).map(tab => (
+          <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
+            {(['all', 'pending', 'active', 'completed', 'cancelled'] as FilterTab[]).map(tab => (
               <IonButton
                 key={tab}
-                style={filter === tab ? { '--background': '#8B5CF6', flexShrink: 0 } : { '--border-color': '#8B5CF6', '--color': '#8B5CF6', flexShrink: 0 }}
+                style={filter === tab ? { '--background': 'var(--ion-color-primary)', flexShrink: 0 } : { '--border-color': 'var(--ion-color-primary)', '--color': 'var(--ion-color-primary)', flexShrink: 0 }}
                 fill={filter === tab ? 'solid' : 'outline'}
                 onClick={() => setFilter(tab)}
               >
-                {tab === 'in_progress' ? 'In Progress' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'active' ? 'Active' : tab === 'completed' ? 'Completed' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </IonButton>
             ))}
           </div>
@@ -132,11 +155,11 @@ const VendorOrders: React.FC = () => {
           {loading ? (
             <div className="text-center p-12"><IonSpinner name="crescent" /></div>
           ) : filteredOrders.length === 0 ? (
-            <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">You don't have any orders yet</p></IonCardContent></IonCard>
+            <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--ion-text-color-secondary)] m-0">You don't have any orders yet</p></IonCardContent></IonCard>
           ) : (
             <div className="grid gap-4">
               {filteredOrders.map(order => (
-                <IonCard key={order.id} className={`rounded-xl shadow ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
+                <IonCard key={order.id} className={`rounded-xl shadow ${order.status === 'cancelled' ? 'opacity-60' : ''}`} style={{ cursor: 'pointer' }} onClick={() => setDetailsOrder(order)}>
                   <IonCardContent>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                       <div>
@@ -152,27 +175,13 @@ const VendorOrders: React.FC = () => {
                           {order.customerPhone && ` · ${order.customerPhone}`}
                         </p>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <IonBadge color={
-                          order.status === 'pending' ? 'warning' :
-                          order.status === 'accepted' ? 'primary' :
-                          order.status === 'preparing' ? 'primary' :
-                          order.status === 'ready' ? 'success' :
-                          order.status === 'delivered' ? 'success' :
-                          order.status === 'cancelled' ? 'danger' : 'medium'
-                        }>
-                          {order.status}
-                        </IonBadge>
-                        <IonButton fill="clear" size="small" style={{ '--color': '#8B5CF6', margin: 0, minHeight: 0, height: '28px' }} onClick={() => setDetailsOrder(order)}>
-                          <IonIcon icon={documentTextOutline} slot="icon-only" />
-                        </IonButton>
-                      </div>
+                      <span style={badgestyle(order.status)}>{STATUS_BADGE[order.status]?.label || order.status}</span>
                     </div>
 
                     <div style={{ padding: '12px', background: 'var(--ion-background-color)', borderRadius: '8px', marginBottom: '12px' }}>
                       {order.items.map((item, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', marginBottom: i < order.items.length - 1 ? '8px' : 0 }}>
-                          <div style={{ width: '36px', height: '36px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: 'var(--ion-color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>{item.name.charAt(0)}</span>
                           </div>
                           <span style={{ color: 'var(--ion-text-color)', flex: 1 }}>{item.name}</span>
@@ -181,7 +190,7 @@ const VendorOrders: React.FC = () => {
                       ))}
                       <div style={{ borderTop: '1px solid var(--ion-border-color)', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ fontWeight: 600, color: 'var(--ion-text-color)' }}>Total</span>
-                        <span style={{ fontWeight: 700, color: '#8B5CF6' }}>₱{order.total.toFixed(2)}</span>
+                        <span style={{ fontWeight: 700, color: 'var(--ion-color-primary)' }}>₱{(order.total - (order.deliveryFee || 0)).toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -194,17 +203,17 @@ const VendorOrders: React.FC = () => {
                     {order.status === 'pending' && (
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <IonButton
-                          style={{ flex: 1, '--background': '#10B981' }}
+                          style={{ flex: 1, '--background': 'var(--ion-color-success)' }}
                           disabled={isProcessing(order.id)}
-                          onClick={() => handleAccept(order)}
+                          onClick={(e) => { e.stopPropagation(); handleAccept(order); }}
                         >
                           {isProcessing(order.id) ? <IonSpinner name="crescent" /> : <IonIcon icon={checkmarkOutline} slot="start" />}
                           Accept
                         </IonButton>
                         <IonButton
-                          style={{ flex: 1, '--background': '#EF4444' }}
+                          style={{ flex: 1, '--background': 'var(--ion-color-danger)' }}
                           disabled={isProcessing(order.id)}
-                          onClick={() => openDeclineModal(order.id)}
+                          onClick={(e) => { e.stopPropagation(); openDeclineModal(order.id); }}
                         >
                           {isProcessing(order.id) ? <IonSpinner name="crescent" /> : <IonIcon icon={closeOutline} slot="start" />}
                           Decline
@@ -217,7 +226,8 @@ const VendorOrders: React.FC = () => {
                           expand="block"
                           style={{ '--background': 'var(--ion-color-primary)' }}
                           disabled={isProcessing(order.id)}
-                          onClick={async () => {
+                          onClick={async (e) => {
+                            e.stopPropagation();
                             setProcessingOrders(prev => new Set(prev).add(order.id));
                             try {
                               await updateOrderStatus(order.id, { status: 'ready' });
@@ -291,13 +301,7 @@ const VendorOrders: React.FC = () => {
                   <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>#{detailsOrder.id.slice(-5)}</h2>
                   <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>{new Date(detailsOrder.createdAt).toLocaleString()}</p>
                 </div>
-                <IonBadge color={
-                  detailsOrder.status === 'pending' ? 'warning' :
-                  detailsOrder.status === 'accepted' ? 'primary' :
-                  detailsOrder.status === 'preparing' ? 'primary' :
-                  detailsOrder.status === 'ready' ? 'success' :
-                  detailsOrder.status === 'delivered' ? 'success' : 'medium'
-                }>{detailsOrder.status}</IonBadge>
+                <span style={badgestyle(detailsOrder.status)}>{STATUS_BADGE[detailsOrder.status]?.label || detailsOrder.status}</span>
               </div>
 
               {(detailsOrder.customerName || detailsOrder.customerPhone || detailsOrder.deliveryAddress) && (
@@ -360,17 +364,27 @@ const VendorOrders: React.FC = () => {
                         <span>Item subtotal</span>
                         <span>₱{(item.price * qty).toFixed(2)}</span>
                       </div>
-                      {item.specialInstructions && (
-                        <p style={{ margin: '4px 0 0', fontSize: '12px', fontStyle: 'italic', color: 'var(--ion-text-color-secondary)' }}>&quot;{item.specialInstructions}&quot;</p>
-                      )}
                     </div>
                   );
                 })}
               </div>
 
+              {/* Notes */}
+              {detailsOrder.items.some(item => item.specialInstructions) && (
+                <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--ion-card-background)', borderRadius: '10px', border: '1px solid var(--ion-border-color)' }}>
+                  <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Notes</p>
+                  {detailsOrder.items.filter(i => i.specialInstructions).map((item, i) => (
+                    <div key={i} style={{ marginBottom: i < detailsOrder.items.filter(i => i.specialInstructions).length - 1 ? '8px' : 0 }}>
+                      <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{item.name}</p>
+                      <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)', fontStyle: 'italic' }}>&quot;{item.specialInstructions}&quot;</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div style={{ padding: '12px', background: 'var(--ion-card-background)', borderRadius: '10px', marginBottom: '16px', border: '1px solid var(--ion-border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--ion-text-color)' }}>Total</span>
-                <span style={{ fontSize: '18px', fontWeight: 700, color: '#8B5CF6' }}>₱{detailsOrder.total.toFixed(2)}</span>
+                <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ion-color-primary)' }}>₱{(detailsOrder.total - (detailsOrder.deliveryFee || 0)).toFixed(2)}</span>
               </div>
 
               {detailsOrder.cancelledReason && (

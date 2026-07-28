@@ -92,7 +92,7 @@ const AdminUsers: React.FC = () => {
   return (
     <>
       <AdminPageShell title="Users" subtitle="Manage all users, riders, vendors">
-        <div style={{ padding: '0 16px 16px' }}>
+        <div className="px-4 pb-4">
           <div style={{ position: 'relative', marginBottom: '16px' }}>
             <IonIcon icon={searchOutline} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ion-text-color-secondary)', fontSize: '16px' }} />
             <input type="text" placeholder="Search users..." value={search} onChange={e => setSearch(e.target.value)}
@@ -111,7 +111,7 @@ const AdminUsers: React.FC = () => {
           {filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--ion-text-color-secondary)', fontSize: '14px' }}>No users found</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {filtered.map(u => (
                 <IonCard key={u.id} className="cursor-pointer hover:shadow-lg transition-shadow duration-200" style={{ margin: 0, background: 'var(--ion-card-background)' }} onClick={() => setSelectedUser(u)}>
                   <IonCardContent style={{ padding: '14px' }}>
@@ -176,7 +176,7 @@ const AdminUsers: React.FC = () => {
                 <IonCardContent style={{ padding: '16px' }}>
                   <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>{selectedUser.name || 'Unnamed'}</h2>
                   <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'var(--ion-text-color-secondary)' }}>{selectedUser.email}</p>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, background: selectedUser.emailVerified ? '#10B98120' : '#F59E0B20', color: selectedUser.emailVerified ? '#10B981' : '#F59E0B', marginBottom: '12px' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, background: selectedUser.emailVerified ? '#10B98120' : '#F59E0B20', color: selectedUser.emailVerified ? '#10B981' : '#F59E0B', marginBottom: '16px' }}>
                     <IonIcon icon={selectedUser.emailVerified ? checkmarkCircleOutline : closeCircleOutline} style={{ fontSize: '12px' }} />
                     {selectedUser.emailVerified ? 'Verified' : 'Unverified'}
                   </div>
@@ -189,7 +189,7 @@ const AdminUsers: React.FC = () => {
               </IonCard>
 
               <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)' }}>Roles & Status</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
                 {(selectedUser.roles || []).map(r => {
                   if (r === 'customer') {
                     const verified = selectedUser.emailVerified;
@@ -412,9 +412,9 @@ const UserRoleTabs: React.FC<{ user: User }> = ({ user }) => {
   if (allTabs.length === 0) return null;
 
   return (
-    <div style={{ marginBottom: '20px' }}>
+    <div style={{ marginBottom: '16px' }}>
       <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600, color: 'var(--ion-text-color)' }}>Role Details</h3>
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto' }}>
         {allTabs.map(r => (
           <button key={r} onClick={() => setTab(r)}
             style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: tab === r ? 'var(--ion-color-primary)' : 'var(--ion-card-background)', color: tab === r ? 'white' : 'var(--ion-text-color-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
@@ -425,7 +425,7 @@ const UserRoleTabs: React.FC<{ user: User }> = ({ user }) => {
       <IonCard style={{ margin: 0, background: 'var(--ion-card-background)' }}>
         <IonCardContent style={{ padding: '14px' }}>
           {tab === 'customer' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Name</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.name || '-'}</p></div>
               <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Email</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.email || '-'}</p></div>
               <div><span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ion-text-color-secondary)' }}>Phone</span><p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--ion-text-color)' }}>{user.phone || '-'}</p></div>

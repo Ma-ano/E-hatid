@@ -23,18 +23,18 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemove })
 
       <div className="flex flex-col flex-1 min-w-0 w-full">
         <div className="flex-1">
-          <h4 className="font-semibold text-sm sm:text-base text-[var(--tw-text-color)] mb-1 sm:mb-2 truncate">{item.name}</h4>
+          <h4 className="font-semibold text-sm sm:text-base text-[var(--ion-text-color)] mb-1 sm:mb-2 truncate">{item.name}</h4>
           {hasCustomizations && (
             <div className="flex flex-wrap gap-1.5 text-[11px] sm:text-xs mb-2">
               {item.selectedOptions?.map(opt => (
-                <span key={opt.optionId} className="text-[var(--tw-text-secondary)]">
-                  {opt.optionName}: <span className="font-semibold text-[var(--tw-text-color)]">{opt.choiceName}</span>
+                <span key={opt.optionId} className="text-[var(--ion-text-color-secondary)]">
+                  {opt.optionName}: <span className="font-semibold text-[var(--ion-text-color)]">{opt.choiceName}</span>
                   {opt.choicePrice > 0 && <span className="text-[var(--ion-color-success)] font-medium">+₱{opt.choicePrice.toFixed(2)}</span>}
                 </span>
               ))}
               {item.selectedAddOns?.map(addOn => (
-                <span key={addOn.addOnId} className="text-[var(--tw-text-secondary)]">
-                  + <span className="font-medium text-[var(--tw-text-color)]">{addOn.name}</span> <span className="text-[var(--ion-color-success)] font-medium">₱{addOn.price.toFixed(2)}</span>
+                <span key={addOn.addOnId} className="text-[var(--ion-text-color-secondary)]">
+                  + <span className="font-medium text-[var(--ion-text-color)]">{addOn.name}</span> <span className="text-[var(--ion-color-success)] font-medium">₱{addOn.price.toFixed(2)}</span>
                 </span>
               ))}
               {item.specialInstructions && (
@@ -44,33 +44,33 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemove })
               )}
             </div>
           )}
-          <p className="text-xs sm:text-sm text-[var(--tw-text-secondary)]">₱{item.price.toFixed(2)} each</p>
+          <p className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">₱{item.price.toFixed(2)} each</p>
         </div>
 
-        <div className="flex justify-between items-center mt-2 pt-2 sm:mt-3 sm:pt-3 border-t border-[var(--tw-border-color)]">
-          <span className="text-xs sm:text-sm text-[var(--tw-text-secondary)]">Total:</span>
-          <span className="font-semibold text-sm sm:text-base text-[var(--tw-text-color)]">₱{(item.price * item.quantity).toFixed(2)}</span>
+        <div className="flex justify-between items-center mt-2 pt-2 sm:mt-3 sm:pt-3 border-t border-[var(--ion-border-color)]">
+          <span className="text-xs sm:text-sm text-[var(--ion-text-color-secondary)]">Total:</span>
+          <span className="font-semibold text-sm sm:text-base text-[var(--ion-text-color)]">₱{(item.price * item.quantity).toFixed(2)}</span>
         </div>
       </div>
 
-      <div className="flex xs:flex-col justify-between xs:justify-center items-center xs:items-stretch gap-2 xs:gap-3 pt-2 xs:pt-0 border-t xs:border-t-0 border-[var(--tw-border-color)]">
+      <div className="flex xs:flex-col justify-between xs:justify-center items-center xs:items-stretch gap-2 xs:gap-3 pt-2 xs:pt-0 border-t xs:border-t-0 border-[var(--ion-border-color)]">
         <div className="flex items-center gap-2">
           <IonButton
-            className="min-w-[36px] min-h-[36px] w-9 h-9 sm:w-10 sm:h-10 rounded-lg"
+            className="min-w-[40px] min-h-[40px] w-10 h-10 rounded-lg"
             onClick={() => onUpdateQuantity(item.quantity - 1)}
             title="Decrease quantity"
-            style={{ '--background': item.quantity === 1 ? 'var(--ion-color-danger)' : 'var(--ion-color-primary)', '--color': '#fff' }}
+            style={{ '--background': item.quantity === 1 ? 'var(--ion-color-danger)' : 'var(--ion-color-primary)', '--color': '#fff', '--padding': '0' }}
           >
             <IonIcon icon={item.quantity === 1 ? trash : remove} className="text-sm" />
           </IonButton>
 
-          <span className="font-medium text-sm w-8 text-center text-[var(--tw-text-color)]">{item.quantity}</span>
+          <span className="font-medium text-sm w-8 text-center text-[var(--ion-text-color)]">{item.quantity}</span>
 
           <IonButton
-            className="min-w-[36px] min-h-[36px] w-9 h-9 sm:w-10 sm:h-10 rounded-lg"
+            className="min-w-[40px] min-h-[40px] w-10 h-10 rounded-lg"
             onClick={() => onUpdateQuantity(item.quantity + 1)}
             title="Increase quantity"
-            style={{ '--background': 'var(--ion-color-primary)', '--color': '#fff' }}
+            style={{ '--background': 'var(--ion-color-primary)', '--color': '#fff', '--padding': '0' }}
           >
             <IonIcon icon={add} className="text-sm" />
           </IonButton>

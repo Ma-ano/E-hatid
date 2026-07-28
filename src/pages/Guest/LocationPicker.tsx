@@ -158,7 +158,7 @@ const GuestLocationPicker: React.FC = () => {
     setSuggestions([]);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedAddress || !selectedLocation) return;
     sessionStorage.setItem('selectedLocation', JSON.stringify(selectedLocation));
     sessionStorage.setItem('locationName', selectedAddress.display);

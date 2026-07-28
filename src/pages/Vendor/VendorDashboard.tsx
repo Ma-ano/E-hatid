@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { IonContent, IonCard, IonCardContent, IonIcon, IonButton, IonSpinner, IonModal, IonHeader, IonToolbar, IonButtons, IonTitle, IonTextarea, IonToast } from '@ionic/react';
-import { trendingUpOutline, cartOutline, starOutline, peopleOutline, storefrontOutline, cashOutline, settingsOutline, clipboardOutline, checkmarkOutline, closeOutline, documentTextOutline, locationOutline, personOutline, callOutline } from 'ionicons/icons';
+import { trendingUpOutline, cartOutline, starOutline, peopleOutline, storefrontOutline, cashOutline, personOutline, clipboardOutline, checkmarkOutline, closeOutline, locationOutline, callOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
@@ -9,6 +9,32 @@ import { getReviewStats } from '../../services/reviewService';
 import { getStallByVendorId } from '../../services/stallService';
 import { useOrders } from '../../context/OrderContext';
 import { Order } from '../../types';
+import PageHeader from '../../components/ui/PageHeader';
+
+const STATUS_BADGE: Record<string, { color: string; label: string }> = {
+  pending: { color: '#F59E0B', label: 'Pending' },
+  accepted: { color: '#3B82F6', label: 'Accepted' },
+  preparing: { color: '#FF5A1F', label: 'Preparing' },
+  ready: { color: '#10B981', label: 'Ready' },
+  delivering: { color: '#8B5CF6', label: 'Delivering' },
+  delivered: { color: '#10B981', label: 'Delivered' },
+  cancelled: { color: '#EF4444', label: 'Cancelled' },
+};
+
+const badgestyle = (status: string): React.CSSProperties => {
+  const c = STATUS_BADGE[status]?.color || '#9CA3AF';
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '3px 10px',
+    borderRadius: 9999,
+    fontSize: 11,
+    fontWeight: 600,
+    backgroundColor: c + '1A',
+    color: c,
+    border: '1px solid ' + c + '30',
+  };
+};
 
 const VendorDashboard: React.FC = () => {
   const history = useHistory();
@@ -16,7 +42,7 @@ const VendorDashboard: React.FC = () => {
   const { updateOrderStatus: localUpdateStatus } = useOrders();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState([
-    { icon: trendingUpOutline, label: 'Total Sales', value: '₱0', color: '#8B5CF6' },
+    { icon: trendingUpOutline, label: 'Total Sales', value: '₱0', color: 'var(--ion-color-primary)' },
     { icon: cartOutline, label: 'Orders Today', value: '0', color: '#10B981' },
     { icon: starOutline, label: 'Average Rating', value: '0.0', color: '#F59E0B' },
     { icon: peopleOutline, label: 'Total Customers', value: '0', color: 'var(--ion-color-primary)' },
@@ -31,11 +57,11 @@ const VendorDashboard: React.FC = () => {
   const [detailsOrder, setDetailsOrder] = useState<Order | null>(null);
 
   const quickLinks = [
-    { label: 'Products', icon: storefrontOutline, route: '/vendor/products', color: '#8B5CF6' },
+    { label: 'Products', icon: storefrontOutline, route: '/vendor/products', color: 'var(--ion-color-primary)' },
     { label: 'Orders', icon: clipboardOutline, route: '/vendor/orders', color: '#10B981' },
     { label: 'Earnings', icon: cashOutline, route: '/vendor/earnings', color: '#F59E0B' },
     { label: 'Reviews', icon: starOutline, route: '/vendor/reviews', color: '#EC4899' },
-    { label: 'Profile', icon: settingsOutline, route: '/vendor/settings', color: '#14B8A6' },
+    { label: 'Profile', icon: personOutline, route: '/vendor/profile', color: '#14B8A6' },
   ];
 
   const loadStats = useCallback(async () => {
@@ -64,7 +90,7 @@ const VendorDashboard: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     const unsub = subscribeVendorOrders(user.id, (orders) => {
-      setRecentOrders(orders.slice(0, 3));
+      setRecentOrders(orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').slice(0, 3));
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -126,11 +152,9 @@ const VendorDashboard: React.FC = () => {
   return (
     <>
 
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-4">
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-[var(--tw-text-color)]">Dashboard Overview</h2>
-            </div>
+            <PageHeader title="Dashboard" subtitle="Overview of your stall's performance" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
               {stats.map((stat, i) => (
                 <IonCard key={i} className="rounded-xl shadow" style={{ borderTop: `4px solid ${stat.color}` }}>
@@ -140,8 +164,8 @@ const VendorDashboard: React.FC = () => {
                         <IonIcon icon={stat.icon} />
                       </div>
                       <div>
-                        <p className="text-sm text-[var(--tw-text-secondary)]">{stat.label}</p>
-                        <h3 className="text-xl font-bold text-[var(--tw-text-color)]">{loading ? '...' : stat.value}</h3>
+                        <p className="text-sm text-[var(--ion-text-color-secondary)]">{stat.label}</p>
+                        <h3 className="text-xl font-bold text-[var(--ion-text-color)]">{loading ? '...' : stat.value}</h3>
                       </div>
                     </div>
                   </IonCardContent>
@@ -152,7 +176,7 @@ const VendorDashboard: React.FC = () => {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-[var(--tw-text-color)]">Quick Links</h2>
+              <h2 className="text-xl font-bold text-[var(--ion-text-color)]">Quick Links</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
               {quickLinks.map((link, i) => (
@@ -162,7 +186,7 @@ const VendorDashboard: React.FC = () => {
                     <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ background: `${link.color}20` }}>
                       <IonIcon icon={link.icon} className="text-xl" style={{ color: link.color }} />
                     </div>
-                    <p className="m-0 text-sm font-semibold text-[var(--tw-text-color)]">{link.label}</p>
+                    <p className="m-0 text-sm font-semibold text-[var(--ion-text-color)]">{link.label}</p>
                   </IonCardContent>
                 </IonCard>
               ))}
@@ -171,49 +195,38 @@ const VendorDashboard: React.FC = () => {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-[var(--tw-text-color)]">Recent Orders</h2>
-              <IonButton fill="clear" onClick={() => history.push('/vendor/orders')} style={{ '--color': '#8B5CF6' }}>
+              <h2 className="text-xl font-bold text-[var(--ion-text-color)]">Recent Orders</h2>
+              <IonButton fill="clear" onClick={() => history.push('/vendor/orders')} style={{ '--color': 'var(--ion-color-primary)' }}>
                 View All
               </IonButton>
             </div>
             {loading ? (
               <div className="text-center p-8"><IonSpinner name="crescent" /></div>
             ) : recentOrders.length === 0 ? (
-              <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--tw-text-secondary)] m-0">You don't have any orders yet</p></IonCardContent></IonCard>
+              <IonCard className="rounded-xl shadow"><IonCardContent><p className="text-center text-[var(--ion-text-color-secondary)] m-0">You don't have any orders yet</p></IonCardContent></IonCard>
             ) : (
               <div style={{ display: 'grid', gap: '16px' }}>
                 {recentOrders.map(order => (
-                  <IonCard key={order.id} className="rounded-xl shadow">
+                  <IonCard key={order.id} className="rounded-xl shadow" style={{ cursor: 'pointer' }} onClick={() => setDetailsOrder(order)}>
                     <IonCardContent>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                         <div>
-                          <h3 className="m-0 mb-1 font-bold text-[var(--tw-text-color)]">#{order.id.slice(-5)}</h3>
-                          <p className="m-0 text-sm text-[var(--tw-text-secondary)]">{order.customerName || 'Unknown'}{order.customerPhone ? ` · ${order.customerPhone}` : ''}</p>
+                          <h3 className="m-0 mb-1 font-bold text-[var(--ion-text-color)]">#{order.id.slice(-5)}</h3>
+                          <p className="m-0 text-sm text-[var(--ion-text-color-secondary)]">{order.customerName || 'Unknown'}{order.customerPhone ? ` · ${order.customerPhone}` : ''}</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-                            order.status === 'pending' ? 'bg-[var(--ion-color-warning)]/10 text-[var(--ion-color-warning)]' :
-                            order.status === 'accepted' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
-                            order.status === 'preparing' ? 'bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)]' :
-                            order.status === 'ready' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
-                            'bg-[var(--ion-color-danger)]/10 text-[var(--ion-color-danger)]'
-                          }`}>{order.status}</span>
-                          <IonButton fill="clear" size="small" style={{ '--color': '#8B5CF6', margin: 0, minHeight: 0, height: '28px' }} onClick={() => setDetailsOrder(order)}>
-                            <IonIcon icon={documentTextOutline} slot="icon-only" />
-                          </IonButton>
-                        </div>
+                        <span style={badgestyle(order.status)}>{STATUS_BADGE[order.status]?.label || order.status}</span>
                       </div>
 
-                      <div className="p-3 bg-[var(--tw-background-color)] rounded-lg mb-3">
+                      <div className="p-3 bg-[var(--ion-background-color)] rounded-lg mb-3">
                         {order.items.map((item, i) => (
                           <div key={i} className="flex items-center gap-2 text-sm" style={{ marginBottom: i < order.items.length - 1 ? '8px' : 0 }}>
-                            <span className="text-[var(--tw-text-color)] flex-1">{item.name}</span>
-                            <span className="text-[var(--tw-text-secondary)]">x{item.quantity}</span>
+                            <span className="text-[var(--ion-text-color)] flex-1">{item.name}</span>
+                            <span className="text-[var(--ion-text-color-secondary)]">x{item.quantity}</span>
                           </div>
                         ))}
-                        <div className="border-t border-[var(--tw-border-color)] mt-2 pt-2 flex justify-between">
-                          <span className="font-semibold text-[var(--tw-text-color)]">Total</span>
-                          <span className="font-bold text-[#8B5CF6]">₱{order.total.toFixed(2)}</span>
+                        <div className="border-t border-[var(--ion-border-color)] mt-2 pt-2 flex justify-between">
+                          <span className="font-semibold text-[var(--ion-text-color)]">Total</span>
+                          <span className="font-bold text-[var(--ion-color-primary)]">₱{(order.total - (order.deliveryFee || 0)).toFixed(2)}</span>
                         </div>
                       </div>
 
@@ -223,7 +236,7 @@ const VendorDashboard: React.FC = () => {
                             className="flex-1"
                             style={{ '--background': '#10B981' }}
                             disabled={isProcessing(order.id)}
-                            onClick={() => handleAccept(order)}
+                            onClick={(e) => { e.stopPropagation(); handleAccept(order); }}
                           >
                             {isProcessing(order.id) ? <IonSpinner name="crescent" /> : <IonIcon icon={checkmarkOutline} slot="start" />}
                             Accept
@@ -232,7 +245,7 @@ const VendorDashboard: React.FC = () => {
                             className="flex-1"
                             style={{ '--background': '#EF4444' }}
                             disabled={isProcessing(order.id)}
-                            onClick={() => openDeclineModal(order.id)}
+                            onClick={(e) => { e.stopPropagation(); openDeclineModal(order.id); }}
                           >
                             {isProcessing(order.id) ? <IonSpinner name="crescent" /> : <IonIcon icon={closeOutline} slot="start" />}
                             Decline
@@ -245,7 +258,8 @@ const VendorDashboard: React.FC = () => {
                             expand="block"
                             style={{ '--background': 'var(--ion-color-primary)' }}
                             disabled={isProcessing(order.id)}
-                            onClick={async () => {
+                            onClick={async (e) => {
+                              e.stopPropagation();
                               setProcessingOrders(prev => new Set(prev).add(order.id));
                               try {
                                 await updateOrderStatus(order.id, { status: 'ready' });
@@ -320,13 +334,7 @@ const VendorDashboard: React.FC = () => {
                   <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 700, color: 'var(--ion-text-color)' }}>#{detailsOrder.id.slice(-5)}</h2>
                   <p style={{ margin: 0, fontSize: '12px', color: 'var(--ion-text-color-secondary)' }}>{new Date(detailsOrder.createdAt).toLocaleString()}</p>
                 </div>
-                <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-                  detailsOrder.status === 'pending' ? 'bg-[var(--ion-color-warning)]/10 text-[var(--ion-color-warning)]' :
-                  detailsOrder.status === 'accepted' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
-                  detailsOrder.status === 'preparing' ? 'bg-[var(--ion-color-primary)]/10 text-[var(--ion-color-primary)]' :
-                  detailsOrder.status === 'ready' ? 'bg-[var(--ion-color-success)]/10 text-[var(--ion-color-success)]' :
-                  'bg-[var(--ion-color-danger)]/10 text-[var(--ion-color-danger)]'
-                }`}>{detailsOrder.status}</span>
+                <span style={badgestyle(detailsOrder.status)}>{STATUS_BADGE[detailsOrder.status]?.label || detailsOrder.status}</span>
               </div>
 
               {(detailsOrder.customerName || detailsOrder.customerPhone || detailsOrder.deliveryAddress) && (
@@ -389,17 +397,27 @@ const VendorDashboard: React.FC = () => {
                         <span>Item subtotal</span>
                         <span>₱{(item.price * qty).toFixed(2)}</span>
                       </div>
-                      {item.specialInstructions && (
-                        <p style={{ margin: '4px 0 0', fontSize: '12px', fontStyle: 'italic', color: 'var(--ion-text-color-secondary)' }}>&quot;{item.specialInstructions}&quot;</p>
-                      )}
                     </div>
                   );
                 })}
               </div>
 
+              {/* Notes */}
+              {detailsOrder.items.some(item => item.specialInstructions) && (
+                <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--ion-card-background)', borderRadius: '10px', border: '1px solid var(--ion-border-color)' }}>
+                  <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 700, color: 'var(--ion-text-color-secondary)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Notes</p>
+                  {detailsOrder.items.filter(i => i.specialInstructions).map((item, i) => (
+                    <div key={i} style={{ marginBottom: i < detailsOrder.items.filter(i => i.specialInstructions).length - 1 ? '8px' : 0 }}>
+                      <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: 600, color: 'var(--ion-text-color)' }}>{item.name}</p>
+                      <p style={{ margin: 0, fontSize: '13px', color: 'var(--ion-text-color-secondary)', fontStyle: 'italic' }}>&quot;{item.specialInstructions}&quot;</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div style={{ padding: '12px', background: 'var(--ion-card-background)', borderRadius: '10px', marginBottom: '16px', border: '1px solid var(--ion-border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--ion-text-color)' }}>Total</span>
-                <span style={{ fontSize: '18px', fontWeight: 700, color: '#8B5CF6' }}>₱{detailsOrder.total.toFixed(2)}</span>
+                <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ion-color-primary)' }}>₱{(detailsOrder.total - (detailsOrder.deliveryFee || 0)).toFixed(2)}</span>
               </div>
 
               {detailsOrder.cancelledReason && (

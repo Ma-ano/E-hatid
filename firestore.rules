@@ -189,6 +189,38 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // riderLocation/{orderId}
+    // - Assigned rider can write their own location
+    // - Customer (userId), vendor, and admin can read
+    // ============================================================
+    match /riderLocation/{orderId} {
+      allow read: if isAuthenticated()
+                  && (
+                    resource.data.riderId == request.auth.uid
+                    || get(/databases/$(database)/documents/orders/$(orderId)).data.userId == request.auth.uid
+                    || get(/databases/$(database)/documents/orders/$(orderId)).data.vendorId == request.auth.uid
+                    || isAdmin()
+                  );
+      allow write: if isAuthenticated()
+                  && request.resource.data.riderId == request.auth.uid
+                  && request.resource.data.keys().hasAll(['lat', 'lng', 'riderId'])
+                  && request.resource.data.lat is number
+                  && request.resource.data.lng is number;
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // config/{configId}
+    // - Public read (needed by customer/guest cart for fee calc)
+    // - Admin write only
+    // ============================================================
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
     // Deny all other collections and operations by default
     // ============================================================
     match /{document=**} {
